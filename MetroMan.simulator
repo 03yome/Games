@@ -1,0 +1,70 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+
+local PhantomForcesWindow = Library:NewWindow("MetroMan.simulator")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+
+-- TextBox for hitbox size modification
+KillingCheats:CreateTextbox("Hitbox Size", function(text)
+    local newSize = tonumber(text)
+    if newSize then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            -- Exclude your own character
+            if player ~= game.Players.LocalPlayer and player.Character then
+                local hitbox = player.Character:FindFirstChild("HumanoidRootPart")
+                if hitbox then
+                    hitbox.Size = Vector3.new(newSize, newSize, newSize)
+                    hitbox.Transparency = 0.7  -- Optional: make the hitbox semi-transparent
+                    hitbox.CanCollide = false  -- Optional: allow hitbox to pass through objects
+                end
+            end
+        end
+    else
+        print("Invalid input! Please enter a number.")
+    end
+end)
+-- Creating TextBox for Speed
+KillingCheats:CreateTextbox("Collect Candy", function(candyAmount)
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local CandyEvent = ReplicatedStorage:WaitForChild("CandyCollected")
+
+    local amount = tonumber(candyAmount)
+
+    if CandyEvent and amount then
+        local args = { amount }
+        CandyEvent:FireServer(unpack(args))
+        print(" Candy set to:", amount)
+    else
+        warn("⚠️ Invalid input or CandyCollected event not found.")
+    end
+end)
+
+-- Creating TextBox for Jump Power
+KillingCheats:CreateTextbox("Set Jump Power", function(jumpInput)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid and tonumber(jumpInput) then
+        humanoid.JumpPower = tonumber(jumpInput)
+        print("Jump power set to:", jumpInput)
+    else
+        print("Invalid input or humanoid not found")
+    end
+end)
+KillingCheats:CreateButton("fly", function()
+local args = {
+	"Fly",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyItem"):FireServer(unpack(args))
+print("HI")
+end)
+KillingCheats:CreateButton("slap", function()
+local args = {
+	"Slap",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyItem"):FireServer(unpack(args))
+print("HI")
+end)
