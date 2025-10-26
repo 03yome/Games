@@ -1,0 +1,71 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+
+local PhantomForcesWindow = Library:NewWindow("Train rng")
+
+local KillingCheats = PhantomForcesWindow:NewSection("Mod")
+
+local autoAddCash = false
+
+KillingCheats:CreateToggle("Auto Add Cash", function(state)
+    autoAddCash = state
+    print("Auto Add Cash:", state)
+
+    while autoAddCash do
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local addCashEvent = ReplicatedStorage:FindFirstChild("AddCash")
+
+        if addCashEvent then
+            local args = { "Cash", 20 } -- số lượng có thể chỉnh ở đây
+            addCashEvent:FireServer(unpack(args))
+            print("Added 20 Cash!")
+        else
+            warn("AddCash event not found!")
+        end
+
+        task.wait(0.5)
+    end
+end)
+
+local autoAddTix = false
+
+KillingCheats:CreateToggle("Auto Add Tix", function(state)
+    autoAddTix = state
+    print("Auto Add Tix:", state)
+
+    while autoAddTix do
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local addCashEvent = ReplicatedStorage:FindFirstChild("AddCash")
+
+        if addCashEvent then
+            local args = { "Tix", 20 } -- số lượng có thể chỉnh ở đây
+            addCashEvent:FireServer(unpack(args))
+            print("Added 20 Tix!")
+        else
+            warn("AddTix event not found!")
+        end
+
+        task.wait(0.5)
+    end
+end)
+
+local KillingCheats = PhantomForcesWindow:NewSection(".")
+
+KillingCheats:CreateButton("no", function()
+g = hookfunction(wait, function(seconds)
+return g(0)
+end)
+print("HI")
+end)
+
+KillingCheats:CreateButton("place", function()
+local part = Instance.new("Part")
+part.Size = Vector3.new(100000, 1, 100000) -- Kích thước
+part.Position = Vector3.new(0, 190, 0) -- Vị trí
+part.Anchored = true -- Cố định không rơi
+part.BrickColor = BrickColor.new("Bright red") -- Màu sắc (có thể không cần nếu tàng hình)
+part.Transparency = 0.5 -- 1 là tàng hình hoàn toàn
+part.Parent = game.Workspace
+print("HI")
+end)
+
+local KillingCheats = PhantomForcesWindow:NewSection("03y_o")
