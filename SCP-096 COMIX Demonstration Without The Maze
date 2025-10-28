@@ -1,1 +1,13 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
+local PhantomForcesWindow = Library:NewWindow("SCP-096 Without The Maze")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+KillingCheats:CreateButton("free", function()
+game:GetService("Players").LocalPlayer.PlayerGui.WholeGamepassButton.Frame2.Visible = true
+print("HI")
+end)
+KillingCheats:CreateButton("slap", function()
+game:GetService("Players").LocalPlayer.PlayerGui.WholeGamepassButton.Frame2.Visible = false
+print("HI")
+end)
