@@ -79,6 +79,8 @@ local mainTab = window:Tab({ Title = "Main" })
 local trollTab = window:Tab({ Title = "Troll" })
 local FreeTab = window:Tab({ Title = "Free" })
 local checkpointTab = window:Tab({ Title = "Checkpoint" })
+local useTab = window:Tab({ Title = "Use" })
+
 
 mainTab:Button({
     Title = "Get all badges",
@@ -156,6 +158,24 @@ game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args
 })
 
 FreeTab:Button({
+    Title = "Nuke",
+    Callback = function() local args = {
+    "Nuke",
+    0
+}
+game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
+})
+
+FreeTab:Button({
+    Title = "Immunity",
+    Callback = function() local args = {
+    "Immunity",
+    0
+}
+game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
+})
+
+useTab:Button({
     Title = "chat spin",
     Callback = function()
 local Players = game:GetService("Players")
@@ -169,6 +189,35 @@ LocalPlayer.Chatted:Connect(function(msg)
     if num then
         local args = { num }
         spinningEvent:FireServer(unpack(args))
+        print("Executor:", num)
+    end
+end)
+end
+})
+
+FreeTab:Button({
+    Title = "Immunity",
+    Callback = function() local args = {
+    "Immunity",
+    0
+}
+game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
+})
+
+useTab:Button({
+    Title = "chat nuke",
+    Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local NukesDroppedEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("NukesDropped")
+
+LocalPlayer.Chatted:Connect(function(msg)
+    local num = tonumber(msg)
+    if num then
+        local args = { num }
+        NukesDropped:FireServer(unpack(args))
         print("Executor:", num)
     end
 end)
