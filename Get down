@@ -110,14 +110,14 @@ print("HI")
 end)
 
 KillingCheats:CreateButton("Give Bomb", function()
--- 💀 Revenge Executor GUI
+-- 💣 Player List Give Bomb GUI
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
 -- 🧱 GUI chính
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "RevengeGUI"
+ScreenGui.Name = "GiveBombGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -130,11 +130,10 @@ Frame.Active = true
 Frame.Draggable = true
 Frame.Parent = ScreenGui
 
--- 🧾 Thanh tiêu đề
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 40)
 Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.Text = "💀 Revenge Executor"
+Title.Text = "💣 Give Bomb Executor"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 20
 Title.Font = Enum.Font.SourceSansBold
@@ -155,7 +154,7 @@ CloseBtn.MouseButton1Click:Connect(function()
 	ScreenGui:Destroy()
 end)
 
--- 📜 Danh sách người chơi
+-- 🧾 Danh sách cuộn
 local ScrollingFrame = Instance.new("ScrollingFrame")
 ScrollingFrame.Size = UDim2.new(1, 0, 1, -40)
 ScrollingFrame.Position = UDim2.new(0, 0, 0, 40)
@@ -164,36 +163,36 @@ ScrollingFrame.ScrollBarThickness = 6
 ScrollingFrame.BackgroundTransparency = 1
 ScrollingFrame.Parent = Frame
 
--- 🧩 Tạo nút cho từng player
+-- 🧩 Hàm tạo nút cho từng player
 local function CreatePlayerButton(player)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(1, -10, 0, 30)
 	btn.Position = UDim2.new(0, 5, 0, #ScrollingFrame:GetChildren() * 35)
 	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-	btn.Text = "⚔️ " .. player.Name
+	btn.Text = "💥 " .. player.Name
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.TextSize = 18
 	btn.Font = Enum.Font.SourceSansBold
 	btn.Parent = ScrollingFrame
 
 	btn.MouseButton1Click:Connect(function()
-		local ev = ReplicatedStorage:FindFirstChild("RevengeEvent")
+		local ev = ReplicatedStorage:FindFirstChild("GiveBomb")
 		if ev then
 			pcall(function()
-				ev:FireServer(player.Name)
+				ev:FireServer(player)
 				game.StarterGui:SetCore("SendNotification", {
-					Title = "Revenge Sent",
-					Text = "💀 Đã revenge " .. player.Name,
-					Duration = 3
+					Title = "GiveBomb";
+					Text = "Đã gửi bomb cho " .. player.Name;
+					Duration = 3;
 				})
 			end)
 		else
-			warn("Không tìm thấy sự kiện RevengeEvent trong ReplicatedStorage")
+			warn("Không tìm thấy sự kiện GiveBomb trong ReplicatedStorage")
 		end
 	end)
 end
 
--- 🔁 Cập nhật danh sách
+-- 🧠 Hàm cập nhật danh sách
 local function RefreshPlayerList()
 	for _, obj in ipairs(ScrollingFrame:GetChildren()) do
 		if obj:IsA("TextButton") then obj:Destroy() end
@@ -208,8 +207,10 @@ local function RefreshPlayerList()
 	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #Players:GetPlayers() * 35)
 end
 
+-- ⚙️ Cập nhật khi có người vào/ra
 Players.PlayerAdded:Connect(RefreshPlayerList)
 Players.PlayerRemoving:Connect(RefreshPlayerList)
+
 RefreshPlayerList()
 
 print("HI")
