@@ -204,26 +204,6 @@ FreeTab:Button({
 game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
 })
 
-useTab:Button({
-    Title = "chat nuke",
-    Callback = function()
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local LocalPlayer = Players.LocalPlayer
-local NukesDroppedEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("NukesDropped")
-
-LocalPlayer.Chatted:Connect(function(msg)
-    local num = tonumber(msg)
-    if num then
-        local args = { num }
-        NukesDropped:FireServer(unpack(args))
-        print("Executor:", num)
-    end
-end)
-end
-})
-
 checkpointTab:Button({
     Title = "Checkpoint 2",
     Callback = function()
