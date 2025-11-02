@@ -78,7 +78,7 @@ window:EditOpenButton({
 local mainTab = window:Tab({ Title = "Main" })
 local trollTab = window:Tab({ Title = "Troll" })
 local FreeTab = window:Tab({ Title = "Free" })
-local CheckPointTab = window:Tab({ Title = "Checkpoint" })
+local checkpointTab = window:Tab({ Title = "Checkpoint" })
 
 mainTab:Button({
     Title = "Get all badges",
@@ -173,6 +173,186 @@ LocalPlayer.Chatted:Connect(function(msg)
     end
 end)
 end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 2",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "2"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 3",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "3"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 4",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "4"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 5",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "5"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 6",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "6"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 7",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "7"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 8",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "8"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 9",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "9"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 10",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "10"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 11",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "11"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 12",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "12"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 13",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "13"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 14",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "14"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 15",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "15"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "Checkpoint 16",
+    Callback = function()
+        local args = {
+            "Checkpoint",
+            0,
+            "16"
+        }
+        game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
 })
 
 updatePlayerList(playersList, pushDropdown)
