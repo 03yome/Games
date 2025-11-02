@@ -204,6 +204,30 @@ FreeTab:Button({
 game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
 })
 
+useTab:Button({
+    Title = "chat nuke",
+    Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+player.Chatted:Connect(function(msg)
+    msg = string.lower(msg)
+
+    if string.sub(msg, 1, 11) == "nukedropped" then
+        local amount = tonumber(string.match(msg, "%d+")) or 1
+        
+        local args = { "NukesDropped", amount }
+        ReplicatedStorage.Events.updateDataValue:FireServer(unpack(args))
+        
+        print("NukesDropped =", amount)
+    end
+end)
+
+end
+})
+
 checkpointTab:Button({
     Title = "Checkpoint 2",
     Callback = function()
