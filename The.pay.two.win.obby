@@ -195,15 +195,6 @@ end)
 end
 })
 
-FreeTab:Button({
-    Title = "Immunity",
-    Callback = function() local args = {
-    "Immunity",
-    0
-}
-game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
-})
-
 checkpointTab:Button({
     Title = "Checkpoint 2",
     Callback = function()
