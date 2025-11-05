@@ -158,6 +158,15 @@ game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args
 })
 
 FreeTab:Button({
+    Title = "Run",
+    Callback = function() local args = {
+    "Run",
+    0
+}
+game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))end
+})
+
+FreeTab:Button({
     Title = "Nuke",
     Callback = function() local args = {
     "Nuke",
