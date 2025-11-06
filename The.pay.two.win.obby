@@ -393,6 +393,17 @@ checkpointTab:Button({
     end
 })
 
+checkpointTab:Button({
+    Title = "skip",
+    Callback = function()
+        local args = {
+    "skipStage",
+    0
+}
+game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
 updatePlayerList(playersList, pushDropdown)
 
 function getBadges()
