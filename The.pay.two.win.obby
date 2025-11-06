@@ -514,7 +514,7 @@ game:GetService("ReplicatedStorage").Events.updateStage:FireServer(unpack(args))
 })
 
 checkpointTab:Button({
-    Title = "Checkpoint 14",
+    Title = "skip.14",
     Callback = function()
         local args = {
     "14"
@@ -524,7 +524,7 @@ game:GetService("ReplicatedStorage").Events.updateStage:FireServer(unpack(args))
 })
 
 checkpointTab:Button({
-    Title = "change.15",
+    Title = "skip.15",
     Callback = function()
         local args = {
     "15"
@@ -534,7 +534,7 @@ game:GetService("ReplicatedStorage").Events.updateStage:FireServer(unpack(args))
 })
 
 checkpointTab:Button({
-    Title = "change.16",
+    Title = "skip.16",
     Callback = function()
         local args = {
     "16"
@@ -551,6 +551,17 @@ checkpointTab:Button({
     0
 }
 game:GetService("ReplicatedStorage").Events.itemPurchased:FireServer(unpack(args))
+    end
+})
+
+checkpointTab:Button({
+    Title = "skip.behind",
+    Callback = function()
+        local args = {
+	"changeStage",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("itemPurchased"):FireServer(unpack(args))
     end
 })
 
