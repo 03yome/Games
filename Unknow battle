@@ -1,0 +1,325 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/SUUUUUS00000/Error/refs/heads/main/Error'))()
+
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Gamepass_Jevil").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_AlphysNeo").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_C_Chara").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_C_Sans").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_Nightmare").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Virus404").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_TheEye").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_Red").Value = true
+game.Players.LocalPlayer.PlayerGui.AchievementSaves:WaitForChild("Badge_Pumpkin").Value = true
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+if _G.UpdateUBSLaunched then return end
+_G.UpdateUBSLaunched = true
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local blurEffect = Instance.new("BlurEffect")
+blurEffect.Size = 0
+blurEffect.Parent = game:GetService("Lighting")
+
+local function createStyledFrame(name, size, position)
+    local frame = Instance.new("Frame")
+    frame.Name = name
+    frame.Size = size
+    frame.Position = position
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    frame.BackgroundTransparency = 0.15
+    frame.BorderSizePixel = 0
+    frame.Visible = false
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = frame
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Transparency = 0.9
+    stroke.Thickness = 1
+    stroke.Parent = frame
+    
+    return frame
+end
+
+local function createHeader(parent)
+    local header = Instance.new("Frame")
+    header.Name = "Header"
+    header.Size = UDim2.new(1, 0, 0, 50)
+    header.Position = UDim2.new(0, 0, 0, 0)
+    header.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    header.BackgroundTransparency = 0.4
+    header.BorderSizePixel = 0
+    header.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = header
+    
+    return header
+end
+
+local function createTextLabel(parent, text, size, position)
+    local label = Instance.new("TextLabel")
+    label.Name = "TextLabel"
+    label.Size = size
+    label.Position = position
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextTransparency = 1
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 16
+    label.TextWrapped = true
+    label.Parent = parent
+    
+    return label
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "UpdateUBSGui"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+local mainFrame = createStyledFrame("MainFrame", UDim2.new(0, 400, 0, 500), UDim2.new(0.5, 0, 0.5, 0))
+mainFrame.Parent = gui
+
+local header = createHeader(mainFrame)
+
+local titleLabel = createTextLabel(header, "Update UBS Script", UDim2.new(1, -40, 0, 30), UDim2.new(0, 20, 0, 10))
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.TextSize = 18
+
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Name = "Content"
+scrollFrame.Size = UDim2.new(1, 0, 1, -50)
+scrollFrame.Position = UDim2.new(0, 0, 0, 50)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.ScrollBarThickness = 4
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+scrollFrame.ScrollBarImageTransparency = 0.8
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.Parent = mainFrame
+
+local updateFrame = Instance.new("Frame")
+updateFrame.Name = "Update_1"
+updateFrame.Size = UDim2.new(1, -40, 0, 80)
+updateFrame.Position = UDim2.new(0, 20, 0, 0)
+updateFrame.BackgroundTransparency = 1
+updateFrame.Parent = scrollFrame
+
+local updateTitle = createTextLabel(updateFrame, "Version 1.0.0", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 0))
+updateTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local updateDesc = createTextLabel(updateFrame, "UpdateGUI + InstructionsGUI", UDim2.new(1, 0, 0, 50), UDim2.new(0, 0, 0, 25))
+updateDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+updateDesc.Font = Enum.Font.Gotham
+updateDesc.TextSize = 14
+updateDesc.TextYAlignment = Enum.TextYAlignment.Top
+
+local updateFrame2 = Instance.new("Frame")
+updateFrame2.Name = "Update_2"
+updateFrame2.Size = UDim2.new(1, -40, 0, 80)
+updateFrame2.Position = UDim2.new(0, 20, 0, 90)
+updateFrame2.BackgroundTransparency = 1
+updateFrame2.Parent = scrollFrame
+
+local updateTitle2 = createTextLabel(updateFrame2, "Version 1.0.5", UDim2.new(1, -24, 0, -50), UDim2.new(0, 0, 0, 0))
+updateTitle2.TextXAlignment = Enum.TextXAlignment.Left
+
+local updateDesc2 = createTextLabel(updateFrame2, "Bug Fixed InstructionsGUI", UDim2.new(1, 0, 0, 25), UDim2.new(0, 0, 0, 0))
+updateDesc2.TextColor3 = Color3.fromRGB(200, 200, 200)
+updateDesc2.Font = Enum.Font.Gotham
+updateDesc2.TextSize = 14
+updateDesc2.TextYAlignment = Enum.TextYAlignment.Top
+
+local updateFrame3 = Instance.new("Frame")
+updateFrame3.Name = "Update_3"
+updateFrame3.Size = UDim2.new(1, -40, 0, 80)
+updateFrame3.Position = UDim2.new(0, 20, 0, 180)
+updateFrame3.BackgroundTransparency = 1
+updateFrame3.Parent = scrollFrame
+
+local updateTitle3 = createTextLabel(updateFrame3, "Version 1.1.0", UDim2.new(1, -24, 0, -100), UDim2.new(0, 0, 0, 0))
+updateTitle3.TextXAlignment = Enum.TextXAlignment.Left
+
+local updateDesc3 = createTextLabel(updateFrame3, "Small optimization + Uptade InstructionsGUI", UDim2.new(1, 0, 0, -25), UDim2.new(0, 0, 0, 0))
+updateDesc3.TextColor3 = Color3.fromRGB(200, 200, 200)
+updateDesc3.Font = Enum.Font.Gotham
+updateDesc3.TextSize = 14
+updateDesc3.TextYAlignment = Enum.TextYAlignment.Top
+
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 80)
+
+local clueGui = Instance.new("ScreenGui")
+clueGui.Name = "ClueGui"
+clueGui.ResetOnSpawn = false
+clueGui.Parent = playerGui
+
+local clueFrame = createStyledFrame("ClueFrame", UDim2.new(0, 300, 0, 80), UDim2.new(0.5, 0, 0.8, 0))
+clueFrame.Parent = clueGui
+clueFrame.Size = UDim2.new(0, 0, 0, 0)
+
+local clueText = createTextLabel(clueFrame, "Select any character and reset", UDim2.new(1, -20, 1, -20), UDim2.new(0, 10, 0, 10))
+clueText.TextXAlignment = Enum.TextXAlignment.Center
+clueText.TextYAlignment = Enum.TextYAlignment.Center
+clueText.Font = Enum.Font.Gotham
+clueText.TextSize = 16
+
+local isHiding = false
+local inputConnection = nil
+local canClose = false
+local clueCanClose = false
+
+local function showUI()
+    mainFrame.Visible = true
+    clueFrame.Visible = true
+    
+    local blurTween = TweenService:Create(
+        blurEffect,
+        TweenInfo.new(0.5),
+        {Size = 24}
+    )
+    blurTween:Play()
+    
+    mainFrame.Size = UDim2.new(0, 0, 0, 0)
+    clueFrame.Size = UDim2.new(0, 0, 0, 0)
+    
+    local mainSizeTween = TweenService:Create(
+        mainFrame,
+        TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0, 400, 0, 500)}
+    )
+    mainSizeTween:Play()
+    
+    task.delay(0.2, function()
+        local clueSizeTween = TweenService:Create(
+            clueFrame,
+            TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 300, 0, 80)}
+        )
+        clueSizeTween:Play()
+    end)
+    
+    task.delay(0.2, function()
+        for _, child in ipairs(mainFrame:GetDescendants()) do
+            if child:IsA("TextLabel") then
+                local tween = TweenService:Create(
+                    child,
+                    TweenInfo.new(0.3),
+                    {TextTransparency = 0}
+                )
+                tween:Play()
+            end
+        end
+        
+        for _, child in ipairs(clueFrame:GetDescendants()) do
+            if child:IsA("TextLabel") then
+                local tween = TweenService:Create(
+                    child,
+                    TweenInfo.new(0.3),
+                    {TextTransparency = 0}
+                )
+                tween:Play()
+            end
+        end
+        
+        canClose = true
+        clueCanClose = true
+    end)
+
+    task.delay(4, function()
+        if clueFrame and clueFrame.Parent then
+            for _, child in ipairs(clueFrame:GetDescendants()) do
+                if child:IsA("TextLabel") then
+                    local tween = TweenService:Create(
+                        child,
+                        TweenInfo.new(0.3),
+                        {TextTransparency = 1}
+                    )
+                    tween:Play()
+                end
+            end
+            
+            local clueSizeTween = TweenService:Create(
+                clueFrame,
+                TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+                {Size = UDim2.new(0, 0, 0, 0)}
+            )
+            clueSizeTween:Play()
+        end
+    end)
+end
+
+local function hideUI()
+    if isHiding or not canClose then return end
+    isHiding = true
+    
+    if inputConnection then
+        inputConnection:Disconnect()
+    end
+    
+    for _, child in ipairs(mainFrame:GetDescendants()) do
+        if child:IsA("TextLabel") then
+            local tween = TweenService:Create(
+                child,
+                TweenInfo.new(0.2),
+                {TextTransparency = 1}
+            )
+            tween:Play()
+        end
+    end
+
+    for _, child in ipairs(clueFrame:GetDescendants()) do
+        if child:IsA("TextLabel") then
+            local tween = TweenService:Create(
+                child,
+                TweenInfo.new(0.15),
+                {TextTransparency = 1}
+            )
+            tween:Play()
+        end
+    end
+    
+    local mainSizeTween = TweenService:Create(
+        mainFrame,
+        TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+        {Size = UDim2.new(0, 0, 0, 0)}
+    )
+    mainSizeTween:Play()
+    
+    local clueSizeTween = TweenService:Create(
+        clueFrame,
+        TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In),
+        {Size = UDim2.new(0, 0, 0, 0)}
+    )
+    clueSizeTween:Play()
+    
+    local blurTween = TweenService:Create(
+        blurEffect,
+        TweenInfo.new(0.35),
+        {Size = 0}
+    )
+    blurTween:Play()
+    
+    task.delay(0.5, function()
+        gui:Destroy()
+        clueGui:Destroy()
+        blurEffect:Destroy()
+    end)
+end
+
+inputConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed then
+        hideUI()
+    end
+end)
+
+task.delay(0.1, showUI)
