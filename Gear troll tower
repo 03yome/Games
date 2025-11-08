@@ -1,0 +1,237 @@
+local player = game.Players.LocalPlayer
+local pgui = player:WaitForChild("PlayerGui")
+local uis = game:GetService("UserInputService")
+local rs = game:GetService("ReplicatedStorage")
+local ts = game:GetService("TweenService")
+
+local toggleSound = Instance.new("Sound")
+toggleSound.SoundId = "rbxassetid://1673280232"
+toggleSound.Volume = 1
+toggleSound.Parent = pgui
+
+local clickSound = Instance.new("Sound")
+clickSound.SoundId = "rbxassetid://1412830636"
+clickSound.Volume = 1
+clickSound.Parent = pgui
+
+local errorSound = Instance.new("Sound")
+errorSound.SoundId = "rbxassetid://2865228021"
+errorSound.Volume = 0.9
+errorSound.Parent = pgui
+
+local function showError()
+    errorSound:Play()
+
+    local errorFrame = Instance.new("Frame")
+    errorFrame.Size = UDim2.new(0, 380, 0, 100)
+    errorFrame.Position = UDim2.new(0.5, -190, 0, -120)
+    errorFrame.BackgroundTransparency = 1
+    errorFrame.Parent = pgui
+
+    local bg = Instance.new("Frame")
+    bg.Size = UDim2.new(1,0,1,0)
+    bg.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    bg.BorderSizePixel = 0
+    bg.Parent = errorFrame
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(0, 16)
+
+    local stroke = Instance.new("UIStroke", bg)
+    stroke.Thickness = 3
+    stroke.Color = Color3.fromRGB(255, 50, 50)
+    stroke.Transparency = 0.3
+
+    local grad = Instance.new("UIGradient", bg)
+    grad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 80, 80)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 0, 100)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 0, 255))
+    }
+    grad.Rotation = 90
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1,0,0,36)
+    title.BackgroundTransparency = 1
+    title.Text = "ERROR 204"
+    title.TextColor3 = Color3.new(1,1,1)
+    title.Font = Enum.Font.GothamBlack
+    title.TextSize = 28
+    title.Parent = bg
+
+    local msg = Instance.new("TextLabel")
+    msg.Size = UDim2.new(1,-20,0,30)
+    msg.Position = UDim2.new(0,10,0,40)
+    msg.BackgroundTransparency = 1
+    msg.Text = "Wrong game! This script only works in Gear Troll Tower"
+    msg.TextColor3 = Color3.fromRGB(255,100,100)
+    msg.Font = Enum.Font.Gotham
+    msg.TextSize = 16
+    msg.TextWrapped = true
+    msg.Parent = bg
+
+    local icon = Instance.new("ImageLabel")
+    icon.Size = UDim2.new(0,50,0,50)
+    icon.Position = UDim2.new(1,-65,0,25)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://7072717849"
+    icon.Parent = bg
+
+    errorFrame:TweenPosition(UDim2.new(0.5,-190,0,30), "Out", "Back", 0.6, true)
+    task.wait(4)
+    errorFrame:TweenPosition(UDim2.new(0.5,-190,0,-120), "In", "Back", 0.5, true)
+    task.wait(0.6)
+    errorFrame:Destroy()
+end
+
+local ShopPurchase = rs:WaitForChild("ShopPurchase")
+
+local screen = Instance.new("ScreenGui")
+screen.Name = "TrollAdmin"
+screen.ResetOnSpawn = false
+screen.Parent = pgui
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 160, 0, 50)
+toggleBtn.Position = UDim2.new(0.5, -80, 0, 15)
+toggleBtn.BackgroundTransparency = 0.15
+toggleBtn.Text = "ADMIN GUI"
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBlack
+toggleBtn.TextSize = 20
+toggleBtn.Parent = screen
+
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 25)
+local tg = Instance.new("UIGradient", toggleBtn)
+tg.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 200))
+}
+tg.Rotation = 90
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 340, 0, 230)
+frame.Position = UDim2.new(0.5, -170, 0.5, -115)
+frame.BackgroundColor3 = Color3.fromRGB(12,12,12)
+frame.Visible = false
+frame.Parent = screen
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 16)
+local stroke = Instance.new("UIStroke", frame)
+stroke.Thickness = 4
+stroke.Color = Color3.fromRGB(170, 0, 255)
+stroke.Transparency = 0.3
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,50)
+title.BackgroundTransparency = 1
+title.Text = "Admin Giver Script"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 28
+title.Parent = frame
+local titleGrad = Instance.new("UIGradient", title)
+titleGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180,0,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,200,255))
+}
+titleGrad.Rotation = 90
+
+local desc = Instance.new("TextLabel")
+desc.Size = UDim2.new(0.9,0,0,30)
+desc.Position = UDim2.new(0.05,0,0,60)
+desc.BackgroundTransparency = 1
+desc.Text = "Only For Gear Troll Tower"
+desc.TextColor3 = Color3.fromRGB(220,220,220)
+desc.Font = Enum.Font.Gotham
+desc.TextSize = 17
+desc.Parent = frame
+
+local credits = Instance.new("TextLabel")
+credits.Size = UDim2.new(0.9,0,0,25)
+credits.Position = UDim2.new(0.05,0,0,90)
+credits.BackgroundTransparency = 1
+credits.Text = "Made By 03y_o,"
+credits.TextColor3 = Color3.fromRGB(255,150,255)
+credits.Font = Enum.Font.GothamBold
+credits.TextSize = 16
+credits.Parent = frame
+
+local adminBtn = Instance.new("TextButton")
+adminBtn.Size = UDim2.new(0.8,0,0,50)
+adminBtn.Position = UDim2.new(0.1,0,0,130)
+adminBtn.Text = "Admin Rank"
+adminBtn.TextColor3 = Color3.new(1,1,1)
+adminBtn.Font = Enum.Font.GothamBlack
+adminBtn.TextSize = 22
+adminBtn.Parent = frame
+
+Instance.new("UICorner", adminBtn).CornerRadius = UDim.new(0,12)
+local adminGrad = Instance.new("UIGradient", adminBtn)
+adminGrad.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255,80,200)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0,255,255))
+}
+adminGrad.Rotation = 90
+
+local dragging = false
+local dragInput, dragStart, startPos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+uis.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+uis.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+local open = false
+local function toggle()
+    open = not open
+    frame.Visible = open
+    if open then
+        frame:TweenPosition(UDim2.new(0.5,-170,0.5,-115), "Out", "Back", 0.4, true)
+    end
+end
+
+toggleBtn.MouseButton1Click:Connect(function()
+    toggleSound:Play()
+    toggle()
+end)
+
+uis.InputBegan:Connect(function(input, gp)
+    if not gp and input.KeyCode == Enum.KeyCode.P then
+        toggleSound:Play()
+        toggle()
+    end
+end)
+
+adminBtn.MouseButton1Click:Connect(function()
+    clickSound:Play()
+    ShopPurchase:FireServer("Admin", 0)
+    adminBtn.Text = "GIVEN!"
+    task.wait(1.5)
+    adminBtn.Text = "Admin Rank"
+end)
+
+task.wait(1)
+toggle()
