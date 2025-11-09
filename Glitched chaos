@@ -232,3 +232,5 @@ SaveManager:LoadAutoloadConfig()
 
 print("✅ Script fully loaded!")
 print("📍Op script!")
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Glitched%20chaos%20kill%20aura"))()
