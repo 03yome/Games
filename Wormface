@@ -1,97 +1,20 @@
--- SCRIPT | Wormface 📍
--- Using Fluent UI Library
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
-print("📍 Loading  Script for Wormface...")
+local PhantomForcesWindow = Library:NewWindow("WormFace")
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local VirtualUser = game:GetService("VirtualUser")
-
-local plr = Players.LocalPlayer
-
--- Anti-AFK
-plr.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
-end)
-
--- Load Fluent UI
-print("Loading Fluent UI...")
-local success, Fluent = pcall(function()
-    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-end)
-
-if not success then
-    warn("Failed to load Fluent UI, trying alternate link...")
-    Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Fluent.lua"))()
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+KillingCheats:CreateButton("godmode", function()
+local touch = game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:WaitForChild("TouchInterest")
+while wait(0.1) do
+   if touch then
+       touch:Destroy()
+       print("destroyed")
+   end
 end
-
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
-print("Creating window...")
-
--- Create Window
-local Window = Fluent:CreateWindow({
-    Title = "📍 Script | Wormface",
-    SubTitle = "Hack Op",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
-    Theme = "Darker",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
-
--- Create Tabs
-local Tabs = {
-    Main = Window:AddTab({ Title = "🏠 Main", Icon = "home" }),
-    Emote = Window:AddTab({ Title = "wormface", Icon = "circle" }),
-    Settings = Window:AddTab({ Title = "⚙️ Settings", Icon = "settings" })
-}
-
--- MAIN TAB
-Tabs.Main:AddParagraph({
-    Title = "📍 Welcome to Script!",
-    Content = "Use script op - real!"
-})
-
-local StatsLabel = Tabs.Main:AddParagraph({
-    Title = "📊 Statistics",
-    Content = "Calls Sent: 0 | Frequency: 10/s | Mode: Send"
-})
-
-task.spawn(function()
-    while task.wait(0.5) do
-        local mode = getgenv().sendMode and "Send" or "Simulate"
-        StatsLabel:SetDesc(string.format(
-            "Calls Sent: %d | Frequency: %d/s | Mode: %s",
-            getgenv().callsSent,
-            getgenv().frequency,
-            mode
-        ))
-    end
+print("HI")
 end)
-
-Tabs.Main:AddButton({
-    Title = "🎮 Join Discord",
-    Description = "Get support and updates",
-    Callback = function()
-        setclipboard("")
-        Fluent:Notify({
-            Title = "Discord Copied!",
-            Content = "Discord invite copied to clipboard!",
-            Duration = 3
-        })
-    end
-})
-
--- wormface TAB
-
-Tabs.wormface:AddButton({
-    Title = "auto.farm",
-    Description = "Hi",
-    Callback = function()
-        local items = game:GetService("Workspace").Items
+KillingCheats:CreateButton("Auto.farm", function()
+local items = game:GetService("Workspace").Items
 local hum = game.Players.LocalPlayer.Character.HumanoidRootPart
 local tweenserv = game:GetService('TweenService')
 local deletethis = game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:FindFirstChild("FaceCenterAttachment")
@@ -159,45 +82,5 @@ while getgenv().active do
   end
   wait()
 end
-    end
-})
-
-Tabs.wormface:AddButton({
-    Title = "godmode",
-    Description = "Hi",
-    Callback = function()
-        local touch = game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:WaitForChild("TouchInterest")
-while wait(0.1) do
-   if touch then
-       touch:Destroy()
-       print("destroyed")
-   end
-end
-    end
-})
-
--- SETTINGS TAB
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
-
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
-
-InterfaceManager:SetFolder("Script")
-SaveManager:SetFolder("Script/Wormface")
-
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-SaveManager:BuildConfigSection(Tabs.Settings)
-
-Window:SelectTab(1)
-
-Fluent:Notify({
-    Title = "📍 Script Loaded!",
-    Content = "Op!",
-    Duration = 5
-})
-
-SaveManager:LoadAutoloadConfig()
-
-print("✅ Script fully loaded!")
-print("📍Op script!")
+print("HI")
+end)
