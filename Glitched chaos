@@ -75,7 +75,7 @@ Tabs.Main:AddButton({
 
 -- Wormface TAB
 
-Tabs.Emote:AddButton({
+Tabs.WormFace:AddButton({
     Title = "godmode",
     Description = "Hi",
     Callback = function()
@@ -89,7 +89,7 @@ end
     end
 })
 
-Tabs.Emote:AddButton({
+Tabs.WormFace:AddButton({
     Title = "Auto.Farm",
     Description = "Hi",
     Callback = function()
