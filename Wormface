@@ -1,0 +1,203 @@
+-- SCRIPT | Wormface 📍
+-- Using Fluent UI Library
+
+print("📍 Loading  Script for Wormface...")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+
+local plr = Players.LocalPlayer
+
+-- Anti-AFK
+plr.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- Load Fluent UI
+print("Loading Fluent UI...")
+local success, Fluent = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end)
+
+if not success then
+    warn("Failed to load Fluent UI, trying alternate link...")
+    Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Fluent.lua"))()
+end
+
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+print("Creating window...")
+
+-- Create Window
+local Window = Fluent:CreateWindow({
+    Title = "📍 Script | Wormface",
+    SubTitle = "Hack Op",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Create Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "🏠 Main", Icon = "home" }),
+    Emote = Window:AddTab({ Title = "wormface", Icon = "circle" }),
+    Settings = Window:AddTab({ Title = "⚙️ Settings", Icon = "settings" })
+}
+
+-- MAIN TAB
+Tabs.Main:AddParagraph({
+    Title = "📍 Welcome to Script!",
+    Content = "Use script op - real!"
+})
+
+local StatsLabel = Tabs.Main:AddParagraph({
+    Title = "📊 Statistics",
+    Content = "Calls Sent: 0 | Frequency: 10/s | Mode: Send"
+})
+
+task.spawn(function()
+    while task.wait(0.5) do
+        local mode = getgenv().sendMode and "Send" or "Simulate"
+        StatsLabel:SetDesc(string.format(
+            "Calls Sent: %d | Frequency: %d/s | Mode: %s",
+            getgenv().callsSent,
+            getgenv().frequency,
+            mode
+        ))
+    end
+end)
+
+Tabs.Main:AddButton({
+    Title = "🎮 Join Discord",
+    Description = "Get support and updates",
+    Callback = function()
+        setclipboard("")
+        Fluent:Notify({
+            Title = "Discord Copied!",
+            Content = "Discord invite copied to clipboard!",
+            Duration = 3
+        })
+    end
+})
+
+-- wormface TAB
+
+Tabs.wormface:AddButton({
+    Title = "auto.farm",
+    Description = "Hi",
+    Callback = function()
+        local items = game:GetService("Workspace").Items
+local hum = game.Players.LocalPlayer.Character.HumanoidRootPart
+local tweenserv = game:GetService('TweenService')
+local deletethis = game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:FindFirstChild("FaceCenterAttachment")
+local rebirthtext = game:GetService("Players").LocalPlayer.PlayerGui.RebirthGui.Button.ProgressBar.Background.Text
+local rebirthevent = game:GetService("ReplicatedStorage").RebirthRequest
+getgenv().active = true
+local doit = true
+local function getGem()
+  for _, v in ipairs(items:GetChildren()) do
+       if not v then return end
+       if not v:FindFirstChild('Part') then return end
+       if(v.Part.Position.X < 325) then
+          return v.Part
+       end
+   end
+end
+local function gotoGem()
+  local gem = getGem()
+  if not gem then return end
+  local goal = {}
+  goal.CFrame = gem.CFrame
+  local tweenInfo = TweenInfo.new(0.01)
+  local tween = tweenserv:Create(game.Players.LocalPlayer.Character.HumanoidRootPart, tweenInfo, goal)
+  tween:Play()
+  wait(0.1)
+  if(gem.Parent) then
+   gem.Parent:Destroy()
+  end
+end
+
+local function canRebirth()
+   local split1 = string.split(rebirthtext.Text, " ")
+   local split2 = string.split(split1[2], "/")
+   local returnval = tonumber(split2[1]) >= tonumber(split2[2])
+   return returnval
+end
+if(deletethis) then
+   deletethis:Destroy()
+end
+if(canRebirth()) then
+      rebirthevent:InvokeServer()
+end
+local rebirthconnect = rebirthtext:GetPropertyChangedSignal("Text"):Connect(function()
+  if(canRebirth()) then
+      print('rebirthing')
+      doit = false
+      rebirthevent:InvokeServer()
+      wait(3)
+      if(game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:FindFirstChild("FaceCenterAttachment")) then
+           game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:FindFirstChild("FaceCenterAttachment"):Destroy()
+      end
+       doit = true
+   end
+end)
+
+local stopconnect = game.Players.LocalPlayer.Chatted:Connect(function(msg)
+  if(msg == "/e stop") then
+      getgenv().active = false
+      rebirthconnect:Disconnect()
+   end
+end)
+while getgenv().active do
+  if doit then
+       gotoGem()
+  end
+  wait()
+end
+    end
+})
+
+Tabs.wormface:AddButton({
+    Title = "godmode",
+    Description = "Hi",
+    Callback = function()
+        local touch = game.Players.LocalPlayer.Character.HumanoidRootPart.StarterWorm.Head:WaitForChild("TouchInterest")
+while wait(0.1) do
+   if touch then
+       touch:Destroy()
+       print("destroyed")
+   end
+end
+    end
+})
+
+-- SETTINGS TAB
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("Script")
+SaveManager:SetFolder("Script/Wormface")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "📍 Script Loaded!",
+    Content = "Op!",
+    Duration = 5
+})
+
+SaveManager:LoadAutoloadConfig()
+
+print("✅ Script fully loaded!")
+print("📍Op script!")
