@@ -1,0 +1,69 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+
+local PhantomForcesWindow = Library:NewWindow("Marvel and DC superheroes")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+
+-- TextBox for hitbox size modification
+KillingCheats:CreateTextbox("Hitbox Size", function(text)
+    local newSize = tonumber(text)
+    if newSize then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            -- Exclude your own character
+            if player ~= game.Players.LocalPlayer and player.Character then
+                local hitbox = player.Character:FindFirstChild("HumanoidRootPart")
+                if hitbox then
+                    hitbox.Size = Vector3.new(newSize, newSize, newSize)
+                    hitbox.Transparency = 0.7  -- Optional: make the hitbox semi-transparent
+                    hitbox.CanCollide = false  -- Optional: allow hitbox to pass through objects
+                end
+            end
+        end
+    else
+        print("Invalid input! Please enter a number.")
+    end
+end)
+-- Creating TextBox for Speed
+KillingCheats:CreateTextbox("Set Speed", function(speedInput)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid and tonumber(speedInput) then
+        humanoid.WalkSpeed = tonumber(speedInput)
+        print("Speed set to:", speedInput)
+    else
+        print("Invalid input or humanoid not found")
+    end
+end)
+-- Creating TextBox for Jump Power
+KillingCheats:CreateTextbox("Set Jump Power", function(jumpInput)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid and tonumber(jumpInput) then
+        humanoid.JumpPower = tonumber(jumpInput)
+        print("Jump power set to:", jumpInput)
+    else
+        print("Invalid input or humanoid not found")
+    end
+end)
+KillingCheats:CreateButton("inf jump", function()
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local InfiniteJumpEnabled = true
+game:GetService("UserInputService").JumpRequest:connect(function()
+	if InfiniteJumpEnabled then
+		game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
+	end
+end)
+print("HI")
+end)
+KillingCheats:CreateButton("no cooldown", function()
+g = hookfunction(wait, function(seconds)
+return g(0)
+end)
+print("HI")
+end)
