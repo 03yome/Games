@@ -1,0 +1,112 @@
+local DrRayLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/DrRay-UI-Library/main/DrRay.lua"))()
+local window = DrRayLibrary:Load("03y_o - free product", "Default")
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Thank you",
+    Text = "wow",
+    Duration = 0.5
+})
+
+local originalButtons = {}
+
+local function addButton(tab, title, description, url)
+    tab.newLabel(" ")
+    local button = tab.newButton(title, description, function()
+        loadstring(game:HttpGet(url))()
+    end)
+    table.insert(originalButtons, {tab = tab, title = title, description = description, url = url})
+end
+
+local function createTab(tabName, imageId)
+    local tab = DrRayLibrary.newTab(tabName, imageId)
+
+    tab.newButton("join now", "Discord me", function()
+        setclipboard("")
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Copied!",
+            Text = "Link Has Been Copied From Your Clipboard.",
+            Duration = 3
+        })
+    end)
+
+    tab.newInput("Search", "Enter a keyword to search a game name.", function(inputSearch)
+        search = inputSearch
+    end)
+
+    tab.newButton("Enter Search", "Searches For The Keyword", function()
+        searchButtons(tab, search)
+    end)
+
+    tab.newButton("Refresh", "Refresh List's", function()
+        refreshButtons(tab)
+    end)
+
+    return tab
+end
+
+local function refreshButtons(tab)
+    for _, child in ipairs(tab:GetChildren()) do
+        if child:IsA("GuiButton") then
+            child:Destroy()
+        end
+    end
+    for _, btn in ipairs(originalButtons) do
+        if btn.tab == tab then
+            addButton(tab, btn.title, btn.description, btn.url)
+        end
+    end
+end
+
+local function searchButtons(tab, keyword)
+    for _, child in ipairs(tab:GetChildren()) do
+        if child:IsA("GuiButton") then
+            child:Destroy()
+        end
+    end
+    for _, btn in ipairs(originalButtons) do
+        if btn.tab == tab and string.find(btn.title:lower(), keyword:lower()) then
+            addButton(tab, btn.title, btn.description, btn.url)
+        end
+    end
+end
+
+local tab = createTab("-•Fly•-", "ImageIdHere")
+tab.newLabel("-•--Fly--•-")
+
+tab.newButton("Fly", "on", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
+end)
+
+tab.newButton("Fly", "off", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
+end)
+
+tab = createTab("-•Armor•-", "ImageIdHere")
+tab.newLabel("-•--Armor--•-")
+
+tab.newButton("wood", "armor", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Wood Armor"),["hp"] = 125,["minutes"] = 5},"EquipArmor")
+
+end)
+tab.newButton("Iron", "armor", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://97261917758290",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Iron Armor"),["hp"] = 150,["minutes"] = 10},"EquipArmor")
+
+end)
+
+tab.newButton("Gold", "armor", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://114222421558942",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Gold Armor"),["hp"] = 175,["minutes"] = 20},"EquipArmor")
+
+end)
+
+tab.newButton("Diamnod", "armor", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://78694581425350",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Diamond Armor"),["hp"] = 200,["minutes"] = 30},"EquipArmor")
+
+end)
+
+local tab = createTab("-•???•-", "ImageIdHere")
+tab.newLabel("-•--???--•-")
+
+tab.newButton("armor by @romd3976 ", "armor", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
+
+end)
