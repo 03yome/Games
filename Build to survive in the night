@@ -10,54 +10,19 @@ local Window = WindUI:CreateWindow({
 
 local Tab = Window:Tab({ Title = "Place Block" })
 
---=============================
--- Player List VARIABLES
---=============================
-
-local playerList = {}
-local autoUpdatePlayers = true -- mặc định bật auto
-local playerDropdown
-
--- Hàm update danh sách player
-local function updatePlayers()
-    playerList = {}
-    for _, plr in pairs(game.Players:GetPlayers()) do
-        if plr ~= game.Players.LocalPlayer then
-            table.insert(playerList, plr.Name)
-        end
-    end
-    if playerDropdown then
-        playerDropdown:Refresh(playerList)
-    end
-end
-
--- Lắng nghe player vào/ra
-game.Players.PlayerAdded:Connect(function(plr)
-    if autoUpdatePlayers then
-        table.insert(playerList, plr.Name)
-        if playerDropdown then playerDropdown:Refresh(playerList) end
-    end
-end)
-
-game.Players.PlayerRemoving:Connect(function(plr)
-    local i = table.find(playerList, plr.Name)
-    if i then
-        table.remove(playerList, i)
-        if autoUpdatePlayers then
-            if playerDropdown then playerDropdown:Refresh(playerList) end
-        end
-    end
-end)
 
 --=============================
 -- VARIABLES
 --=============================
 local category = ""
 local blockName = ""
-local mode = "Player" -- Player or Coordinates
-local targetPlayer = nil -- Player target if placing on someone
+local mode = "Player" 
+local targetPlayer = nil 
 local posX, posY, posZ = 0, 0, 0
 local rotation = 0
+
+local players = game:GetService("Players")
+
 
 --=============================
 -- CATEGORY INPUT
@@ -72,6 +37,7 @@ Tab:Input({
     end
 })
 
+
 --=============================
 -- BLOCK INPUT
 --=============================
@@ -85,18 +51,20 @@ Tab:Input({
     end
 })
 
+
 --=============================
--- ROTATION INPUT
+-- ROTATION
 --=============================
 Tab:Input({
     Title = "Rotation",
-    Desc = "Nhập rotation (độ)",
+    Desc = "Nhập rotation",
     Placeholder = "0",
     Value = "0",
     Callback = function(text)
         rotation = tonumber(text) or 0
     end
 })
+
 
 --=============================
 -- MODE DROPDOWN
@@ -110,48 +78,65 @@ Tab:Dropdown({
     end
 })
 
+
 --=============================
--- TARGET PLAYER DROPDOWN
+-- PLAYER LIST (AUTO + MANUAL UPDATE)
 --=============================
-local players = game:GetService("Players")
-local playerList = {}
-for _, plr in pairs(players:GetPlayers()) do
-    table.insert(playerList, plr.Name)
+local function getPlayerList()
+    local list = {}
+    for _, plr in ipairs(players:GetPlayers()) do
+        table.insert(list, plr.Name)
+    end
+    return list
 end
 
-Tab:Dropdown({
+local targetDropdown
+local autoUpdate = false
+
+-- AUTO UPDATE TOGGLE
+Tab:Toggle({
+    Title = "Auto Update Player List",
+    Desc = "Tự động cập nhật danh sách người chơi",
+    Value = false,
+    Callback = function(val)
+        autoUpdate = val
+    end
+})
+
+-- MANUAL UPDATE
+Tab:Button({
+    Title = "Manual Update Player List",
+    Desc = "Cập nhật danh sách ngay lập tức",
+    Callback = function()
+        if targetDropdown then
+            targetDropdown:SetValues(getPlayerList())
+        end
+    end
+})
+
+-- TARGET PLAYER DROPDOWN (CÓ THỂ UPDATE)
+targetDropdown = Tab:Dropdown({
     Title = "Target Player",
-    Values = playerList,
-    Value = playerList[1],
+    Values = getPlayerList(),
+    Value = players:GetPlayers()[1] and players:GetPlayers()[1].Name or "",
     Callback = function(val)
         targetPlayer = players:FindFirstChild(val)
     end
 })
 
---=============================
--- TOGGLE AUTO UPDATE
---=============================
-Tab:Toggle({
-    Title = "Auto Update Player List",
-    Value = true,
-    Callback = function(state)
-        autoUpdatePlayers = state
+-- AUTO UPDATE LOOP
+task.spawn(function()
+    while true do
+        task.wait(2)
+        if autoUpdate and targetDropdown then
+            targetDropdown:SetValues(getPlayerList())
+        end
     end
-})
+end)
+
 
 --=============================
--- MANUAL UPDATE BUTTON
---=============================
-Tab:Button({
-    Title = "Update Player List",
-    Callback = function()
-        updatePlayers()
-        print("✅ Player list manually updated!")
-    end
-})
-
---=============================
--- X / Y / Z INPUTS
+-- XYZ INPUTS
 --=============================
 Tab:Input({
     Title = "X",
@@ -183,8 +168,9 @@ Tab:Input({
     end
 })
 
+
 --=============================
--- PLACE BLOCK BUTTON
+-- PLACE BLOCK
 --=============================
 Tab:Button({
     Title = "PLACE BLOCK",
@@ -210,7 +196,7 @@ Tab:Button({
             if targetPlayer and targetPlayer.Character then
                 hrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
             else
-                local char = game.Players.LocalPlayer.Character
+                local char = players.LocalPlayer.Character
                 hrp = char and char:FindFirstChild("HumanoidRootPart")
             end
             if not hrp then return end
@@ -327,14 +313,14 @@ Tab:Button({
      })
 
 Tab:Button({
-    Title = "+500 block(off",
+    Title = "fly(off",
     Callback = function()
         game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
         end
      })
 
 Tab:Button({
-    Title = "+500 block(turn on",
+    Title = "fly(turn on",
     Callback = function()
         game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
         end
