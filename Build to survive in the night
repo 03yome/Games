@@ -1,10 +1,10 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-    Title = "Build to survive in the night| Script",
+    Title = "Build to survive in the night | Script",
     Icon = "Cube",
-    Author = "cript by romd3976",
-    Size = UDim2.fromOffset(600, 500),
+    Author = "cript by ?",
+    Size = UDim2.fromOffset(600, 600),
     Resizable = true,
 })
 
@@ -15,9 +15,10 @@ local Tab = Window:Tab({ Title = "Place Block" })
 --=============================
 local category = ""
 local blockName = ""
-local mode = "Player"
+local mode = "Player" -- Player or Coordinates
+local targetPlayer = nil -- Player target if placing on someone
 local posX, posY, posZ = 0, 0, 0
-
+local rotation = 0
 
 --=============================
 -- CATEGORY INPUT
@@ -46,6 +47,19 @@ Tab:Input({
 })
 
 --=============================
+-- ROTATION INPUT
+--=============================
+Tab:Input({
+    Title = "Rotation",
+    Desc = "Nhập rotation (độ)",
+    Placeholder = "0",
+    Value = "0",
+    Callback = function(text)
+        rotation = tonumber(text) or 0
+    end
+})
+
+--=============================
 -- MODE DROPDOWN
 --=============================
 Tab:Dropdown({
@@ -54,6 +68,24 @@ Tab:Dropdown({
     Value = "Player",
     Callback = function(opt)
         mode = opt
+    end
+})
+
+--=============================
+-- TARGET PLAYER DROPDOWN
+--=============================
+local players = game:GetService("Players")
+local playerList = {}
+for _, plr in pairs(players:GetPlayers()) do
+    table.insert(playerList, plr.Name)
+end
+
+Tab:Dropdown({
+    Title = "Target Player",
+    Values = playerList,
+    Value = playerList[1],
+    Callback = function(val)
+        targetPlayer = players:FindFirstChild(val)
     end
 })
 
@@ -90,7 +122,6 @@ Tab:Input({
     end
 })
 
-
 --=============================
 -- PLACE BLOCK BUTTON
 --=============================
@@ -103,7 +134,6 @@ Tab:Button({
             return
         end
 
-        -- Lấy block từ ReplicatedStorage
         local blockFolder = game.ReplicatedStorage:WaitForChild("Components"):WaitForChild("Blocks")
         local blockModel = blockFolder:FindFirstChild(blockName)
 
@@ -115,27 +145,31 @@ Tab:Button({
         local finalPosition
 
         if mode == "Player" then
-            local char = game.Players.LocalPlayer.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local hrp
+            if targetPlayer and targetPlayer.Character then
+                hrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+            else
+                local char = game.Players.LocalPlayer.Character
+                hrp = char and char:FindFirstChild("HumanoidRootPart")
+            end
             if not hrp then return end
 
-            finalPosition = vector.create(
+            finalPosition = Vector3.new(
                 math.floor(hrp.Position.X),
                 math.floor(hrp.Position.Y),
                 math.floor(hrp.Position.Z)
             )
         else
-            finalPosition = vector.create(
+            finalPosition = Vector3.new(
                 math.floor(posX),
                 math.floor(posY),
                 math.floor(posZ)
             )
         end
 
-        -- Gửi remote
         local args = {
             {
-                rotation = 0,
+                rotation = rotation,
                 selectedBlock = {
                     order = 4,
                     model = blockModel,
@@ -148,7 +182,7 @@ Tab:Button({
 
         game.ReplicatedStorage.Networker.Remotes.BlockReliable:FireServer(unpack(args))
 
-        print("✅ Placed block:", blockName)
+        print("✅ Placed block:", blockName, "at", finalPosition, "rotation:", rotation)
     end
 })
 
