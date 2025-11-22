@@ -3,12 +3,51 @@ local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/rel
 local Window = WindUI:CreateWindow({
     Title = "Build to survive in the night | Script",
     Icon = "Cube",
-    Author = "cript by ?",
+    Author = "script by romd3976",
     Size = UDim2.fromOffset(600, 600),
     Resizable = true,
 })
 
 local Tab = Window:Tab({ Title = "Place Block" })
+
+--=============================
+-- Player List VARIABLES
+--=============================
+
+local playerList = {}
+local autoUpdatePlayers = true -- mặc định bật auto
+local playerDropdown
+
+-- Hàm update danh sách player
+local function updatePlayers()
+    playerList = {}
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer then
+            table.insert(playerList, plr.Name)
+        end
+    end
+    if playerDropdown then
+        playerDropdown:Refresh(playerList)
+    end
+end
+
+-- Lắng nghe player vào/ra
+game.Players.PlayerAdded:Connect(function(plr)
+    if autoUpdatePlayers then
+        table.insert(playerList, plr.Name)
+        if playerDropdown then playerDropdown:Refresh(playerList) end
+    end
+end)
+
+game.Players.PlayerRemoving:Connect(function(plr)
+    local i = table.find(playerList, plr.Name)
+    if i then
+        table.remove(playerList, i)
+        if autoUpdatePlayers then
+            if playerDropdown then playerDropdown:Refresh(playerList) end
+        end
+    end
+end)
 
 --=============================
 -- VARIABLES
@@ -86,6 +125,28 @@ Tab:Dropdown({
     Value = playerList[1],
     Callback = function(val)
         targetPlayer = players:FindFirstChild(val)
+    end
+})
+
+--=============================
+-- TOGGLE AUTO UPDATE
+--=============================
+Tab:Toggle({
+    Title = "Auto Update Player List",
+    Value = true,
+    Callback = function(state)
+        autoUpdatePlayers = state
+    end
+})
+
+--=============================
+-- MANUAL UPDATE BUTTON
+--=============================
+Tab:Button({
+    Title = "Update Player List",
+    Callback = function()
+        updatePlayers()
+        print("✅ Player list manually updated!")
     end
 })
 
