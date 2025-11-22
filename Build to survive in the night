@@ -81,6 +81,10 @@ tab.newButton("Fly", "off", function()
 game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
 end)
 
+tab.newButton("Add", "+500 blocks only once", function()
+game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
+end)
+
 tab = createTab("-•Armor•-", "ImageIdHere")
 tab.newLabel("-•--Armor--•-")
 
