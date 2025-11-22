@@ -339,3 +339,69 @@ Tab:Button({
         game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
         end
      })
+
+local Tab = Window:Tab({ Title = "Kill" })
+
+Tab:Button({
+    Title = "kill Shadow",
+    Callback = function()
+        local args = {
+    [1] = {
+        ["damage"] = 1000,
+        ["humanoid"] = workspace.Monsters.Shadow.Humanoid
+    },
+    [2] = "DamageHumanoid"
+}
+
+game:GetService("ReplicatedStorage").Networker.Remotes.Bow:FireServer(unpack(args))
+
+        end
+     })
+
+Tab:Button({
+    Title = "kill Wizard",
+    Callback = function()
+        local args = {
+    [1] = {
+        ["damage"] = 1000,
+        ["humanoid"] = workspace.Monsters.Wizard.Humanoid
+    },
+    [2] = "DamageHumanoid"
+}
+
+game:GetService("ReplicatedStorage").Networker.Remotes.Bow:FireServer(unpack(args))
+
+        end
+     })
+
+Tab:Button({
+    Title = "kill Skeleton",
+    Callback = function()
+        local args = {
+    [1] = {
+        ["damage"] = 1000,
+        ["humanoid"] = workspace.Monsters.Skeleton.Humanoid
+    },
+    [2] = "DamageHumanoid"
+}
+
+game:GetService("ReplicatedStorage").Networker.Remotes.Bow:FireServer(unpack(args))
+
+        end
+     })
+
+Tab:Button({
+    Title = "kill Zombie",
+    Callback = function()
+        local args = {
+    [1] = {
+        ["damage"] = 1000,
+        ["humanoid"] = workspace.Monsters.Zombie.Humanoid
+    },
+    [2] = "DamageHumanoid"
+}
+
+game:GetService("ReplicatedStorage").Networker.Remotes.Bow:FireServer(unpack(args))
+
+        end
+     })
