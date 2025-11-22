@@ -1,116 +1,162 @@
-local DrRayLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/DrRay-UI-Library/main/DrRay.lua"))()
-local window = DrRayLibrary:Load("03y_o - free product", "Default")
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Thank you",
-    Text = "wow",
-    Duration = 0.5
+local Window = WindUI:CreateWindow({
+    Title = "Build to survive in the night| Script",
+    Icon = "Cube",
+    Author = "cript by romd3976",
+    Size = UDim2.fromOffset(600, 500),
+    Resizable = true,
 })
 
-local originalButtons = {}
+local Tab = Window:Tab({ Title = "Place Block" })
 
-local function addButton(tab, title, description, url)
-    tab.newLabel(" ")
-    local button = tab.newButton(title, description, function()
-        loadstring(game:HttpGet(url))()
-    end)
-    table.insert(originalButtons, {tab = tab, title = title, description = description, url = url})
-end
+--=============================
+-- VARIABLES
+--=============================
+local category = ""
+local blockName = ""
+local mode = "Player"
+local posX, posY, posZ = 0, 0, 0
 
-local function createTab(tabName, imageId)
-    local tab = DrRayLibrary.newTab(tabName, imageId)
 
-    tab.newButton("join now", "Discord me", function()
-        setclipboard("")
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Copied!",
-            Text = "Link Has Been Copied From Your Clipboard.",
-            Duration = 3
-        })
-    end)
-
-    tab.newInput("Search", "Enter a keyword to search a game name.", function(inputSearch)
-        search = inputSearch
-    end)
-
-    tab.newButton("Enter Search", "Searches For The Keyword", function()
-        searchButtons(tab, search)
-    end)
-
-    tab.newButton("Refresh", "Refresh List's", function()
-        refreshButtons(tab)
-    end)
-
-    return tab
-end
-
-local function refreshButtons(tab)
-    for _, child in ipairs(tab:GetChildren()) do
-        if child:IsA("GuiButton") then
-            child:Destroy()
-        end
+--=============================
+-- CATEGORY INPUT
+--=============================
+Tab:Input({
+    Title = "Category",
+    Desc = "VD: furniture",
+    Placeholder = "Nhập category",
+    Value = "",
+    Callback = function(text)
+        category = text
     end
-    for _, btn in ipairs(originalButtons) do
-        if btn.tab == tab then
-            addButton(tab, btn.title, btn.description, btn.url)
-        end
+})
+
+--=============================
+-- BLOCK INPUT
+--=============================
+Tab:Input({
+    Title = "Block Name",
+    Desc = "VD: Brown Chair",
+    Placeholder = "Nhập tên block",
+    Value = "",
+    Callback = function(text)
+        blockName = text
     end
-end
+})
 
-local function searchButtons(tab, keyword)
-    for _, child in ipairs(tab:GetChildren()) do
-        if child:IsA("GuiButton") then
-            child:Destroy()
-        end
+--=============================
+-- MODE DROPDOWN
+--=============================
+Tab:Dropdown({
+    Title = "Place Mode",
+    Values = {"Player", "Coordinates"},
+    Value = "Player",
+    Callback = function(opt)
+        mode = opt
     end
-    for _, btn in ipairs(originalButtons) do
-        if btn.tab == tab and string.find(btn.title:lower(), keyword:lower()) then
-            addButton(tab, btn.title, btn.description, btn.url)
-        end
+})
+
+--=============================
+-- X / Y / Z INPUTS
+--=============================
+Tab:Input({
+    Title = "X",
+    Desc = "Tọa độ X",
+    Placeholder = "0",
+    Value = "",
+    Callback = function(text)
+        posX = tonumber(text) or 0
     end
-end
+})
 
-local tab = createTab("-•Fly•-", "ImageIdHere")
-tab.newLabel("-•--Fly--•-")
+Tab:Input({
+    Title = "Y",
+    Desc = "Tọa độ Y",
+    Placeholder = "0",
+    Value = "",
+    Callback = function(text)
+        posY = tonumber(text) or 0
+    end
+})
 
-tab.newButton("Fly", "on", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
-end)
+Tab:Input({
+    Title = "Z",
+    Desc = "Tọa độ Z",
+    Placeholder = "0",
+    Value = "",
+    Callback = function(text)
+        posZ = tonumber(text) or 0
+    end
+})
 
-tab.newButton("Fly", "off", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
-end)
 
-tab.newButton("Add", "+500 blocks only once", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
-end)
+--=============================
+-- PLACE BLOCK BUTTON
+--=============================
+Tab:Button({
+    Title = "PLACE BLOCK",
+    Desc = "Đặt block ngay!",
+    Callback = function()
+        if category == "" or blockName == "" then
+            warn("⚠ Chưa nhập Category hoặc BlockName")
+            return
+        end
 
-tab = createTab("-•Armor•-", "ImageIdHere")
-tab.newLabel("-•--Armor--•-")
+        -- Lấy block từ ReplicatedStorage
+        local blockFolder = game.ReplicatedStorage:WaitForChild("Components"):WaitForChild("Blocks")
+        local blockModel = blockFolder:FindFirstChild(blockName)
 
-tab.newButton("wood", "armor", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Wood Armor"),["hp"] = 125,["minutes"] = 5},"EquipArmor")
+        if not blockModel then
+            warn("❌ Không tìm thấy block: " .. blockName)
+            return
+        end
 
-end)
-tab.newButton("Iron", "armor", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://97261917758290",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Iron Armor"),["hp"] = 150,["minutes"] = 10},"EquipArmor")
+        local finalPosition
 
-end)
+        if mode == "Player" then
+            local char = game.Players.LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
 
-tab.newButton("Gold", "armor", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://114222421558942",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Gold Armor"),["hp"] = 175,["minutes"] = 20},"EquipArmor")
+            finalPosition = vector.create(
+                math.floor(hrp.Position.X),
+                math.floor(hrp.Position.Y),
+                math.floor(hrp.Position.Z)
+            )
+        else
+            finalPosition = vector.create(
+                math.floor(posX),
+                math.floor(posY),
+                math.floor(posZ)
+            )
+        end
 
-end)
+        -- Gửi remote
+        local args = {
+            {
+                rotation = 0,
+                selectedBlock = {
+                    order = 4,
+                    model = blockModel,
+                    category = category
+                },
+                gridPosition = finalPosition
+            },
+            "Place"
+        }
 
-tab.newButton("Diamnod", "armor", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://78694581425350",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Diamond Armor"),["hp"] = 200,["minutes"] = 30},"EquipArmor")
+        game.ReplicatedStorage.Networker.Remotes.BlockReliable:FireServer(unpack(args))
 
-end)
+        print("✅ Placed block:", blockName)
+    end
+})
 
-local tab = createTab("-•???•-", "ImageIdHere")
-tab.newLabel("-•--???--•-")
+local Tab = Window:Tab({ Title = "Player" })
 
-tab.newButton("armor by @romd3976 ", "armor", function()
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
-
-end)
+Tab:Button({
+    Title = "Wood Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Wood Armor"),["hp"] = 125,["minutes"] = 5},"EquipArmor")
+        end
+     })
