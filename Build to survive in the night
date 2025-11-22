@@ -160,3 +160,59 @@ Tab:Button({
         game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Wood Armor"),["hp"] = 125,["minutes"] = 5},"EquipArmor")
         end
      })
+
+Tab:Button({
+    Title = "Iron Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://97261917758290",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Iron Armor"),["hp"] = 150,["minutes"] = 10},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Gold Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://114222421558942",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Gold Armor"),["hp"] = 175,["minutes"] = 20},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Diamond Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://78694581425350",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Diamond Armor"),["hp"] = 200,["minutes"] = 30},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "God 03y_o",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "fly(turn on)",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
+        end
+     })
+
+Tab:Button({
+    Title = "fly(off)",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
+        end
+     })
+
+Tab:Button({
+    Title = "+500 block(off",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
+        end
+     })
+
+Tab:Button({
+    Title = "+500 block(turn on",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
+        end
+     })
