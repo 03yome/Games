@@ -299,6 +299,34 @@ Tab:Button({
      })
 
 Tab:Button({
+    Title = "Wood Armor Tier.2",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Wood Armor"),["hp"] = 250,["minutes"] = 5},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Iron Armor Tier.2",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://97261917758290",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Iron Armor"),["hp"] = 300,["minutes"] = 10},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Gold Armor Tier.2",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://114222421558942",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Gold Armor"),["hp"] = 350,["minutes"] = 20},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Diamond Armor Tier.2",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://78694581425350",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Diamond Armor"),["hp"] = 400,["minutes"] = 30},"EquipArmor")
+        end
+     })
+
+Tab:Button({
     Title = "+500 block(off",
     Callback = function()
         game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
