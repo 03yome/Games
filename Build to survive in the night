@@ -394,13 +394,13 @@ local Tab = Window:Tab({ Title = "More" })
 Tab:Button({
     Title = "tools",
     Callback = function()
-        https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night(tools)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night(tools)"))()
         end
      })
 
 Tab:Button({
     Title = "place players",
     Callback = function()
-        https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night%20(place%20playets)
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night%20(place%20playets)"))()
         end
      })
