@@ -1,0 +1,176 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Build to survive in the night | Script",
+    Icon = "Cube",
+    Author = "script by romd3976",
+    Size = UDim2.fromOffset(600, 600),
+    Resizable = true,
+})
+
+local Tab = Window:Tab({ Title = "Place Block" })
+
+-- VARIABLES
+local category, blockName, rotation = "", "", 0
+local mode = "Player"
+local posX, posY, posZ = 0, 0, 0
+local targetPlayer = nil
+local playersList = {}
+local Players = game:GetService("Players")
+local playerDropdown
+
+--=============================
+-- INPUTS
+--=============================
+Tab:Input({
+    Title = "Category",
+    Desc = "VD: furniture",
+    Placeholder = "Nhập category",
+    Callback = function(val) category = val end
+})
+
+Tab:Input({
+    Title = "Block Name",
+    Desc = "VD: Brown Chair",
+    Placeholder = "Nhập tên block",
+    Callback = function(val) blockName = val end
+})
+
+Tab:Input({
+    Title = "Rotation",
+    Desc = "Nhập rotation",
+    Placeholder = "0",
+    Value = "0",
+    Callback = function(val) rotation = tonumber(val) or 0 end
+})
+
+Tab:Dropdown({
+    Title = "Place Mode",
+    Values = {"Player", "Coordinates"},
+    Value = "Player",
+    Callback = function(opt) mode = opt end
+})
+
+Tab:Input({
+    Title = "X",
+    Desc = "Tọa độ X",
+    Placeholder = "0",
+    Callback = function(val) posX = tonumber(val) or 0 end
+})
+
+Tab:Input({
+    Title = "Y",
+    Desc = "Tọa độ Y",
+    Placeholder = "0",
+    Callback = function(val) posY = tonumber(val) or 0 end
+})
+
+Tab:Input({
+    Title = "Z",
+    Desc = "Tọa độ Z",
+    Placeholder = "0",
+    Callback = function(val) posZ = tonumber(val) or 0 end
+})
+
+--=============================
+-- FUNCTIONS
+--=============================
+local function getOtherPlayers()
+    local list = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    return list
+end
+
+-- Hàm updatePlayerList chuẩn
+local function updatePlayerList(listTable, pushDropdown)
+    table.clear(listTable)
+    for _, name in ipairs(getOtherPlayers()) do
+        table.insert(listTable, name)
+    end
+    if pushDropdown then
+        pushDropdown:SetValues(listTable)
+    end
+end
+
+--=============================
+-- PLAYER DROPDOWN
+--=============================
+playerDropdown = Tab:Dropdown({
+    Title = "Target Player",
+    Values = getOtherPlayers(),
+    Value = getOtherPlayers()[1] or "",
+    Callback = function(val)
+        targetPlayer = Players:FindFirstChild(val)
+    end
+})
+
+-- Auto update dropdown 2 giây/lần
+task.spawn(function()
+    while true do
+        task.wait(2)
+        updatePlayerList(playersList, playerDropdown)
+    end
+end)
+
+--=============================
+-- PLACE BLOCK BUTTON
+--=============================
+Tab:Button({
+    Title = "PLACE BLOCK",
+    Desc = "Đặt block lên Player đã chọn",
+    Callback = function()
+        if category == "" or blockName == "" then
+            warn("⚠ Chưa nhập Category hoặc BlockName")
+            return
+        end
+
+        local blockFolder = game.ReplicatedStorage:WaitForChild("Components"):WaitForChild("Blocks")
+        local blockModel = blockFolder:FindFirstChild(blockName)
+        if not blockModel then
+            warn("❌ Không tìm thấy block: "..blockName)
+            return
+        end
+
+        local finalPosition
+
+        if mode == "Player" then
+            if not targetPlayer or not targetPlayer.Character then
+                warn("⚠ Chưa chọn Player hoặc Player không có Character!")
+                return
+            end
+            local hrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            finalPosition = Vector3.new(
+                math.floor(hrp.Position.X),
+                math.floor(hrp.Position.Y),
+                math.floor(hrp.Position.Z)
+            )
+        else
+            finalPosition = Vector3.new(
+                math.floor(posX),
+                math.floor(posY),
+                math.floor(posZ)
+            )
+        end
+
+        local args = {
+            {
+                rotation = rotation,
+                selectedBlock = {
+                    order = 4,
+                    model = blockModel,
+                    category = category
+                },
+                gridPosition = finalPosition
+            },
+            "Place"
+        }
+
+        game.ReplicatedStorage.Networker.Remotes.BlockReliable:FireServer(unpack(args))
+        print("✅ Placed block:", blockName, "on player:", targetPlayer.Name)
+    end
+})
