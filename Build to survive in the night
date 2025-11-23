@@ -239,6 +239,20 @@ Tab:Button({
         end
      })
 
+Tab:Button({
+    Title = "Netherrite Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Netherrite:FindFirstChild("Netherrite"),["hp"] = 1500,["minutes"] = 5},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "Netherrite Armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Netherrite:FindFirstChild("Netherrite"),["hp"] = 1500,["minutes"] = 5},"EquipArmor")
+        end
+     })
+
 
 Tab:Button({
     Title = "God 03y_o",
