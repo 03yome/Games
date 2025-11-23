@@ -482,6 +482,55 @@ mainHeader:Checkbox({
 
 mainHeader:Checkbox({
 
+    Label = "Auto Equip Speed coil",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipSpeedCoil = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+mainHeader:Checkbox({
+
+    Label = "Auto Equip Bomb",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipBomb = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+mainHeader:Checkbox({
+
+    Label = "Auto Equip Rocket Launcher",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipRocketLauncher = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+    
+mainHeader:Checkbox({
+
     Label = "Auto Upgrade Bow",
 
     Value = false,
@@ -782,6 +831,60 @@ if AutoEquipRemove and not HasEquipped and ReplicatedStorage:FindFirstChild("Net
             pcall(function()
 
                 hotbarRemote:FireServer("Remove", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+if AutoEquipSpeedCoil and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Speed Coil", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+if AutoEquipBomb and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Bomb", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+if AutoEquipRocketLauncher and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Rocket Launcher", "PlayerEquip")
 
             end)
 
