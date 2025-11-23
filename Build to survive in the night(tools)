@@ -434,6 +434,54 @@ mainHeader:Checkbox({
 
 mainHeader:Checkbox({
 
+    Label = "Auto Equip twice",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipTwice = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+mainHeader:Checkbox({
+
+    Label = "Auto Equip Place",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipPlace = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+mainHeader:Checkbox({
+
+    Label = "Auto Equip Remove",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+        AutoEquipRemove = v
+
+        HasEquipped = false
+
+    end
+
+})
+
+mainHeader:Checkbox({
+
     Label = "Auto Upgrade Bow",
 
     Value = false,
@@ -679,6 +727,61 @@ RunService.Heartbeat:Connect(function()
             pcall(function()
 
                 hotbarRemote:FireServer("Sword", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+
+if AutoEquipTwice and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Bow", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+if AutoEquipPlace and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Place", "PlayerEquip")
+
+            end)
+
+            HasEquipped = true
+
+        end
+
+    end
+
+if AutoEquipRemove and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+
+        if hotbarRemote then
+
+            pcall(function()
+
+                hotbarRemote:FireServer("Remove", "PlayerEquip")
 
             end)
 
