@@ -10,19 +10,17 @@ local Window = WindUI:CreateWindow({
 
 local Tab = Window:Tab({ Title = "Place Block" })
 
-
 --=============================
 -- VARIABLES
 --=============================
 local category = ""
 local blockName = ""
-local mode = "Player" 
-local targetPlayer = nil 
+local mode = "Player"  -- Player or Coordinates
 local posX, posY, posZ = 0, 0, 0
 local rotation = 0
 
-local players = game:GetService("Players")
-
+-- NEW: đặt block lên bạn hay người khác
+local placeOnMe = true  
 
 --=============================
 -- CATEGORY INPUT
@@ -37,7 +35,6 @@ Tab:Input({
     end
 })
 
-
 --=============================
 -- BLOCK INPUT
 --=============================
@@ -51,9 +48,8 @@ Tab:Input({
     end
 })
 
-
 --=============================
--- ROTATION
+-- ROTATION INPUT
 --=============================
 Tab:Input({
     Title = "Rotation",
@@ -64,7 +60,6 @@ Tab:Input({
         rotation = tonumber(text) or 0
     end
 })
-
 
 --=============================
 -- MODE DROPDOWN
@@ -78,62 +73,17 @@ Tab:Dropdown({
     end
 })
 
-
 --=============================
--- PLAYER LIST (AUTO + MANUAL UPDATE)
+-- PLACE ON ME TOGGLE
 --=============================
-local function getPlayerList()
-    local list = {}
-    for _, plr in ipairs(players:GetPlayers()) do
-        table.insert(list, plr.Name)
-    end
-    return list
-end
-
-local targetDropdown
-local autoUpdate = false
-
--- AUTO UPDATE TOGGLE
 Tab:Toggle({
-    Title = "Auto Update Player List",
-    Desc = "Tự động cập nhật danh sách người chơi",
-    Value = false,
+    Title = "Place on Me",
+    Desc = "ON = đặt block lên bạn | OFF = đặt lên player khác",
+    Value = true,
     Callback = function(val)
-        autoUpdate = val
+        placeOnMe = val
     end
 })
-
--- MANUAL UPDATE
-Tab:Button({
-    Title = "Manual Update Player List",
-    Desc = "Cập nhật danh sách ngay lập tức",
-    Callback = function()
-        if targetDropdown then
-            targetDropdown:SetValues(getPlayerList())
-        end
-    end
-})
-
--- TARGET PLAYER DROPDOWN (CÓ THỂ UPDATE)
-targetDropdown = Tab:Dropdown({
-    Title = "Target Player",
-    Values = getPlayerList(),
-    Value = players:GetPlayers()[1] and players:GetPlayers()[1].Name or "",
-    Callback = function(val)
-        targetPlayer = players:FindFirstChild(val)
-    end
-})
-
--- AUTO UPDATE LOOP
-task.spawn(function()
-    while true do
-        task.wait(2)
-        if autoUpdate and targetDropdown then
-            targetDropdown:SetValues(getPlayerList())
-        end
-    end
-end)
-
 
 --=============================
 -- XYZ INPUTS
@@ -142,7 +92,6 @@ Tab:Input({
     Title = "X",
     Desc = "Tọa độ X",
     Placeholder = "0",
-    Value = "",
     Callback = function(text)
         posX = tonumber(text) or 0
     end
@@ -152,7 +101,6 @@ Tab:Input({
     Title = "Y",
     Desc = "Tọa độ Y",
     Placeholder = "0",
-    Value = "",
     Callback = function(text)
         posY = tonumber(text) or 0
     end
@@ -162,15 +110,13 @@ Tab:Input({
     Title = "Z",
     Desc = "Tọa độ Z",
     Placeholder = "0",
-    Value = "",
     Callback = function(text)
         posZ = tonumber(text) or 0
     end
 })
 
-
 --=============================
--- PLACE BLOCK
+-- PLACE BLOCK BUTTON
 --=============================
 Tab:Button({
     Title = "PLACE BLOCK",
@@ -185,20 +131,34 @@ Tab:Button({
         local blockModel = blockFolder:FindFirstChild(blockName)
 
         if not blockModel then
-            warn("❌ Không tìm thấy block: " .. blockName)
+            warn("❌ Không tìm thấy block:", blockName)
             return
         end
 
         local finalPosition
 
         if mode == "Player" then
-            local hrp
-            if targetPlayer and targetPlayer.Character then
-                hrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+            local target = nil
+            
+            if placeOnMe then
+                -- đặt lên local player
+                target = game.Players.LocalPlayer
             else
-                local char = players.LocalPlayer.Character
-                hrp = char and char:FindFirstChild("HumanoidRootPart")
+                -- tìm player khác đầu tiên
+                for _, plr in ipairs(game.Players:GetPlayers()) do
+                    if plr ~= game.Players.LocalPlayer then
+                        target = plr
+                        break
+                    end
+                end
             end
+
+            if not target or not target.Character then
+                warn("⚠ Không tìm thấy player để đặt block")
+                return
+            end
+
+            local hrp = target.Character:FindFirstChild("HumanoidRootPart")
             if not hrp then return end
 
             finalPosition = Vector3.new(
@@ -206,6 +166,7 @@ Tab:Button({
                 math.floor(hrp.Position.Y),
                 math.floor(hrp.Position.Z)
             )
+
         else
             finalPosition = Vector3.new(
                 math.floor(posX),
@@ -214,6 +175,7 @@ Tab:Button({
             )
         end
 
+        -- FIRE EVENT
         local args = {
             {
                 rotation = rotation,
