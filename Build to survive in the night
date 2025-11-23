@@ -8,6 +8,11 @@ local Window = WindUI:CreateWindow({
     Resizable = true,
 })
 
+--// SERVICES
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Tab = Window:Tab({ Title = "Place Block" })
 
 --=============================
@@ -323,7 +328,57 @@ Tab:Button({
         end
      })
 
-local Tab = Window:Tab({ Title = "Kill" })
+local Tab = Window:Tab({ Title = "Kill aura" })
+
+local AutoDamageAll = false
+local DamageRange = 50
+local AttackDelay = 0.2
+local CustomDamage = 999
+
+Tab:Toggle({
+    Title = "Auto Damage All",
+    Desc = "Tự động đánh tất cả người chơi trong phạm vi",
+    Value = false,
+    Callback = function(v)
+        AutoDamageAll = v
+    end
+})
+
+Tab:Input({
+    Title = "Range",
+    Desc = "Khoảng cách Kill Aura",
+    Placeholder = "VD: 50",
+    Numeric = true,
+    Finished = true,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then DamageRange = num end
+    end
+})
+
+Tab:Input({
+    Title = "Attack Delay",
+    Desc = "Thời gian giữa mỗi lần đánh",
+    Placeholder = "VD: 0.2",
+    Numeric = true,
+    Finished = true,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then AttackDelay = num end
+    end
+})
+
+Tab:Input({
+    Title = "Damage",
+    Desc = "Sát thương mỗi lần đánh",
+    Placeholder = "VD: 999",
+    Numeric = true,
+    Finished = true,
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then CustomDamage = num end
+    end
+})
 
 Tab:Button({
     Title = "kill Shadow",
@@ -404,3 +459,53 @@ Tab:Button({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night%20(place%20playets)"))()
         end
      })
+
+--// GET VALID TARGETS
+function GetValidTargets()
+    local targets = {}
+
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+            local myhrp =
+                LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if hrp and myhrp then
+                if (myhrp.Position - hrp.Position).Magnitude <= DamageRange then
+                    table.insert(targets, plr.Character)
+                end
+            end
+        end
+    end
+
+    return targets
+end
+
+--// MAIN LOOP
+task.spawn(function()
+    while true do
+        task.wait(AttackDelay)
+
+        if AutoDamageAll and ReplicatedStorage:FindFirstChild("Networker") then
+            local bowRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("Bow")
+
+            if bowRemote then
+                for _, target in pairs(GetValidTargets()) do
+                    local targetHumanoid = target:FindFirstChild("Humanoid")
+
+                    if targetHumanoid then
+                        pcall(function()
+                            bowRemote:FireServer(
+                                {
+                                    humanoid = targetHumanoid,
+                                    damage = CustomDamage
+                                },
+                                "DamageHumanoid"
+                            )
+                        end)
+                    end
+                end
+            end
+        end
+    end
+end)
