@@ -240,19 +240,25 @@ Tab:Button({
      })
 
 Tab:Button({
-    Title = "Netherrite Armor",
+    Title = "Helmet netherritr",
     Callback = function()
-        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Netherrite:FindFirstChild("Netherrite"),["hp"] = 1500,["minutes"] = 5},"EquipArmor")
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Netherrite:FindFirstChild("Helmet"),["hp"] = 1500,["minutes"] = 5},"EquipArmor")
         end
      })
 
 Tab:Button({
-    Title = "Netherrite Armor",
+    Title = "Accessory Squid",
     Callback = function()
-        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Netherrite:FindFirstChild("Netherrite"),["hp"] = 1500,["minutes"] = 5},"EquipArmor")
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor.Squid:FindFirstChild("Accessory"),["hp"] = 999,["minutes"] = 5},"EquipArmor")
         end
      })
 
+Tab:Button({
+    Title = "invisble armor",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://93802990711198",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Netherrite"),["hp"] = 10000,["minutes"] = 5},"EquipArmor")
+        end
+     })
 
 Tab:Button({
     Title = "God 03y_o",
