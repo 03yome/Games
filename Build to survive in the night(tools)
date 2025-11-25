@@ -414,7 +414,7 @@ local TabMovement = UI:CreateTab({ Name = "Movement" })
 
 local TabVisual = UI:CreateTab({ Name = "Visual" })
 
-local TabShow/Hide = UI:CreateTab({ Name = "Show/Hide" })
+local Tabshowhide = UI:CreateTab({ Name = "Show/Hide" })
 
 local mainHeader = TabMain:CollapsingHeader({ Title = "Main" })
 
@@ -767,7 +767,9 @@ moveHeader:Checkbox({
 
 })
 
-ShowHideHeader:Checkbox({
+local showhideHeader = Tabshowhide:CollapsingHeader({ Title = "Show and Hide" })
+
+showhideHeader:Checkbox({
 
     Label = "Show secret",
 
@@ -791,7 +793,7 @@ end
 for _, obj in ipairs(workspace:GetDescendants()) do
     if obj:IsA("BasePart") and not IsPlayerPart(obj) then
         obj.Transparency = 0
-        obj.CanCollide = false
+        obj.CanCollide = true
     end
 end
 
@@ -801,7 +803,7 @@ print("✅ All non-player parts are now visible.")
 
 })
 
-ShowHideHeader:Checkbox({
+showhideHeader:Checkbox({
 
     Label = "invisible part",
 
@@ -834,7 +836,7 @@ print("✅ All non-player parts are now invisible.")
 
 })
 
-ShowHideHeader:Checkbox({
+showhideHeader:Checkbox({
 
     Label = "Hide secret",
 
@@ -856,20 +858,21 @@ local function IsCharacterPart(part)
     return false
 end
 
--- Ẩn toàn bộ part trong folder chỉ định
+-- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
 for _, obj in ipairs(targetFolder:GetDescendants()) do
     if obj:IsA("BasePart") and not IsCharacterPart(obj) then
         obj.Transparency = 1
+        obj.CanCollide = false
     end
 end
 
-print("✅ Hidden all parts inside folder:", targetFolder.Name)
+print("✅ Hidden all parts and disabled collisions inside folder:", targetFolder.Name)
 
     end
 
 })
 
-ShowHideHeader:Checkbox({
+showhideHeader:Checkbox({
 
     Label = "Hide secret",
 
@@ -891,14 +894,15 @@ local function IsCharacterPart(part)
     return false
 end
 
--- Ẩn toàn bộ part trong folder chỉ định
+-- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
 for _, obj in ipairs(targetFolder:GetDescendants()) do
     if obj:IsA("BasePart") and not IsCharacterPart(obj) then
         obj.Transparency = 1
+        obj.CanCollide = false
     end
 end
 
-print("✅ Hidden all parts inside folder:", targetFolder.Name)
+print("✅ Hidden all parts and disabled collisions inside folder:", targetFolder.Name)
 
     end
 
