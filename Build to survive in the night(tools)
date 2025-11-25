@@ -767,7 +767,7 @@ moveHeader:Checkbox({
 
 })
 
-Show/HideHeader:Checkbox({
+ShowHideHeader:Checkbox({
 
     Label = "Show secret",
 
@@ -801,7 +801,7 @@ print("✅ All non-player parts are now visible.")
 
 })
 
-Show/HideHeader:Checkbox({
+ShowHideHeader:Checkbox({
 
     Label = "invisible part",
 
@@ -834,7 +834,7 @@ print("✅ All non-player parts are now invisible.")
 
 })
 
-Show/HideHeader:Checkbox({
+ShowHideHeader:Checkbox({
 
     Label = "Hide secret",
 
@@ -869,7 +869,7 @@ print("✅ Hidden all parts inside folder:", targetFolder.Name)
 
 })
 
-Show/HideHeader:Checkbox({
+ShowHideHeader:Checkbox({
 
     Label = "Hide secret",
 
