@@ -414,6 +414,8 @@ local TabMovement = UI:CreateTab({ Name = "Movement" })
 
 local TabVisual = UI:CreateTab({ Name = "Visual" })
 
+local TabShow/Hide = UI:CreateTab({ Name = "Show/Hide" })
+
 local mainHeader = TabMain:CollapsingHeader({ Title = "Main" })
 
 mainHeader:Checkbox({
@@ -760,6 +762,143 @@ moveHeader:Checkbox({
     Callback = function(_, v)
 
         Noclip = v
+
+    end
+
+})
+
+Show/HideHeader:Checkbox({
+
+    Label = "Show secret",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+local Players = game:GetService("Players")
+
+local function IsPlayerPart(part)
+    local model = part:FindFirstAncestorWhichIsA("Model")
+    if not model then return false end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character == model then
+            return true
+        end
+    end
+    return false
+end
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
+        obj.Transparency = 0
+        obj.CanCollide = false
+    end
+end
+
+print("✅ All non-player parts are now visible.")
+
+    end
+
+})
+
+Show/HideHeader:Checkbox({
+
+    Label = "invisible part",
+
+    Value = false,
+
+    Callback = function(_, v)
+
+local Players = game:GetService("Players")
+
+local function IsPlayerPart(part)
+    local model = part:FindFirstAncestorWhichIsA("Model")
+    if not model then return false end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character == model then
+            return true
+        end
+    end
+    return false
+end
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
+        obj.Transparency = 1
+    end
+end
+
+print("✅ All non-player parts are now invisible.")
+
+    end
+
+})
+
+Show/HideHeader:Checkbox({
+
+    Label = "Hide secret",
+
+    Value = false,
+
+    Callback = function(_, v)
+local Players = game:GetService("Players")
+
+-- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
+local targetFolder = workspace:WaitForChild("Zones") -- đổi tên tại đây
+
+-- Check xem part có thuộc nhân vật người chơi hay không
+local function IsCharacterPart(part)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character and part:IsDescendantOf(plr.Character) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Ẩn toàn bộ part trong folder chỉ định
+for _, obj in ipairs(targetFolder:GetDescendants()) do
+    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
+        obj.Transparency = 1
+    end
+end
+
+print("✅ Hidden all parts inside folder:", targetFolder.Name)
+
+    end
+
+})
+
+Show/HideHeader:Checkbox({
+
+    Label = "Hide secret",
+
+    Value = false,
+
+    Callback = function(_, v)
+local Players = game:GetService("Players")
+
+-- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
+local targetFolder = workspace:WaitForChild("NoBuildZone") -- đổi tên tại đây
+
+-- Check xem part có thuộc nhân vật người chơi hay không
+local function IsCharacterPart(part)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character and part:IsDescendantOf(plr.Character) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Ẩn toàn bộ part trong folder chỉ định
+for _, obj in ipairs(targetFolder:GetDescendants()) do
+    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
+        obj.Transparency = 1
+    end
+end
+
+print("✅ Hidden all parts inside folder:", targetFolder.Name)
 
     end
 
