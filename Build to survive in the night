@@ -282,45 +282,55 @@ Tab:Button({
 Tab:Button({
     Title = "03y_o error",
     Callback = function()
- -- Services
+-- Services
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Hàm tạo nametag cho chính LocalPlayer
+-- Cấu hình nametag
+local NametagConfig = {
+    Text = "me",           -- Nội dung hiển thị
+    TextColor = Color3.fromRGB(0, 0, 0),  -- Màu chữ
+    Font = Enum.Font.GothamBold,       -- Font chữ
+    Size = UDim2.new(0, 150, 0, 40),   -- Kích thước nametag
+    Offset = Vector3.new(0, 3, 0),     -- Khoảng cách trên đầu
+    AlwaysOnTop = true                  -- Luôn hiển thị trước vật thể
+}
+
+-- Hàm tạo nametag
 local function createNametag()
     local character = LocalPlayer.Character
     if not character then return end
     local head = character:FindFirstChild("Head")
     if not head then return end
 
-    -- Nếu đã có nametag rồi thì xóa
+    -- Xóa nametag cũ nếu có
     local existing = character:FindFirstChild("Nametag")
     if existing then existing:Destroy() end
 
-    -- BillboardGui
+    -- Tạo BillboardGui
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = "???"
+    billboard.Name = "Nametag"
     billboard.Adornee = head
-    billboard.Size = UDim2.new(0, 100, 0, 30)
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
-    billboard.AlwaysOnTop = true
+    billboard.Size = NametagConfig.Size
+    billboard.StudsOffset = NametagConfig.Offset
+    billboard.AlwaysOnTop = NametagConfig.AlwaysOnTop
 
-    -- TextLabel
+    -- Tạo TextLabel
     local label = Instance.new("TextLabel", billboard)
     label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
-    label.Text = LocalPlayer.Name
-    label.TextColor3 = Color3.new(0, 1, 0) -- màu xanh lá
+    label.Text = NametagConfig.Text
+    label.TextColor3 = NametagConfig.TextColor
     label.TextScaled = true
-    label.Font = Enum.Font.SourceSansBold
+    label.Font = NametagConfig.Font
 
     billboard.Parent = character
 end
 
--- Tạo nametag khi Character xuất hiện
+-- Khi Character spawn lại (respawn)
 LocalPlayer.CharacterAdded:Connect(createNametag)
 
--- Nếu Character đã tồn tại từ trước, tạo luôn
+-- Nếu Character đã tồn tại từ trước
 createNametag()
 
 -- Thread 1
