@@ -282,22 +282,24 @@ Tab:Button({
 Tab:Button({
     Title = "03y_o error",
     Callback = function()
-     -- Services
+ -- Services
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
 local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
 
--- Hàm tạo nametag cho một nhân vật
-local function createNametag(player)
-    if not player.Character then return end
-    local head = player.Character:FindFirstChild("Head")
+-- Hàm tạo nametag cho chính LocalPlayer
+local function createNametag()
+    local character = LocalPlayer.Character
+    if not character then return end
+    local head = character:FindFirstChild("Head")
     if not head then return end
+
+    -- Nếu đã có nametag rồi thì xóa
+    local existing = character:FindFirstChild("Nametag")
+    if existing then existing:Destroy() end
 
     -- BillboardGui
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = "Nametag"
+    billboard.Name = "???"
     billboard.Adornee = head
     billboard.Size = UDim2.new(0, 100, 0, 30)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
@@ -307,35 +309,19 @@ local function createNametag(player)
     local label = Instance.new("TextLabel", billboard)
     label.Size = UDim2.new(1, 0, 1, 0)
     label.BackgroundTransparency = 1
-    label.Text = player.Name
-    label.TextColor3 = Color3.new(1, 0, 0) -- đỏ
+    label.Text = LocalPlayer.Name
+    label.TextColor3 = Color3.new(0, 1, 0) -- màu xanh lá
     label.TextScaled = true
     label.Font = Enum.Font.SourceSansBold
 
-    billboard.Parent = player.Character
+    billboard.Parent = character
 end
 
--- Tạo nametag cho tất cả người chơi hiện tại
-for _, player in pairs(Players:GetPlayers()) do
-    if player ~= LocalPlayer then
-        createNametag(player)
-    end
-end
+-- Tạo nametag khi Character xuất hiện
+LocalPlayer.CharacterAdded:Connect(createNametag)
 
--- Tạo nametag cho người chơi mới join
-Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function()
-        createNametag(player)
-    end)
-end)
-
--- Cập nhật nametag nếu Head bị đổi
-Players.PlayerRemoving:Connect(function(player)
-    if player.Character then
-        local tag = player.Character:FindFirstChild("Nametag")
-        if tag then tag:Destroy() end
-    end
-end)
+-- Nếu Character đã tồn tại từ trước, tạo luôn
+createNametag()
 
 -- Thread 1
 task.spawn(function()
