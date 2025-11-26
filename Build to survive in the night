@@ -280,10 +280,21 @@ Tab:Button({
      })
 
 Tab:Button({
-    Title = "",
+    Title = "03y_o error",
     Callback = function()
-        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
-        end
+        local h = true
+while h do
+if h then
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
+      end
+      wait(5)
+end wait(1) local h = true
+while h do
+if h then
+game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 0/0,["minutes"] = 1},"EquipArmor")
+      end
+      wait(3)
+end        end
      })
 
 Tab:Button({
