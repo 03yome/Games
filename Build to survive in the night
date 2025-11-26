@@ -282,19 +282,88 @@ Tab:Button({
 Tab:Button({
     Title = "03y_o error",
     Callback = function()
-        local h = true
-while h do
-if h then
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
-      end
-      wait(5)
-end wait(1) local h = true
-while h do
-if h then
-game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 0/0,["minutes"] = 1},"EquipArmor")
-      end
-      wait(3)
-end        end
+     -- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Hàm tạo nametag cho một nhân vật
+local function createNametag(player)
+    if not player.Character then return end
+    local head = player.Character:FindFirstChild("Head")
+    if not head then return end
+
+    -- BillboardGui
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "Nametag"
+    billboard.Adornee = head
+    billboard.Size = UDim2.new(0, 100, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.AlwaysOnTop = true
+
+    -- TextLabel
+    local label = Instance.new("TextLabel", billboard)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = player.Name
+    label.TextColor3 = Color3.new(1, 0, 0) -- đỏ
+    label.TextScaled = true
+    label.Font = Enum.Font.SourceSansBold
+
+    billboard.Parent = player.Character
+end
+
+-- Tạo nametag cho tất cả người chơi hiện tại
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        createNametag(player)
+    end
+end
+
+-- Tạo nametag cho người chơi mới join
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        createNametag(player)
+    end)
+end)
+
+-- Cập nhật nametag nếu Head bị đổi
+Players.PlayerRemoving:Connect(function(player)
+    if player.Character then
+        local tag = player.Character:FindFirstChild("Nametag")
+        if tag then tag:Destroy() end
+    end
+end)
+
+-- Thread 1
+task.spawn(function()
+    while true do
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+            ["icon"] = "rbxassetid://128684074780331",
+            ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+            ["hp"] = 1e308,
+            ["minutes"] = 1
+        }, "EquipArmor")
+        task.wait(5)
+    end
+end)
+
+-- Thread 2
+task.spawn(function()
+    while true do
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+            ["icon"] = "rbxassetid://128684074780331",
+            ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+            ["hp"] = 0/0,
+            ["minutes"] = 1
+        }, "EquipArmor")
+        task.wait(3)
+    end
+end)
+
+        end
      })
 
 Tab:Button({
