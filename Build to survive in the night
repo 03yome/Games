@@ -273,6 +273,20 @@ Tab:Button({
      })
 
 Tab:Button({
+    Title = "God kill you",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 0/1,["minutes"] = 1},"EquipArmor")
+        end
+     })
+
+Tab:Button({
+    Title = "",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({["icon"] = "rbxassetid://128684074780331",["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),["hp"] = 1e308,["minutes"] = 1},"EquipArmor")
+        end
+     })
+
+Tab:Button({
     Title = "fly(turn on)",
     Callback = function()
         game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
