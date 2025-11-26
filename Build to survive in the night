@@ -314,20 +314,6 @@ Tab:Button({
         end
      })
 
-Tab:Button({
-    Title = "fly(off",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(off,"ChangeFlight")
-        end
-     })
-
-Tab:Button({
-    Title = "fly(turn on",
-    Callback = function()
-        game:GetService("ReplicatedStorage").Networker.Remotes.Fly:FireServer(true,"ChangeFlight")
-        end
-     })
-
 local Tab = Window:Tab({ Title = "Kill aura" })
 
 local AutoDamageAll = false
