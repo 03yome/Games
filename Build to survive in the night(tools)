@@ -777,27 +777,7 @@ showhideHeader:Checkbox({
 
     Callback = function(_, v)
 
-local Players = game:GetService("Players")
-
-local function IsPlayerPart(part)
-    local model = part:FindFirstAncestorWhichIsA("Model")
-    if not model then return false end
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character == model then
-            return true
-        end
-    end
-    return false
-end
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
-        obj.Transparency = 0
-        obj.CanCollide = true
-    end
-end
-
-print("✅ All non-player parts are now visible.")
+Showsercet1 = v
 
     end
 
@@ -1204,6 +1184,34 @@ if AutoEquipRocketLauncher and not HasEquipped and ReplicatedStorage:FindFirstCh
     end
 
 end)
+
+if Showsercet1 then
+
+        local Players = game:GetService("Players")
+
+local function IsPlayerPart(part)
+    local model = part:FindFirstAncestorWhichIsA("Model")
+    if not model then return false end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character == model then
+            return true
+        end
+    end
+    return false
+end
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
+        obj.Transparency = 0
+        obj.CanCollide = true
+    end
+end
+
+print("✅ All non-player parts are now visible.")
+
+        end
+
+    end)
 
 UserInputService.JumpRequest:Connect(function()
 
