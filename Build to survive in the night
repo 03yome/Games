@@ -333,15 +333,21 @@ LocalPlayer.CharacterAdded:Connect(createNametag)
 -- Nếu Character đã tồn tại từ trước
 createNametag()
 
+-- Bật/tắt
+_G.ArmorBoost1 = true   -- Thread 1
+_G.ArmorBoost2 = true   -- Thread 2
+
 -- Thread 1
 task.spawn(function()
     while true do
-        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
-            ["icon"] = "rbxassetid://128684074780331",
-            ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
-            ["hp"] = 1e308,
-            ["minutes"] = 1
-        }, "EquipArmor")
+        if _G.ArmorBoost1 then
+            game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+                ["icon"] = "rbxassetid://128684074780331",
+                ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+                ["hp"] = 1e308,
+                ["minutes"] = 1
+            }, "EquipArmor")
+        end
         task.wait(5)
     end
 end)
@@ -349,16 +355,56 @@ end)
 -- Thread 2
 task.spawn(function()
     while true do
-        game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
-            ["icon"] = "rbxassetid://128684074780331",
-            ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
-            ["hp"] = 0/0,
-            ["minutes"] = 1
-        }, "EquipArmor")
+        if _G.ArmorBoost2 then
+            game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+                ["icon"] = "rbxassetid://128684074780331",
+                ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+                ["hp"] = 0/0,
+                ["minutes"] = 1
+            }, "EquipArmor")
+        end
         task.wait(3)
     end
 end)
+        end
+     })
 
+Tab:Button({
+    Title = "03y_o not error",
+    Callback = function()
+        -- Bật/tắt
+_G.ArmorBoost1 = false   -- Thread 1
+_G.ArmorBoost2 = false   -- Thread 2
+
+-- Thread 1
+task.spawn(function()
+    while true do
+        if _G.ArmorBoost1 then
+            game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+                ["icon"] = "rbxassetid://128684074780331",
+                ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+                ["hp"] = 1e308,
+                ["minutes"] = 1
+            }, "EquipArmor")
+        end
+        task.wait(5)
+    end
+end)
+
+-- Thread 2
+task.spawn(function()
+    while true do
+        if _G.ArmorBoost2 then
+            game:GetService("ReplicatedStorage").Networker.Remotes.Armour:FireServer({
+                ["icon"] = "rbxassetid://128684074780331",
+                ["accessory"] = game:GetService("ReplicatedStorage").Components.Armor:FindFirstChild("Emerald Armor"),
+                ["hp"] = 0/0,
+                ["minutes"] = 1
+            }, "EquipArmor")
+        end
+        task.wait(3)
+    end
+end)
         end
      })
 
