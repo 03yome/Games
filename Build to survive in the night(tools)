@@ -414,8 +414,6 @@ local TabMovement = UI:CreateTab({ Name = "Movement" })
 
 local TabVisual = UI:CreateTab({ Name = "Visual" })
 
-local Tabshowhide = UI:CreateTab({ Name = "Show/Hide" })
-
 local mainHeader = TabMain:CollapsingHeader({ Title = "Main" })
 
 mainHeader:Checkbox({
@@ -767,127 +765,6 @@ moveHeader:Checkbox({
 
 })
 
-local showhideHeader = Tabshowhide:CollapsingHeader({ Title = "Show and Hide" })
-
-showhideHeader:Checkbox({
-
-    Label = "Show secret",
-
-    Value = false,
-
-    Callback = function(_, v)
-
-Showsercet1 = v
-
-    end
-
-})
-
-showhideHeader:Checkbox({
-
-    Label = "invisible part",
-
-    Value = false,
-
-    Callback = function(_, v)
-
-local Players = game:GetService("Players")
-
-local function IsPlayerPart(part)
-    local model = part:FindFirstAncestorWhichIsA("Model")
-    if not model then return false end
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character == model then
-            return true
-        end
-    end
-    return false
-end
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
-        obj.Transparency = 1
-    end
-end
-
-print("✅ All non-player parts are now invisible.")
-
-    end
-
-})
-
-showhideHeader:Checkbox({
-
-    Label = "Hide secret",
-
-    Value = false,
-
-    Callback = function(_, v)
-local Players = game:GetService("Players")
-
--- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
-local targetFolder = workspace:WaitForChild("Zones") -- đổi tên tại đây
-
--- Check xem part có thuộc nhân vật người chơi hay không
-local function IsCharacterPart(part)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character and part:IsDescendantOf(plr.Character) then
-            return true
-        end
-    end
-    return false
-end
-
--- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
-for _, obj in ipairs(targetFolder:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
-        obj.Transparency = 1
-        obj.CanCollide = false
-    end
-end
-
-print("✅ Hidden all parts and disabled collisions inside folder:", targetFolder.Name)
-
-    end
-
-})
-
-showhideHeader:Checkbox({
-
-    Label = "Hide secret",
-
-    Value = false,
-
-    Callback = function(_, v)
-local Players = game:GetService("Players")
-
--- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
-local targetFolder = workspace:WaitForChild("NoBuildZone") -- đổi tên tại đây
-
--- Check xem part có thuộc nhân vật người chơi hay không
-local function IsCharacterPart(part)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character and part:IsDescendantOf(plr.Character) then
-            return true
-        end
-    end
-    return false
-end
-
--- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
-for _, obj in ipairs(targetFolder:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
-        obj.Transparency = 1
-        obj.CanCollide = false
-    end
-end
-
-print("✅ Hidden all parts and disabled collisions inside folder:", targetFolder.Name)
-
-    end
-
-})
-
 RunService.Heartbeat:Connect(function()
 
     if AutoEquipOnce and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
@@ -1184,34 +1061,6 @@ if AutoEquipRocketLauncher and not HasEquipped and ReplicatedStorage:FindFirstCh
     end
 
 end)
-
-if Showsercet1 then
-
-        local Players = game:GetService("Players")
-
-local function IsPlayerPart(part)
-    local model = part:FindFirstAncestorWhichIsA("Model")
-    if not model then return false end
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character == model then
-            return true
-        end
-    end
-    return false
-end
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
-        obj.Transparency = 0
-        obj.CanCollide = true
-    end
-end
-
-print("✅ All non-player parts are now visible.")
-
-        end
-
-    end)
 
 UserInputService.JumpRequest:Connect(function()
 
