@@ -72,109 +72,6 @@ Tab:Input({
     Callback = function(val) posZ = tonumber(val) or 0 end
 })
 
-Tab:Button({
-    Title = "Show sercet",
-    Desc = "",
-    Callback = function()
-    local Players = game:GetService("Players")
-
-local function IsPlayerPart(part)
-    local model = part:FindFirstAncestorWhichIsA("Model")
-    if not model then return false end
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character == model then
-            return true
-        end
-    end
-    return false
-end
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
-        obj.Transparency = 0
-        obj.CanCollide = true
-    end
-end
-        end
-
-Tab:Button({
-    Title = "invisible part",
-    Desc = "",
-    Callback = function()
-local function IsPlayerPart(part)
-    local model = part:FindFirstAncestorWhichIsA("Model")
-    if not model then return false end
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character == model then
-            return true
-        end
-    end
-    return false
-end
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsPlayerPart(obj) then
-        obj.Transparency = 1
-    end
-end
-        end
-
-Tab:Button({
-    Title = "hide sercet",
-    Desc = "",
-    Callback = function()
-     local Players = game:GetService("Players")
-
--- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
-local targetFolder = workspace:WaitForChild("Zones") -- đổi tên tại đây
-
--- Check xem part có thuộc nhân vật người chơi hay không
-local function IsCharacterPart(part)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character and part:IsDescendantOf(plr.Character) then
-            return true
-        end
-    end
-    return false
-end
-
--- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
-for _, obj in ipairs(targetFolder:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
-        obj.Transparency = 1
-        obj.CanCollide = false
-    end
-end
-        end
-
-Tab:Button({
-    Title = "show sercet",
-    Desc = "",
-    Callback = function()
-      local Players = game:GetService("Players")
-
--- Tên folder trong workspace mà bạn muốn ẩn TẤT CẢ part
-local targetFolder = workspace:WaitForChild("NoBuildZone") -- đổi tên tại đây
-
--- Check xem part có thuộc nhân vật người chơi hay không
-local function IsCharacterPart(part)
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr.Character and part:IsDescendantOf(plr.Character) then
-            return true
-        end
-    end
-    return false
-end
-
--- Ẩn toàn bộ part trong folder chỉ định và tắt CanCollide
-for _, obj in ipairs(targetFolder:GetDescendants()) do
-    if obj:IsA("BasePart") and not IsCharacterPart(obj) then
-        obj.Transparency = 1
-        obj.CanCollide = false
-    end
-end
-        end
-
 --=============================
 -- FUNCTIONS
 --=============================
@@ -275,5 +172,135 @@ Tab:Button({
 
         game.ReplicatedStorage.Networker.Remotes.BlockReliable:FireServer(unpack(args))
         print("✅ Placed block:", blockName, "on player:", targetPlayer.Name)
+    end
+})
+
+---------------------------------------------------------------------
+-- BUTTON 1: Show secret (hiện toàn bộ)
+---------------------------------------------------------------------
+Tab:Button({
+    Title = "Show secret",
+    Desc = "",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+
+        local function IsPlayerPart(part)
+            local model = part:FindFirstAncestorWhichIsA("Model")
+            if not model then return false end
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr.Character == model then
+                    return true
+                end
+            end
+            return false
+        end
+
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not IsPlayerPart(obj) then
+                obj.Transparency = 0
+                obj.CanCollide = true
+            end
+        end
+    end
+})
+
+---------------------------------------------------------------------
+-- BUTTON 2: Invisible all part
+---------------------------------------------------------------------
+Tab:Button({
+    Title = "Invisible part",
+    Desc = "",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+
+        local function IsPlayerPart(part)
+            local model = part:FindFirstAncestorWhichIsA("Model")
+            if not model then return false end
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr.Character == model then
+                    return true
+                end
+            end
+            return false
+        end
+
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not IsPlayerPart(obj) then
+                obj.Transparency = 1
+                obj.CanCollide = false
+            end
+        end
+    end
+})
+
+---------------------------------------------------------------------
+-- BUTTON 3: Hide Zones folder
+---------------------------------------------------------------------
+Tab:Button({
+    Title = "Hide Zones",
+    Desc = "",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local targetFolder = workspace:WaitForChild("Zones")
+
+        local function IsCharacterPart(part)
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr.Character and part:IsDescendantOf(plr.Character) then
+                    return true
+                end
+            end
+            return false
+        end
+
+        local function ApplyTransparency(obj)
+            if obj:IsA("BasePart") and not IsCharacterPart(obj) then
+                obj.Transparency = 1
+                obj.CanCollide = false
+            end
+        end
+
+        for _, obj in ipairs(targetFolder:GetDescendants()) do
+            ApplyTransparency(obj)
+        end
+
+        targetFolder.DescendantAdded:Connect(ApplyTransparency)
+    end
+})
+
+---------------------------------------------------------------------
+-- BUTTON 4: Hide NoBuildZone folder
+---------------------------------------------------------------------
+Tab:Button({
+    Title = "Hide NoBuildZone",
+    Desc = "",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local targetFolder = workspace:WaitForChild("NoBuildZone")
+
+        local function IsCharacterPart(part)
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr.Character and part:IsDescendantOf(plr.Character) then
+                    return true
+                end
+            end
+            return false
+        end
+
+        local function ApplyTransparency(obj)
+            if obj:IsA("BasePart") and not IsCharacterPart(obj) then
+                obj.Transparency = 1
+                obj.CanCollide = false
+            end
+        end
+
+        for _, obj in ipairs(targetFolder:GetDescendants()) do
+            ApplyTransparency(obj)
+        end
+
+        targetFolder.DescendantAdded:Connect(ApplyTransparency)
     end
 })
