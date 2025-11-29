@@ -215,3 +215,14 @@ RefreshPlayerList()
 
 print("HI")
 end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local remoteName = "SlipEvent" -- đổi tên tại đây
+
+local remote = ReplicatedStorage:FindFirstChild(remoteName)
+if remote and remote:IsA("RemoteEvent") then
+    remote:Destroy()
+    print("you not fall:", remoteName)
+else
+    warn("❌ Không tìm thấy RemoteEvent:", remoteName)
+end
