@@ -1,4 +1,214 @@
-local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+-- FIXZ HUB | DRAW PERFECT CIRCLE 📍
+-- Using Fluent UI Library
+
+print("📍 Loading Fixz Hub for Draw Perfect Circle...")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+
+local plr = Players.LocalPlayer
+
+-- Anti-AFK
+plr.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- Load Fluent UI
+print("Loading Fluent UI...")
+local success, Fluent = pcall(function()
+    return loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end)
+
+if not success then
+    warn("Failed to load Fluent UI, trying alternate link...")
+    Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Fluent.lua"))()
+end
+
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+print("Creating window...")
+
+-- Create Window
+local Window = Fluent:CreateWindow({
+    Title = "📍 script |  Get down",
+    SubTitle = "boost",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Create Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "🏠 Main", Icon = "home" }),
+    Boost = Window:AddTab({ Title = "Boost Sender", Icon = "circle" }),
+    Settings = Window:AddTab({ Title = "⚙️ Settings", Icon = "settings" })
+}
+
+-- MAIN TAB
+Tabs.Main:AddParagraph({
+    Title = "📍 Welcome to Fixz Hub!",
+    Content = "Draw Perfect Circle - Auto score sender with adjustable frequency!"
+})
+
+local StatsLabel = Tabs.Main:AddParagraph({
+    Title = "📊 Statistics",
+    Content = "Calls Sent: 0 | Frequency: 10/s | Mode: Send"
+})
+
+Tabs.Main:AddButton({
+    Title = "🎮 Join Discord",
+    Description = "Get support and updates",
+    Callback = function()
+        setclipboard("https://discord.gg/CDyrbSY8Gx")
+        Fluent:Notify({
+            Title = "Discord Copied!",
+            Content = "Discord invite copied to clipboard!",
+            Duration = 3
+        })
+    end
+})
+Tabs.Boost:AddButton({
+    Title = "boost 1",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	1
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 2",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	2
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 3",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	3
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 4",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	4
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 5",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	5
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 6",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	6
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 7",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	7
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 8",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	8
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 9",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	9
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 10",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	10
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 11",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	11
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "boost 12",
+    Description = "idk",
+    Callback = function()
+        local args = {
+	12
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpack(args))
+  end
+})
+
+Tabs.Boost:AddButton({
+    Title = "troll",
+    Description = "idk",
+    Callback = function()
+ local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
 local PhantomForcesWindow = Library:NewWindow("Get.Down")
 
@@ -226,3 +436,52 @@ if remote and remote:IsA("RemoteEvent") then
 else
     warn("❌ Không tìm thấy RemoteEvent:", remoteName)
 end
+
+local autoPlantBomb = false
+
+KillingCheats:CreateToggle("Auto Plant Bomb", function(state)
+    autoPlantBomb = state
+    print("Auto Plant Bomb:", state)
+
+    while autoPlantBomb do
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local plantEvent = ReplicatedStorage:WaitForChild("PlantBomb")
+
+        if plantEvent then
+            plantEvent:FireServer()
+            print("Planted Bomb!")
+        else
+            warn("PlantBomb event not found!")
+        end
+
+        task.wait(0.5)
+    end
+end)
+  end
+})
+
+-- SETTINGS TAB
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("FixzHub")
+SaveManager:SetFolder("FixzHub/DrawPerfectCircle")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "script Loaded!",
+    Content = "Fr!",
+    Duration = 5
+})
+
+SaveManager:LoadAutoloadConfig()
+
+print("script fully loaded!")
+print(" Use the Score Sender tab to configure and start!")
