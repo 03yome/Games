@@ -84,7 +84,7 @@ game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpac
 })
 
 Tabs.Boost:AddButton({
-    Title = "boost 2",
+    Title = "invisible mine",
     Description = "idk",
     Callback = function()
         local args = {
@@ -95,7 +95,7 @@ game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpac
 })
 
 Tabs.Boost:AddButton({
-    Title = "boost 3",
+    Title = "speed boost",
     Description = "idk",
     Callback = function()
         local args = {
@@ -106,7 +106,7 @@ game:GetService("ReplicatedStorage"):WaitForChild("ApplyBoost"):FireServer(unpac
 })
 
 Tabs.Boost:AddButton({
-    Title = "boost 4",
+    Title = "jump boost",
     Description = "idk",
     Callback = function()
         local args = {
