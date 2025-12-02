@@ -1,0 +1,233 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+
+local PhantomForcesWindow = Library:NewWindow("Killstreak button test remastered")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+KillingCheats:CreateButton("Aura Hacker", function()
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("TheForce")
+
+local Player = game.Players.LocalPlayer
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0,150,0,40)
+ToggleBtn.Position = UDim2.new(0.1,0,0.2,0)
+ToggleBtn.Text = "TheForce: OFF"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleBtn.Draggable = true
+
+local Auto = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    Auto = not Auto
+    ToggleBtn.Text = Auto and "Aura hacker: ON" or "Aura hacker: OFF"
+    ToggleBtn.BackgroundColor3 = Auto and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
+end)
+
+-- Auto loop
+task.spawn(function()
+    while wait(1) do
+        if Auto then
+            pcall(function()
+                remote:FireServer()
+            end)
+        end
+    end
+end)
+
+print("HI")
+end)
+KillingCheats:CreateButton("autokill", function()
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Container draggable
+local Container = Instance.new("Frame", ScreenGui)
+Container.Size = UDim2.new(0, 200, 0, 180)
+Container.Position = UDim2.new(0.1, 0, 0.2, 0)
+Container.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Container.Active = true
+Container.Draggable = true
+
+-- Toggle Button
+local ToggleBtn = Instance.new("TextButton", Container)
+ToggleBtn.Size = UDim2.new(1, 0, 0, 40)
+ToggleBtn.Position = UDim2.new(0, 0, 0, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Text = "Auto Kill: OFF"
+
+-- Dropdown label
+local Label = Instance.new("TextLabel", Container)
+Label.Size = UDim2.new(1, 0, 0, 20)
+Label.Position = UDim2.new(0, 0, 0, 45)
+Label.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Label.TextColor3 = Color3.fromRGB(255,255,255)
+Label.Text = "Select Part:"
+
+-- Dropdown buttons
+local parts = {"Left Arm", "Right Arm", "HumanoidRootPart", "Head", "Torso"}
+local selectedPart = "Left Arm"
+for i, partName in ipairs(parts) do
+    local btn = Instance.new("TextButton", Container)
+    btn.Size = UDim2.new(1, 0, 0, 20)
+    btn.Position = UDim2.new(0, 0, 0, 65 + 20*(i-1))
+    btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Text = partName
+    btn.MouseButton1Click:Connect(function()
+        selectedPart = partName
+        print("✅ Selected Part: "..selectedPart)
+    end)
+end
+
+-- Toggle AutoKill
+local AutoKill = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    AutoKill = not AutoKill
+    ToggleBtn.Text = AutoKill and "Auto Kill: ON" or "Auto Kill: OFF"
+    ToggleBtn.BackgroundColor3 = AutoKill and Color3.fromRGB(0,170,0) or Color3.fromRGB(30,30,30)
+end)
+
+-- Auto Kill Loop
+local remote = RS:WaitForChild("SlapRemotes"):WaitForChild("KillstreakHit")
+task.spawn(function()
+    while task.wait(0.1) do
+        if AutoKill then
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr.Character then
+                    local part = plr.Character:FindFirstChild(selectedPart)
+                    if part then
+                        pcall(function()
+                            remote:FireServer(part)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+end)
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Container draggable
+local Container = Instance.new("Frame", ScreenGui)
+Container.Size = UDim2.new(0, 200, 0, 180)
+Container.Position = UDim2.new(0.1, 0, 0.2, 0)
+Container.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Container.Active = true
+Container.Draggable = true
+
+-- Toggle Button
+local ToggleBtn = Instance.new("TextButton", Container)
+ToggleBtn.Size = UDim2.new(1, 0, 0, 40)
+ToggleBtn.Position = UDim2.new(0, 0, 0, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Text = "Auto Kill: OFF"
+
+-- Dropdown label
+local Label = Instance.new("TextLabel", Container)
+Label.Size = UDim2.new(1, 0, 0, 20)
+Label.Position = UDim2.new(0, 0, 0, 45)
+Label.BackgroundColor3 = Color3.fromRGB(50,50,50)
+Label.TextColor3 = Color3.fromRGB(255,255,255)
+Label.Text = "Select Part:"
+
+-- Dropdown buttons
+local parts = {"Left Arm", "Right Arm", "HumanoidRootPart", "Head", "Torso"}
+local selectedPart = "Left Arm"
+for i, partName in ipairs(parts) do
+    local btn = Instance.new("TextButton", Container)
+    btn.Size = UDim2.new(1, 0, 0, 20)
+    btn.Position = UDim2.new(0, 0, 0, 65 + 20*(i-1))
+    btn.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.Text = partName
+    btn.MouseButton1Click:Connect(function()
+        selectedPart = partName
+        print("✅ Selected Part: "..selectedPart)
+    end)
+end
+
+-- Toggle AutoKill
+local AutoKill = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    AutoKill = not AutoKill
+    ToggleBtn.Text = AutoKill and "Auto Kill: ON" or "Auto Kill: OFF"
+    ToggleBtn.BackgroundColor3 = AutoKill and Color3.fromRGB(0,170,0) or Color3.fromRGB(30,30,30)
+end)
+
+-- Auto Kill Loop
+local remote = RS:WaitForChild("SlapRemotes"):WaitForChild("KillstreakHit")
+task.spawn(function()
+    while task.wait(0.1) do
+        if AutoKill then
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer and plr.Character then
+                    local part = plr.Character:FindFirstChild(selectedPart)
+                    if part then
+                        pcall(function()
+                            remote:FireServer(part)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+print("HI")
+end)
+
+KillingCheats:CreateButton("give kill", function()
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("AdminEvents"):WaitForChild("GiveKill")
+
+-- 📌 Tạo GUI
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+
+ToggleBtn.Size = UDim2.new(0, 150, 0, 40)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Text = "GiveKill: OFF"
+ToggleBtn.Draggable = true
+
+-- 📌 Trạng thái auto loop
+local AutoLoop = false
+
+-- 🔘 Bấm để đổi trạng thái
+ToggleBtn.MouseButton1Click:Connect(function()
+    AutoLoop = not AutoLoop
+    ToggleBtn.Text = AutoLoop and "GiveKill: ON" or "GiveKill: OFF"
+    ToggleBtn.BackgroundColor3 = AutoLoop and Color3.fromRGB(0,170,0) or Color3.fromRGB(30,30,30)
+end)
+
+-- 🔥 LOOP GIVEKILL
+task.spawn(function()
+    while true do
+        if AutoLoop then
+            pcall(function()
+                remote:FireServer()
+            end)
+        end
+        wait(0.1) -- tốc độ spam
+    end
+end)
+
+print("HI")
+end)
