@@ -97,6 +97,11 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("Power up Hacker", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("Powerup"):FireServer()
+print("HI")
+end)
+
 KillingCheats:CreateButton("autokill", function()
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
