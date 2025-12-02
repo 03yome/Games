@@ -6,11 +6,13 @@ local KillingCheats = PhantomForcesWindow:NewSection("main")
 KillingCheats:CreateButton("Aura Hacker", function()
 local RS = game:GetService("ReplicatedStorage")
 local remote = RS:WaitForChild("TheForce")
-
 local Player = game.Players.LocalPlayer
 
 -- GUI
-local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false  -- ✅ GUI sẽ không mất khi nhân vật chết
+
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0,150,0,40)
 ToggleBtn.Position = UDim2.new(0.1,0,0.2,0)
@@ -22,7 +24,52 @@ ToggleBtn.Draggable = true
 local Auto = false
 ToggleBtn.MouseButton1Click:Connect(function()
     Auto = not Auto
-    ToggleBtn.Text = Auto and "Aura hacker: ON" or "Aura hacker: OFF"
+    ToggleBtn.Text = Auto and "Aura: ON" or "Aura: OFF"
+    ToggleBtn.BackgroundColor3 = Auto and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
+end)
+
+-- Auto loop
+task.spawn(function()
+    while wait(1) do
+        if Auto then
+            pcall(function()
+                remote:FireServer()
+            end)
+        end
+    end
+end)
+
+
+print("HI")
+end)
+
+KillingCheats:CreateButton("Haki Hacker", function()
+game:GetService("ReplicatedStorage"):WaitForChild("KillstreakEvents"):WaitForChild("Haki"):FireServer()
+print("HI")
+end)
+
+KillingCheats:CreateButton("Aura Hacker.v2", function()
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("TheForce2")
+local Player = game.Players.LocalPlayer
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false  -- ✅ GUI sẽ không mất khi nhân vật chết
+
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0,150,0,40)
+ToggleBtn.Position = UDim2.new(0.1,0,0.2,0)
+ToggleBtn.Text = "TheForce: OFF"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
+ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleBtn.Draggable = true
+
+local Auto = false
+ToggleBtn.MouseButton1Click:Connect(function()
+    Auto = not Auto
+    ToggleBtn.Text = Auto and "Aura: ON" or "Aura: OFF"
     ToggleBtn.BackgroundColor3 = Auto and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
 end)
 
@@ -39,6 +86,12 @@ end)
 
 print("HI")
 end)
+
+KillingCheats:CreateButton("Orb Hacker", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("OrbEvent"):FireServer()
+print("HI")
+end)
+
 KillingCheats:CreateButton("autokill", function()
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
@@ -232,7 +285,7 @@ end)
 print("HI")
 end)
 
-KillingCheats:CreateButton("give kill", function()
+KillingCheats:CreateButton("autokill OG", function()
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
