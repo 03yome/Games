@@ -92,6 +92,11 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("Orb sans Hacker", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("ORBAbility"):FireServer()
+print("HI")
+end)
+
 KillingCheats:CreateButton("autokill", function()
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
