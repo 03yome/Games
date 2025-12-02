@@ -4,14 +4,12 @@ local PhantomForcesWindow = Library:NewWindow("Killstreak button test remastered
 
 local KillingCheats = PhantomForcesWindow:NewSection("main")
 KillingCheats:CreateButton("Aura Hacker", function()
-local RS = game:GetService("ReplicatedStorage")
-local remote = RS:WaitForChild("TheForce")
-local Player = game.Players.LocalPlayer
-
 -- GUI
+
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = Player:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false  -- ✅ GUI sẽ không mất khi nhân vật chết
+ScreenGui.Name = "hack"          -- đặt tên tùy ý
+ScreenGui.ResetOnSpawn = false          -- không mất khi respawn
+ScreenGui.Parent = game:GetService("CoreGui")
 
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0,150,0,40)
@@ -19,6 +17,7 @@ ToggleBtn.Position = UDim2.new(0.1,0,0.2,0)
 ToggleBtn.Text = "TheForce: OFF"
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(50,50,50)
 ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 
 local Auto = false
@@ -29,6 +28,7 @@ ToggleBtn.MouseButton1Click:Connect(function()
 end)
 
 -- Auto loop
+local remote = game:GetService("ReplicatedStorage"):WaitForChild("TheForce")
 task.spawn(function()
     while wait(1) do
         if Auto then
@@ -38,7 +38,6 @@ task.spawn(function()
         end
     end
 end)
-
 
 print("HI")
 end)
@@ -55,6 +54,7 @@ local Player = game.Players.LocalPlayer
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "hack"
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false  -- ✅ GUI sẽ không mất khi nhân vật chết
 
@@ -108,6 +108,7 @@ local RS = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
 local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "hack"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -182,6 +183,7 @@ local RS = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 
 local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "hack"
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -260,14 +262,25 @@ local RS = game:GetService("ReplicatedStorage")
 local remote = RS:WaitForChild("AdminEvents"):WaitForChild("GiveKill")
 
 -- 📌 Tạo GUI
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-local ToggleBtn = Instance.new("TextButton", ScreenGui)
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("AdminEvents"):WaitForChild("GiveKill")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 
+-- 📌 Tạo GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "hack"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- 📌 Tạo Toggle Button
+local ToggleBtn = Instance.new("TextButton", gui)
 ToggleBtn.Size = UDim2.new(0, 150, 0, 40)
 ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.Text = "GiveKill: OFF"
+ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 
 -- 📌 Trạng thái auto loop
@@ -292,6 +305,7 @@ task.spawn(function()
     end
 end)
 
+
 print("HI")
 end)
 
@@ -302,7 +316,7 @@ local slapFolder = rs:WaitForChild("SlapRemotes")
 
 -- GUI chính
 local gui = Instance.new("ScreenGui")
-gui.Name = "AutoKillGUI"
+gui.Name = "hack"
 gui.ResetOnSpawn = false
 gui.Parent = game.CoreGui
 
@@ -426,5 +440,33 @@ KillingCheats:CreateButton("OrbEventEx", function()
 game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("OrbEventEx"):FireServer()
 print("HI")
 end)
+
+KillingCheats:CreateButton("delete button", function()
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+
+local guiName = "hack" -- <-- đổi tên GUI cần xóa
+
+-- Xóa trong PlayerGui
+local playerGui = Player:FindFirstChild("PlayerGui")
+if playerGui then
+    local gui = playerGui:FindFirstChild(guiName)
+    if gui then
+        gui:Destroy()
+        print("✅ Đã xóa "..guiName.." trong PlayerGui")
+    end
+end
+
+-- Xóa trong CoreGui
+local coreGui = CoreGui:FindFirstChild(guiName)
+if coreGui then
+    coreGui:Destroy()
+    print("✅ Đã xóa "..guiName.." trong CoreGui")
+end
+
+print("HI")
+end)
+
 print("HI")
 end)
