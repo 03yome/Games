@@ -22,7 +22,7 @@ ToggleBtn.Draggable = true
 local Auto = false
 ToggleBtn.MouseButton1Click:Connect(function()
     Auto = not Auto
-    ToggleBtn.Text = Auto and "Aura: ON" or "Aura: OFF"
+    ToggleBtn.Text = Auto and "Aura beta: ON" or "Aura beta: OFF"
     ToggleBtn.BackgroundColor3 = Auto and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
 end)
 
@@ -106,7 +106,7 @@ ToggleBtn.Draggable = true
 local Auto = false
 ToggleBtn.MouseButton1Click:Connect(function()
     Auto = not Auto
-    ToggleBtn.Text = Auto and "Aura: ON" or "Aura: OFF"
+    ToggleBtn.Text = Auto and "Aura.v2: ON" or "Aura.v2: OFF"
     ToggleBtn.BackgroundColor3 = Auto and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
 end)
 
