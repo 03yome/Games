@@ -27,7 +27,7 @@ ToggleBtn.MouseButton1Click:Connect(function()
 end)
 
 -- Auto loop
-local remote = game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("Shockwave"):FireServer()
+local remote = game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("Shockwave")
 task.spawn(function()
     while wait(1) do
         if Auto then
