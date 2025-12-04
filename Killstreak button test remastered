@@ -522,5 +522,10 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("trolling player", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("ZeroG"):FireServer()
+print("HI")
+end)
+
 print("HI")
 end)
