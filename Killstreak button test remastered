@@ -473,5 +473,10 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("HallowJack", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("HallowJack"):FireServer()
+print("HI")
+end)
+
 print("HI")
 end)
