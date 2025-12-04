@@ -517,5 +517,10 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("Swap.Position.Hacker", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("SwapPosition"):FireServer()
+print("HI")
+end)
+
 print("HI")
 end)
