@@ -468,5 +468,10 @@ end
 print("HI")
 end)
 
+KillingCheats:CreateButton("funny", function()
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("Duel"):FireServer()
+print("HI")
+end)
+
 print("HI")
 end)
