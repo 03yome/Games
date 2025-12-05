@@ -304,3 +304,257 @@ Tab:Button({
         targetFolder.DescendantAdded:Connect(ApplyTransparency)
     end
 })
+
+local Tab = Window:Tab({ Title = "Place" })
+
+Tab:Button({
+    Title = "1",
+    Callback = function()
+        local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local targetName = "x5_oz6" -- ⚠️ TÊN NGƯỜI MUỐN BAO VÂY
+
+local target = Players:FindFirstChild(targetName)
+if not target or not target.Character then
+    warn("Không tìm thấy người chơi!")
+    return
+end
+
+local HRP = target.Character:WaitForChild("HumanoidRootPart")
+
+local blockRemote = ReplicatedStorage.Networker.Remotes:WaitForChild("BlockReliable")
+
+-- ⭐ Model block
+local windowBlock = ReplicatedStorage.Components.Blocks["Window"]      -- tường
+local floorBlock  = ReplicatedStorage.Components.Blocks["FloorBlock"]  -- sàn + mái (block bạn muốn dùng)
+
+local height = 50
+local radius = 40          -- bán kính vòng tròn
+local enableRoof = true    -- bật mái
+
+-- SNAP LƯỚI
+local function snap4(v)
+    return math.floor(v / 4) * 4
+end
+
+local function placeBlock(model, pos)
+    local gridPos = Vector3.new(snap4(pos.X), snap4(pos.Y), snap4(pos.Z))
+
+    local data = {
+        rotation = 0,
+        selectedBlock = { order = 9, model = model, category = "block" },
+        gridPosition = gridPos
+    }
+
+    pcall(function()
+        blockRemote:FireServer(data, "Place")
+    end)
+end
+
+-- ⭐ Build vòng tròn Window
+local function buildCircle(model, center, yLevel)
+    for x = -radius, radius do
+        for z = -radius, radius do
+            -- Vẽ đường tròn (tường)
+            if x*x + z*z >= (radius-1)^2 and x*x + z*z <= (radius+1)^2 then
+                placeBlock(model, Vector3.new(
+                    center.X + x * 4,
+                    yLevel,
+                    center.Z + z * 4
+                ))
+                task.wait(0.001)
+            end
+        end
+    end
+end
+
+-- ⭐ Build sàn hoặc mái (full circle)
+local function buildFullCircleFloor(model, center, yLevel)
+    for x = -radius, radius do
+        for z = -radius, radius do
+            if x*x + z*z <= radius^2 then
+                placeBlock(model, Vector3.new(
+                    center.X + x * 4,
+                    yLevel,
+                    center.Z + z * 4
+                ))
+                task.wait(0.001)
+            end
+        end
+    end
+end
+
+
+local function BuildTrap()
+    local base = HRP.Position
+
+    -- ⭐ Sàn (block loại khác)
+    buildFullCircleFloor(floorBlock, base, base.Y - 4)
+
+    -- ⭐ Tường (Window)
+    for level = 0, height - 1 do
+        local y = base.Y + (level * 4)
+        buildCircle(windowBlock, base, y)
+    end
+
+    -- ⭐ Mái (cùng block với sàn)
+    if enableRoof then
+        buildFullCircleFloor(floorBlock, base, base.Y + height * 4)
+    end
+end
+
+BuildTrap()
+
+        end
+     })
+
+Tab:Button({
+    Title = "2",
+    Callback = function()
+        local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+
+local targetName = "x5_oz6" -- tên player để build quanh
+local target = Players:FindFirstChild(targetName)
+if not target or not target.Character then return end
+
+local HRP = target.Character:WaitForChild("HumanoidRootPart")
+local blockRemote = ReplicatedStorage.Networker.Remotes:WaitForChild("BlockReliable")
+
+-- ⭐ ĐỔI TÊN BLOCK (VD: "Window", "Stone", "Wood")
+local block = ReplicatedStorage.Components.Blocks["Window"]
+local category = block.Parent.Name
+
+local steps = 100       -- số bậc thang
+local radius = 12       -- độ rộng vòng xoắn
+local heightPerStep = 4 -- mỗi bước cao 4 vì snap 4
+
+local function snap4(v)
+	return math.floor(v / 4) * 4
+end
+
+local function placeBlock(pos)
+	local gridPos = Vector3.new(snap4(pos.X), snap4(pos.Y), snap4(pos.Z))
+
+	local data = {
+		rotation = 0,
+		selectedBlock = { order = 9, model = block, category = category },
+		gridPosition = gridPos
+	}
+
+	pcall(function()
+		blockRemote:FireServer(data, "Place")
+	end)
+end
+
+local function BuildSpiral()
+	local origin = HRP.Position
+
+	for i = 1, steps do
+		local angle = math.rad(i * 20) -- xoay quanh player
+		local x = origin.X + math.cos(angle) * radius
+		local z = origin.Z + math.sin(angle) * radius
+		local y = origin.Y + (i * heightPerStep)
+
+		placeBlock(Vector3.new(x, y, z))
+
+		task.wait(0.01)
+	end
+end
+
+BuildSpiral()
+
+        end
+     })
+
+Tab:Button({
+    Title = "3",
+    Callback = function()
+        local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local targetName = "ibai201000" -- ĐỔI PLAYER MUỐN TRAP
+
+local target = Players:FindFirstChild(targetName)
+if not target or not target.Character then
+    warn("Không tìm thấy người chơi!")
+    return
+end
+
+local HRP = target.Character:WaitForChild("HumanoidRootPart")
+local blockRemote = ReplicatedStorage.Networker.Remotes:WaitForChild("BlockReliable")
+
+-- ⭐ Tường + mái đều dùng block thường Light Gray
+local wallBlock = ReplicatedStorage.Components.Blocks["Light Gray"]
+
+local height = 10 -- số tầng
+local radius = 2  -- bán kính
+local CloseRoof = true -- ⭐ BẬT/TẮT MÁI (true = đóng lại, false = để hở)
+
+local function snap4(v)
+    return math.floor(v / 4) * 4
+end
+
+local function placeBlock(pos)
+    local gridPos = Vector3.new(snap4(pos.X), snap4(pos.Y), snap4(pos.Z))
+
+    local data = {
+        rotation = 0,
+        selectedBlock = { order = 1, model = wallBlock, category = "block" },
+        gridPosition = gridPos
+    }
+
+    pcall(function()
+        blockRemote:FireServer(data, "Place")
+    end)
+end
+
+local function BuildTrap()
+    local base = HRP.Position
+
+    -- ⭐ Xây tường
+    for y = 0, height - 1 do
+        local h = y * 4
+
+        for x = -radius, radius do
+            for z = -radius, radius do
+                if x == -radius or x == radius or z == -radius or z == radius then
+                    local pos = Vector3.new(
+                        base.X + x * 4,
+                        base.Y + h,
+                        base.Z + z * 4
+                    )
+                    placeBlock(pos)
+                    task.wait(0.01)
+                end
+            end
+        end
+    end
+
+    -- ⭐ Nếu bật CloseRoof → làm mái Light Gray
+    if CloseRoof then
+        local roofY = base.Y + height * 4
+
+        for x = -radius, radius do
+            for z = -radius, radius do
+                local pos = Vector3.new(
+                    base.X + x * 4,
+                    roofY,
+                    base.Z + z * 4
+                )
+                placeBlock(pos)
+                task.wait(0.01)
+            end
+        end
+    end
+end
+
+BuildTrap()
+
+        end
+     })
