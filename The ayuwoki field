@@ -131,3 +131,22 @@ _G.FullBrightEnabled = not _G.FullBrightEnabled
 print("HI")
 end)
 
+KillingCheats:CreateButton("anti Damage fall ", function()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local folder = ReplicatedStorage:FindFirstChild("Events") -- ⭐ Đặt tên folder tại đây
+local remoteName = "TakeDamage" -- ⭐ Tên remote cần xóa
+
+if folder then
+    for _, obj in pairs(folder:GetChildren()) do
+        if obj.Name == remoteName and obj:IsA("RemoteEvent") then
+            obj:Destroy()
+            print("Đã xóa:", obj:GetFullName())
+        end
+    end
+else
+    warn("❌ Không tìm thấy folder:", "Events")
+end
+
+print("HI")
+end)
