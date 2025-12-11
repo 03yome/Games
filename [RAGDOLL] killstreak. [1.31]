@@ -65,7 +65,7 @@ game:GetService("ReplicatedStorage").Events.BuyWizard:FireServer()
 print("HI")
 end)
 ------------------------------------
-KillingCheats:CreateButton("next", function()
+KillingCheats:CreateButton("next Killstreak", function()
 local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 local PhantomForcesWindow = Library:NewWindow("Killstreak")
 local KillingCheats = PhantomForcesWindow:NewSection("Phase")
@@ -155,8 +155,5 @@ local args = {
 game:GetService("ReplicatedStorage").Events.PhaseChangeVictoria:FireServer(unpack(args))
 print("HI")
 end)
-print("HI")
-end)
-
 print("HI")
 end)
