@@ -88,3 +88,72 @@ print("HI")
 end)
 print("HI")
 end)
+------------------------------------
+KillingCheats:CreateButton("next", function()
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+local PhantomForcesWindow = Library:NewWindow("Killstreak")
+local KillingCheats = PhantomForcesWindow:NewSection("Phase")
+KillingCheats:CreateButton("phase 1", function()
+local args = {
+    [1] = 1
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 2", function()
+local args = {
+    [1] = 2
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 3", function()
+local args = {
+    [1] = 3
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 4", function()
+local args = {
+    [1] = 4
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 5", function()
+local args = {
+    [1] = 5
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 6", function()
+local args = {
+    [1] = 6
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 7", function()
+local args = {
+    [1] = 7
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
+print("HI")
+end)
+print("HI")
+end)
