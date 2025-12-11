@@ -64,30 +64,6 @@ KillingCheats:CreateButton("Wizard", function()
 game:GetService("ReplicatedStorage").Events.BuyWizard:FireServer()
 print("HI")
 end)
---------------------
-KillingCheats:CreateButton("next", function()
-local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
-local PhantomForcesWindow = Library:NewWindow("Victoria")
-local KillingCheats = PhantomForcesWindow:NewSection("Phase")
-KillingCheats:CreateButton("phase 1", function()
-local args = {
-    [1] = 1
-}
-
-game:GetService("ReplicatedStorage").Events.PhaseChangeVictoria:FireServer(unpack(args))
-print("HI")
-end)
-
-KillingCheats:CreateButton("phase 2", function()
-local args = {
-    [1] = 2
-}
-
-game:GetService("ReplicatedStorage").Events.PhaseChangeVictoria:FireServer(unpack(args))
-print("HI")
-end)
-print("HI")
-end)
 ------------------------------------
 KillingCheats:CreateButton("next", function()
 local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
@@ -155,5 +131,32 @@ local args = {
 game:GetService("ReplicatedStorage").Events.PhaseChangeKillstreak:FireServer(unpack(args))
 print("HI")
 end)
+
+
+--------------------
+KillingCheats:CreateButton("next", function()
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+local PhantomForcesWindow = Library:NewWindow("Victoria")
+local KillingCheats = PhantomForcesWindow:NewSection("Phase")
+KillingCheats:CreateButton("phase 1", function()
+local args = {
+    [1] = 1
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeVictoria:FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("phase 2", function()
+local args = {
+    [1] = 2
+}
+
+game:GetService("ReplicatedStorage").Events.PhaseChangeVictoria:FireServer(unpack(args))
+print("HI")
+end)
+print("HI")
+end)
+
 print("HI")
 end)
