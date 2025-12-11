@@ -696,6 +696,58 @@ end)
 print("HI")
 end)
 
+KillingCheats:CreateButton("give kill2", function()
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("AdminEvents"):WaitForChild("GiveKill2")
+
+-- 📌 Tạo GUI
+local RS = game:GetService("ReplicatedStorage")
+local remote = RS:WaitForChild("AdminEvents"):WaitForChild("GiveKill2")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+-- 📌 Tạo GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "hack"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- 📌 Tạo Toggle Button
+local ToggleBtn = Instance.new("TextButton", gui)
+ToggleBtn.Size = UDim2.new(0, 150, 0, 40)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Text = "GiveKill2: OFF"
+ToggleBtn.Active = true
+ToggleBtn.Draggable = true
+
+-- 📌 Trạng thái auto loop
+local AutoLoop = false
+
+-- 🔘 Bấm để đổi trạng thái
+ToggleBtn.MouseButton1Click:Connect(function()
+    AutoLoop = not AutoLoop
+    ToggleBtn.Text = AutoLoop and "GiveKill2: ON" or "GiveKill2: OFF"
+    ToggleBtn.BackgroundColor3 = AutoLoop and Color3.fromRGB(0,170,0) or Color3.fromRGB(30,30,30)
+end)
+
+-- 🔥 LOOP GIVEKILL
+task.spawn(function()
+    while true do
+        if AutoLoop then
+            pcall(function()
+                remote:FireServer()
+            end)
+        end
+        wait(0.1) -- tốc độ spam
+    end
+end)
+
+
+print("HI")
+end)
+
 KillingCheats:CreateButton("Swap.Position.Hacker", function()
 game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild("SwapPosition"):FireServer()
 print("HI")
