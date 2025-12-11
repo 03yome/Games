@@ -64,10 +64,10 @@ KillingCheats:CreateButton("Wizard", function()
 game:GetService("ReplicatedStorage").Events.BuyWizard:FireServer()
 print("HI")
 end)
-
+--------------------
 KillingCheats:CreateButton("next", function()
 local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
-local PhantomForcesWindow = Library:NewWindow("Frame 2")
+local PhantomForcesWindow = Library:NewWindow("Victoria")
 local KillingCheats = PhantomForcesWindow:NewSection("Phase")
 KillingCheats:CreateButton("phase 1", function()
 local args = {
