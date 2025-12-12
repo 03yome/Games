@@ -1,0 +1,319 @@
+local TARGET_NAME = "TransfurPart"  -- 🔥 ĐỔI TÊN TẠI ĐÂY
+
+local workspace = game:GetService("Workspace")
+local count = 0
+
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") and obj.Name == TARGET_NAME then
+        obj:Destroy()
+        count += 1
+    end
+end
+
+print("Đã xóa tổng cộng:", count, "part tên", TARGET_NAME)
+-------------------------------
+-- Gui
+-------------------------------
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+local enabled1 = false
+local enabled2 = false
+
+-- GUI
+local screenGui = player.PlayerGui:FindFirstChild("AutoPanelGui") or Instance.new("ScreenGui")
+screenGui.Name = "AutoPanelGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player.PlayerGui
+
+-- Container
+local container = Instance.new("Frame")
+container.Size = UDim2.new(0, 220, 0, 240)
+container.Position = UDim2.new(0.5, -110, 0.1, 0)
+container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+container.BorderSizePixel = 0
+container.Parent = screenGui
+Instance.new("UICorner", container)
+
+-- Viền
+local stroke = Instance.new("UIStroke", container)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(255,50,50)
+
+-- Title
+local title = Instance.new("TextLabel", container)
+title.Size = UDim2.new(1,0,0,30)
+title.BackgroundColor3 = Color3.fromRGB(50,50,50)
+title.Text = "AUTO PANEL"
+title.TextColor3 = Color3.fromRGB(0,255,100)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+Instance.new("UICorner", title)
+
+-- ScrollFrame
+local scrollFrame = Instance.new("ScrollingFrame", container)
+scrollFrame.Size = UDim2.new(1,0,1,-30)
+scrollFrame.Position = UDim2.new(0,0,0,30)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollFrame.CanvasSize = UDim2.new(0,0,0,0)
+
+-- UIListLayout (tự căn button)
+local list = Instance.new("UIListLayout", scrollFrame)
+list.Padding = UDim.new(0, 10)
+list.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- MAKE BUTTON FUNCTION (AUTO)
+local buttonIndex = 0
+local function makeBtn(text, color)
+    buttonIndex += 1
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9,0,0,40)
+    btn.BackgroundColor3 = color or Color3.fromRGB(40,40,40)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Text = text
+    btn.TextScaled = true
+    btn.Font = Enum.Font.GothamBold
+    btn.LayoutOrder = buttonIndex
+    btn.Parent = scrollFrame
+
+    Instance.new("UICorner", btn)
+
+    local s = Instance.new("UIStroke", btn)
+    s.Thickness = 3
+    s.Color = Color3.fromRGB(255,50,50)
+
+    return btn
+end
+
+-- Buttons
+local toggle1 = makeBtn("Rush: OFF", Color3.fromRGB(255,50,50))
+local toggle2 = makeBtn("Add cash: OFF", Color3.fromRGB(255,50,50))
+
+local oneClick1  = makeBtn("Vanish (Once)")
+local oneClick2  = makeBtn("Strike")
+local oneClick3  = makeBtn("BShot")
+local oneClick4  = makeBtn("Combo")
+local oneClick5  = makeBtn("Haki")
+local oneClick6  = makeBtn("HookWorm")
+local oneClick7  = makeBtn("Cyclops")
+local oneClick8  = makeBtn("KuchisakeOnna")
+local oneClick9  = makeBtn("Squid")
+local oneClick10 = makeBtn("Uzumaki")
+
+local oneClick11 = makeBtn("IdleDeathGamble")
+local oneClick12 = makeBtn("IdleDeathGambleFail")
+local oneClick13 = makeBtn("LuckyBeatdown")
+local oneClick14 = makeBtn("Pachinko")
+local oneClick15 = makeBtn("PachinkoBall")
+local oneClick16 = makeBtn("ShutterDoors")
+local oneClick17 = makeBtn("Atomic")
+local oneClick18 = makeBtn("Chainsaw man")
+
+local oneClick19 = makeBtn("IgrisEvent")
+local oneClick20 = makeBtn("MalevolentShrine")
+local oneClick21 = makeBtn("Okarun")
+local oneClick22 = makeBtn("Luffy")
+local oneClick23 = makeBtn("BajrangGun")
+local oneClick24 = makeBtn("BallBarrage")
+local oneClick25 = makeBtn("Kaminari")
+local oneClick26 = makeBtn("Chibaku")
+local oneClick27 = makeBtn("Katon")
+local oneClick28 = makeBtn("Meteor")
+local oneClick29 = makeBtn("Susanoo")
+
+-------------------------------
+-- Auto loops
+-------------------------------
+task.spawn(function()
+    while task.wait(0.1) do
+        if enabled1 then
+            ReplicatedStorage.EventsSJW.Rush:FireServer()
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if enabled2 then
+            ReplicatedStorage.AddGamePassCash:FireServer()
+        end
+    end
+end)
+
+-------------------------------
+-- Toggle events
+-------------------------------
+toggle1.MouseButton1Click:Connect(function()
+    enabled1 = not enabled1
+    if enabled1 then
+        toggle1.Text = "Rush: ON"
+        toggle1.BackgroundColor3 = Color3.fromRGB(0,255,100)
+    else
+        toggle1.Text = "Rush: OFF"
+        toggle1.BackgroundColor3 = Color3.fromRGB(255,50,50)
+    end
+end)
+
+toggle2.MouseButton1Click:Connect(function()
+    enabled2 = not enabled2
+    if enabled2 then
+        toggle2.Text = "Add cash: ON"
+        toggle2.BackgroundColor3 = Color3.fromRGB(0,255,100)
+    else
+        toggle2.Text = "Add cash: OFF"
+        toggle2.BackgroundColor3 = Color3.fromRGB(255,50,50)
+    end
+end)
+
+-------------------------------
+-- One-click events
+-------------------------------
+oneClick1.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsSJW.Vanish:FireServer()
+end)
+
+oneClick2.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsSJW.Strike:FireServer()
+end)
+
+oneClick3.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsSanji.BShot:FireServer()
+end)
+
+oneClick4.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsSanji.Combo:FireServer()
+end)
+
+oneClick5.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Eventz.Haki:FireServer()
+end)
+
+oneClick6.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsGeto.Geto.HookWorm:FireServer()
+end)
+
+oneClick7.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsGeto.Geto.Cyclops:FireServer()
+end)
+
+oneClick8.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsGeto.Geto.KuchisakeOnna:FireServer()
+end)
+
+oneClick9.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsGeto.Geto.Squid:FireServer()
+end)
+
+oneClick10.MouseButton1Click:Connect(function()
+    ReplicatedStorage.EventsGeto.Geto.Uzumaki:FireServer()
+end)
+
+oneClick11.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.IdleDeathGamble:FireServer()
+end)
+
+oneClick12.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.IdleDeathGambleFail:FireServer()
+end)
+
+oneClick13.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.LuckyBeatdown:FireServer()
+end)
+
+oneClick14.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.Pachinko:FireServer()
+end)
+
+oneClick15.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.PachinkoBall:FireServer()
+end)
+
+oneClick16.MouseButton1Click:Connect(function()
+    ReplicatedStorage.Remotes.ShutterDoors:FireServer()
+end)
+
+oneClick17.MouseButton1Click:Connect(function() game:GetService("ReplicatedStorage").AtomicFolder.Event:FireServer()
+end)
+
+oneClick18.MouseButton1Click:Connect(function() game:GetService("ReplicatedStorage").Chainsaw_Man_RS_Folder.Remotes.Transform_RE:FireServer()
+end)
+
+oneClick19.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").IgrisMonarchMode.IgrisEvent:FireServer()
+end)
+
+oneClick20.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").MalevolentShrine:FireServer()
+end)
+
+oneClick21.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").Skills.Okarun.One:FireServer()
+end)
+
+oneClick22.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsGear5.Luffy.AWK.One:FireServer()
+end)
+
+oneClick23.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsGear5.Luffy.BajrangGun.One:FireServer()
+end)
+
+oneClick24.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsGear5.Luffy.BallBarrage.One:FireServer()
+end)
+
+oneClick25.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsGear5.Luffy.Kaminari.One:FireServer()
+end)
+
+oneClick26.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsMadara.Madara.Chibaku.One:FireServer()
+end)
+
+oneClick27.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsMadara.Madara.Katon.One:FireServer()
+end)
+
+oneClick28.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsMadara.Madara.Meteor.One:FireServer()
+end)
+
+oneClick29.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").SkillsMadara.Madara.Susanoo.One:FireServer()
+end)
+
+-------------------------------
+-- Drag UI
+-------------------------------
+local dragging = false
+local dragStart, startPos
+
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = container.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+title.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        container.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
