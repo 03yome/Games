@@ -758,5 +758,10 @@ game:GetService("ReplicatedStorage"):WaitForChild("AbilityEvents"):WaitForChild(
 print("HI")
 end)
 
+KillingCheats:CreateButton("MakeTheStarFall", function()
+game:GetService("ReplicatedStorage").AbilityEvents.MakeTheStarFall:FireServer()
+print("HI")
+end)
+
 print("HI")
 end)
