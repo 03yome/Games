@@ -1,0 +1,234 @@
+-- Generated via discord.gg/25ms
+-- Refactored: readability + structure only
+
+--========================
+-- SERVICES
+--========================
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local DamageRemote = ReplicatedStorage.ALLREMBINDS.Pls_Dont_Hack_Plssssssssss
+
+--========================
+-- UI
+--========================
+local UI = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"
+))():NewWindow("03y_o SCRIPT"):NewSection("MAIN")
+
+--========================
+-- FURNITURE
+--========================
+local FurnitureFolder = workspace.World.Map.Furinture
+local FurnitureList = {}
+local SelectedFurniture
+
+for _, obj in ipairs(FurnitureFolder:GetChildren()) do
+    table.insert(FurnitureList, obj.Name)
+end
+
+SelectedFurniture = FurnitureList[1]
+
+UI:CreateDropdown("Select Furniture", FurnitureList, 1, function(v)
+    SelectedFurniture = v
+end)
+
+UI:CreateButton("Get Furniture", function()
+    local furniture = FurnitureFolder:FindFirstChild(SelectedFurniture)
+    if not furniture then return end
+
+    DamageRemote:FireServer(
+        "EMMFOSS__!ZCNSJNXCSDWQSANBX",
+        "PickUpPlaceFurintureOC_R",
+        {
+            LocalPlayer.Character,
+            furniture,
+            true
+        }
+    )
+end)
+
+--========================
+-- UTIL
+--========================
+local function IsMonster(model)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character == model then
+            return false
+        end
+    end
+    return true
+end
+
+--========================
+-- DAMAGE
+--========================
+local function DamageTarget(target)
+    if not target:FindFirstChild("Humanoid") then return end
+    if not IsMonster(target) then return end
+
+    DamageRemote:FireServer(
+        "EMMFOSS__!ZCNSJNXCSDWQSANBX",
+        "Main_Damger_OC_R",
+        {
+            target,
+            {
+                F = LocalPlayer.Character,
+                D = 99999
+            }
+        }
+    )
+end
+
+--========================
+-- AUTO KILL MONSTERS
+--========================
+local AutoKillMonsters = false
+
+UI:CreateToggle("Auto Kill Monsters", function(v)
+    AutoKillMonsters = v
+
+    task.spawn(function()
+        while AutoKillMonsters do
+            for _, mob in ipairs(workspace.Characters:GetChildren()) do
+                DamageTarget(mob)
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+workspace.Characters.ChildAdded:Connect(function(mob)
+    if AutoKillMonsters then
+        DamageTarget(mob)
+    end
+end)
+
+--========================
+-- AUTO KILL PLAYERS
+--========================
+local AutoKillPlayers = false
+
+local function KillPlayer(plr)
+    if plr == LocalPlayer then return end
+    if not plr.Character then return end
+
+    DamageRemote:FireServer(
+        "EMMFOSS__!ZCNSJNXCSDWQSANBX",
+        "Main_Damger_OC_R",
+        {
+            plr.Character,
+            {
+                F = LocalPlayer.Character,
+                D = 99999
+            }
+        }
+    )
+end
+
+UI:CreateToggle("Auto Kill Players", function(v)
+    AutoKillPlayers = v
+
+    task.spawn(function()
+        while AutoKillPlayers do
+            for _, plr in ipairs(Players:GetPlayers()) do
+                KillPlayer(plr)
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    if AutoKillPlayers then
+        plr.CharacterAdded:Connect(function()
+            KillPlayer(plr)
+        end)
+    end
+end)
+
+--========================
+-- ESP MONSTERS
+--========================
+local MonsterESP = false
+
+local function SetMonsterESP(model, enabled)
+    if not IsMonster(model) then return end
+
+    local esp = model:FindFirstChild("MonsterESP") or Instance.new("Highlight")
+    esp.Name = "MonsterESP"
+    esp.Adornee = model
+    esp.FillColor = Color3.fromRGB(255, 0, 0)
+    esp.Parent = model
+    esp.Enabled = enabled
+end
+
+UI:CreateToggle("ESP Monsters (Red)", function(v)
+    MonsterESP = v
+    for _, mob in ipairs(workspace.Characters:GetChildren()) do
+        SetMonsterESP(mob, v)
+    end
+end)
+
+workspace.Characters.ChildAdded:Connect(function(mob)
+    if MonsterESP then
+        SetMonsterESP(mob, true)
+    end
+end)
+
+--========================
+-- ESP PLAYERS
+--========================
+local PlayerESP = false
+
+local function SetPlayerESP(plr, enabled)
+    if plr == LocalPlayer or not plr.Character then return end
+
+    local esp = plr.Character:FindFirstChild("PlayerESP") or Instance.new("Highlight")
+    esp.Name = "PlayerESP"
+    esp.Adornee = plr.Character
+    esp.FillColor = Color3.fromRGB(0, 255, 0)
+    esp.Parent = plr.Character
+    esp.Enabled = enabled
+end
+
+UI:CreateToggle("ESP Players (Green)", function(v)
+    PlayerESP = v
+    for _, plr in ipairs(Players:GetPlayers()) do
+        SetPlayerESP(plr, v)
+    end
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    if PlayerESP then
+        plr.CharacterAdded:Connect(function()
+            SetPlayerESP(plr, true)
+        end)
+    end
+end)
+
+--========================
+-- KILL SELECTED PLAYER
+--========================
+local PlayerNames = {}
+for _, plr in ipairs(Players:GetPlayers()) do
+    table.insert(PlayerNames, plr.Name)
+end
+
+local SelectedPlayer = PlayerNames[1]
+
+UI:CreateDropdown("Select Player", PlayerNames, 1, function(v)
+    SelectedPlayer = v
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    table.insert(PlayerNames, plr.Name)
+end)
+
+UI:CreateButton("Kill Selected Player", function()
+    local plr = Players:FindFirstChild(SelectedPlayer)
+    if plr then
+        KillPlayer(plr)
+    end
+end)
