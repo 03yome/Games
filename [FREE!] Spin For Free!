@@ -197,3 +197,17 @@ local SpinButton = MainTab:CreateButton({
 			:FireServer(unpack(args))
 	end
 })
+
+local Button = MainTab:CreateButton({
+	Name = "turn admin panle",
+	Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.FramesGUI.AdminPanel.Visible = true
+	end
+})
+
+local Button = MainTab:CreateButton({
+	Name = "turn frame admin",
+	Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.FramesGUI.AdminPanel.GiveFrame.Visible = true
+	end
+})
