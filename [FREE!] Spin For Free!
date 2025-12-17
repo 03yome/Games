@@ -1,0 +1,199 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "[FREE!] Spin For Free!",
+   Icon = 0, 
+   LoadingTitle = "",
+   LoadingSubtitle = "by romd3976",
+   ShowText = "Rayfield", 
+   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
+
+   Discord = {
+      Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "noinvitelink", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "lol", 
+      FileName = "Key", 
+      SaveKey = true,
+      GrabKeyFromSite = false, 
+      Key = {"Hello"}
+   }
+})
+
+local MainTab = Window:CreateTab("Change", 4483362458) -- Title, Image
+
+-- biến lưu giá trị input
+local spinAmount = 0
+
+-- Input
+local Input = MainTab:CreateInput({
+	Name = "Spin Amount",
+	CurrentValue = "",
+	PlaceholderText = "Enter number of spins",
+	RemoveTextAfterFocusLost = false,
+	Flag = "SpinInput",
+	Callback = function(Text)
+		spinAmount = tonumber(Text) or 0
+	end,
+})
+
+-- Button để fire remote
+local Button = MainTab:CreateButton({
+	Name = "Give Spins",
+	Callback = function()
+		if spinAmount <= 0 then
+			warn("Invalid spin amount")
+			return
+		end
+
+		local args = {
+			[1] = "Spins",
+			[2] = spinAmount
+		}
+
+		game:GetService("ReplicatedStorage")
+			:WaitForChild("Events")
+			:WaitForChild("PlayTimeGifts")
+			:FireServer(unpack(args))
+	end,
+})
+
+-- biến lưu giá trị input
+local creditAmount = 0
+
+-- Input
+local Input = MainTab:CreateInput({
+	Name = "Credit Amount",
+	CurrentValue = "",
+	PlaceholderText = "Enter number of Credits",
+	RemoveTextAfterFocusLost = false,
+	Flag = "CreditInput",
+	Callback = function(Text)
+		creditAmount = tonumber(Text) or 0
+	end,
+})
+
+-- Button để fire remote
+local Button = MainTab:CreateButton({
+	Name = "Give Credits",
+	Callback = function()
+		if creditAmount <= 0 then
+			warn("Invalid credit amount")
+			return
+		end
+
+		local args = {
+			[1] = "Credits",
+			[2] = creditAmount
+		}
+
+		game:GetService("ReplicatedStorage")
+			:WaitForChild("Events")
+			:WaitForChild("PlayTimeGifts")
+			:FireServer(unpack(args))
+	end,
+})
+
+-- ===== Spin Config =====
+local spinAmount = "1" -- string theo game
+local spinMulti = 1
+
+-- Input: số lượng
+local SpinInput = MainTab:CreateInput({
+	Name = "Spin Amount",
+	CurrentValue = "",
+	PlaceholderText = "Enter amount",
+	RemoveTextAfterFocusLost = false,
+	Flag = "SpinAmount",
+	Callback = function(text)
+		spinAmount = tostring(text)
+	end
+})
+
+-- Slider: hệ số nhân
+local SpinSlider = MainTab:CreateSlider({
+	Name = "Spin Multiplier",
+	Range = {1, 500},
+	Increment = 1,
+	CurrentValue = 1,
+	Flag = "SpinMultiplier",
+	Callback = function(value)
+		spinMulti = value
+	end
+})
+
+-- Button: FireServer
+local SpinButton = MainTab:CreateButton({
+	Name = "Give Credits spin",
+	Callback = function()
+		local args = {
+			spinAmount, -- số lượng
+			spinMulti  -- hệ số
+		}
+
+		game:GetService("ReplicatedStorage")
+			:WaitForChild("Events")
+			:WaitForChild("Spin")
+			:FireServer(unpack(args))
+	end
+})
+
+local Button = MainTab:CreateButton({
+   Name = "Daily Chest",
+   Callback = function()
+local args = {
+    [1] = "claim"
+}
+
+game:GetService("ReplicatedStorage").Events.DailyChest:FireServer(unpack(args))
+   end,
+})
+
+-- ===== Spin (free / amount) =====
+local spinValue = "free"
+
+-- Input nhập free hoặc số
+local SpinInput = MainTab:CreateInput({
+	Name = "Spin (free / amount)",
+	CurrentValue = "",
+	PlaceholderText = "free hoặc số (vd: )",
+	RemoveTextAfterFocusLost = false,
+	Flag = "SpinValue",
+	Callback = function(text)
+		if text ~= "" then
+			spinValue = tostring(text)
+		end
+	end
+})
+
+-- Button fire server
+local SpinButton = MainTab:CreateButton({
+	Name = "Fire Spin Server",
+	Callback = function()
+		local args = {
+			spinValue
+		}
+
+		game:GetService("ReplicatedStorage")
+			:WaitForChild("Events")
+			:WaitForChild("Spin")
+			:FireServer(unpack(args))
+	end
+})
