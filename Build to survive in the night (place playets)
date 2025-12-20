@@ -558,3 +558,203 @@ BuildTrap()
 
         end
      })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local HRP = player.Character and player.Character:WaitForChild("HumanoidRootPart")
+if not HRP then return end
+
+local blockRemote = ReplicatedStorage.Networker.Remotes:WaitForChild("BlockReliable")
+local Blocks = ReplicatedStorage.Components.Blocks
+
+-- ===== BLOCK DÙNG CHO CHỮ =====
+local TEXT_BLOCK = Blocks["Blue"] -- đổi màu chữ ở đây
+local CATEGORY = TEXT_BLOCK.Parent.Name
+
+-- ===== CONFIG =====
+local unit = 4
+local origin = HRP.Position + Vector3.new(0, 20, -30)
+
+-- ✏️ CHỮ MUỐN VẼ
+local TEXT = "HELLO HI 1 2 3 4 5 6 7 8 9 10"
+
+-- ===== FONT PIXEL 5x5 =====
+local FONT = {
+	H = {
+		"X___X",
+		"X___X",
+		"XXXXX",
+		"X___X",
+		"X___X",
+	},
+	E = {
+		"XXXXX",
+		"X____",
+		"XXXX_",
+		"X____",
+		"XXXXX",
+	},
+	L = {
+		"X____",
+		"X____",
+		"X____",
+		"X____",
+		"XXXXX",
+	},
+	O = {
+		"_XXX_",
+		"X___X",
+		"X___X",
+		"X___X",
+		"_XXX_",
+	},
+	I = {
+		"XXXXX",
+		"__X__",
+		"__X__",
+		"__X__",
+		"XXXXX",
+	},
+	["1"] = {
+		"__X__",
+		"_XX__",
+		"__X__",
+		"__X__",
+		"_XXX_",
+	},
+	["2"] = {
+		"_XXX_",
+		"X___X",
+		"___X_",
+		"_X___",
+		"XXXXX",
+	},
+	["3"] = {
+		"XXXXX",
+		"___X_",
+		"_XXX_",
+		"___X_",
+		"XXXXX",
+	},
+	["4"] = {
+		"X___X",
+		"X___X",
+		"XXXXX",
+		"____X",
+		"____X",
+	},
+	["5"] = {
+		"XXXXX",
+		"X____",
+		"XXXX_",
+		"____X",
+		"XXXX_",
+	},
+	["6"] = {
+		"_XXX_",
+		"X____",
+		"XXXX_",
+		"X___X",
+		"_XXX_",
+	},
+	["7"] = {
+		"XXXXX",
+		"___X_",
+		"__X__",
+		"_X___",
+		"X____",
+	},
+	["8"] = {
+		"_XXX_",
+		"X___X",
+		"_XXX_",
+		"X___X",
+		"_XXX_",
+	},
+	["9"] = {
+		"_XXX_",
+		"X___X",
+		"_XXXX",
+		"____X",
+		"_XXX_",
+	},
+	["0"] = {
+		"_XXX_",
+		"X___X",
+		"X___X",
+		"X___X",
+		"_XXX_",
+	},
+}
+
+-- ===== UTIL =====
+local function snap(v)
+	return math.floor(v / unit) * unit
+end
+
+local function place(pos)
+	local data = {
+		rotation = 0,
+		selectedBlock = {
+			order = 9,
+			model = TEXT_BLOCK,
+			category = CATEGORY
+		},
+		gridPosition = Vector3.new(
+			snap(pos.X),
+			snap(pos.Y),
+			snap(pos.Z)
+		)
+	}
+	pcall(function()
+		blockRemote:FireServer(data, "Place")
+	end)
+end
+
+-- ===== DRAW TEXT =====
+local cursorX = 0
+
+for char in TEXT:gmatch(".") do
+	if char == " " then
+		cursorX = cursorX + 4
+	else
+		local glyph = FONT[char]
+		if glyph then
+			for y = 1, #glyph do
+				for x = 1, #glyph[y] do
+					if glyph[y]:sub(x,x) == "X" then
+						place(
+							origin + Vector3.new(
+								(cursorX + x) * unit,
+								(#glyph - y) * unit,
+								0
+							)
+						)
+					end
+				end
+			end
+			cursorX = cursorX + 6
+		end
+	end
+	task.wait(0.02)
+end
