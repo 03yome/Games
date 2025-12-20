@@ -1,0 +1,77 @@
+--// Library
+local Library = loadstring(
+    game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard")
+)()
+
+local Window = Library:NewWindow("Escape from Nosey The Rabbit")
+local Main = Window:NewSection("Main")
+
+--// Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local Events = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Server")
+local ItemsFolder = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Items")
+
+--// =========================
+--// ITEM DROPDOWN (STYLE d9f4b51d)
+--// =========================
+
+local ItemList = {}
+for _, item in ipairs(ItemsFolder:GetChildren()) do
+    table.insert(ItemList, item.Name)
+end
+
+local SelectedItem = ItemList[1]
+
+Main:CreateDropdown("Select Item", ItemList, 1, function(v)
+    SelectedItem = v
+end)
+
+Main:CreateButton("Give Selected Item", function()
+    local item = ItemsFolder:FindFirstChild(SelectedItem)
+    if not item then
+        warn("Item not found:", SelectedItem)
+        return
+    end
+
+    Events.GiveItem:FireServer(item)
+end)
+
+--// =========================
+--// GIVE COINS
+--// =========================
+
+Main:CreateTextbox("Give Coins Amount", function(text)
+    local amount = tonumber(text)
+    if not amount then
+        warn("Invalid number")
+        return
+    end
+
+    Events.GiveCoins:FireServer(amount)
+end)
+
+--// =========================
+--// SET PAGES VALUE
+--// =========================
+
+Main:CreateTextbox("Set Pages Value", function(text)
+    local value = tonumber(text)
+    if not value then
+        warn("Invalid number")
+        return
+    end
+
+    local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+    if not leaderstats then return end
+
+    local pages = leaderstats:FindFirstChild("Pages")
+    if not pages then return end
+
+    Events.ChangeProperties:FireServer(
+        pages,
+        { Value = value }
+    )
+end)
