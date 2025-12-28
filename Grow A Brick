@@ -1,0 +1,145 @@
+--// Load Rayfield
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+--// Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+
+--// Remote
+local foodRemote = ReplicatedStorage
+    :WaitForChild("remote_events")
+    :WaitForChild("food_tool_remote_event")
+
+--// Window
+local Window = Rayfield:CreateWindow({
+    Name = "Drop!",
+    ToggleUIKeybind = "K",
+    Theme = "Default"
+})
+
+--// Tab
+local Tab = Window:CreateTab("Drop", 4483362458)
+
+--// ================= DATA =================
+local foodList = {}
+local selectedFood = nil
+local customAmount = 0
+
+--// Scan food_amounts
+local function scanFoods()
+    table.clear(foodList)
+    local folder = player:WaitForChild("food_amounts")
+
+    for _, food in ipairs(folder:GetChildren()) do
+        table.insert(foodList, food.Name)
+    end
+
+    selectedFood = foodList[1]
+end
+
+scanFoods()
+
+--// ================= DROPDOWN =================
+Tab:CreateDropdown({
+    Name = "Select Food",
+    Options = foodList,
+    CurrentOption = selectedFood and {selectedFood} or {},
+    MultipleOptions = false,
+    Flag = "FoodDropdown",
+    Callback = function(Options)
+        selectedFood = Options[1]
+    end,
+})
+
+--// ================= INPUT (THÊM – KHÔNG THAY X100) =================
+Tab:CreateInput({
+    Name = "Custom Amount",
+    PlaceholderText = "Enter amount (optional)",
+    CurrentValue = "",
+    RemoveTextAfterFocusLost = false,
+    Flag = "CustomAmount",
+    Callback = function(Text)
+        local num = tonumber(Text)
+        if num and num > 0 then
+            customAmount = math.floor(num)
+        else
+            customAmount = 0
+        end
+    end,
+})
+
+--// ================= BUTTON DROP x100 (GIỮ NGUYÊN) =================
+Tab:CreateButton({
+    Name = "DROP x100",
+    Callback = function()
+        if not selectedFood then return end
+
+        for i = 1, 100 do
+            foodRemote:FireServer("drop_food", selectedFood)
+            task.wait()
+        end
+    end,
+})
+
+--// ================= BUTTON DROP CUSTOM =================
+Tab:CreateButton({
+    Name = "DROP CUSTOM",
+    Callback = function()
+        if not selectedFood then return end
+        if customAmount <= 0 then
+            Rayfield:Notify({
+                Title = "Error",
+                Content = "Please enter a valid amount",
+                Duration = 2
+            })
+            return
+        end
+
+        for i = 1, customAmount do
+            foodRemote:FireServer("drop_food", selectedFood)
+            task.wait()
+        end
+    end,
+})
+
+Tab:CreateButton({
+    Name = "Claim all cube",
+    Callback = function()
+-- grow a brick
+-- execute it again if you want to reclaim all the food again
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+
+local food = {}
+for _, part in ipairs(workspace:GetDescendants()) do
+    if part.Name == "new_food" then
+        table.insert(food, part)
+    end
+end
+
+local Index = 1
+
+local function yess()
+    local Stop = math.min(Index + 25 - 1, #food)
+        
+    for i = Index, Stop do
+            local food = food[i]
+        if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = LP.Character.HumanoidRootPart
+            food.CanCollide = false
+            food.Transparency = 1
+            food.CFrame = hrp.CFrame + Vector3.new(0, 0, 0)
+        end
+    end
+
+    Index = Stop + 1
+    if Index <= #food then
+        task.delay(0.1, yess)
+    end
+end
+yess()
+    end,
+})
