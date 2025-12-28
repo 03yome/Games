@@ -1960,6 +1960,65 @@ game:GetService("ReplicatedStorage").NetworkEvents.RemoteEvent:FireServer("PLACE
    end,
 })
 
+local Section = Tab:CreateSection("Client")
+
+local Button = Tab:CreateButton({
+   Name = "Unload Entities(P)",
+   Callback = function()
+-- services
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+
+local lplr = Players.LocalPlayer
+local char = lplr.Character or lplr.CharacterAdded:Wait()
+
+-- folder entity (đổi nếu game khác)
+local living = workspace:FindFirstChild("LivingThings")
+if not living then
+    warn("LivingThings not found")
+    return
+end
+
+local unloaded = false
+
+-- luôn giữ character trong workspace
+local function keepCharacterSafe()
+    if char and char.Parent ~= workspace then
+        char.Parent = workspace
+    end
+end
+
+-- theo dõi respawn
+lplr.CharacterAdded:Connect(function(c)
+    char = c
+    task.wait()
+    keepCharacterSafe()
+end)
+
+-- toggle unload
+local function toggleUnload()
+    unloaded = not unloaded
+    keepCharacterSafe()
+
+    if unloaded then
+        living.Parent = nil
+        warn("Unload Entities: ON")
+    else
+        living.Parent = workspace
+        warn("Unload Entities: OFF")
+    end
+end
+
+-- phím bật/tắt
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.P then
+        toggleUnload()
+    end
+end)
+   end,
+})
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
