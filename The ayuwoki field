@@ -282,3 +282,163 @@ end)
 print("HI")
 end)
 
+KillingCheats:CreateButton("menu flashbang ", function()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
+local player = Players.LocalPlayer
+
+local camaraToolName = "Camara"
+local target = nil
+local active = false
+
+StarterGui:SetCore("SendNotification", {
+    Title = "FLASH BANG";
+    Text = "cracked by romd3976";
+    Duration = 3;
+})
+
+local screenGui = player:WaitForChild("PlayerGui"):FindFirstChild("FlashBangGui")
+if not screenGui then
+    screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "FlashBangGui"
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = player:WaitForChild("PlayerGui")
+
+    local frame = Instance.new("Frame")
+    frame.Name = "MainFrame"
+    frame.Size = UDim2.new(0, 250, 0, 400)
+    frame.Position = UDim2.new(0.5, -125, 0.5, -200)
+    frame.BackgroundColor3 = Color3.new(1, 1, 1)
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = screenGui
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "FLASH BANG"
+    title.TextColor3 = Color3.new(0, 0, 0)
+    title.TextScaled = true
+    title.Parent = frame
+
+    local stopBtn = Instance.new("TextButton")
+    stopBtn.Size = UDim2.new(0, 80, 0, 30)
+    stopBtn.Position = UDim2.new(1, -85, 0, 0)
+    stopBtn.Text = "STOP"
+    stopBtn.BackgroundColor3 = Color3.new(1, 0, 0)
+    stopBtn.TextColor3 = Color3.new(1, 1, 1)
+    stopBtn.Parent = frame
+    stopBtn.MouseButton1Click:Connect(function()
+        active = false
+    end)
+
+    local scrollingFrame = Instance.new("ScrollingFrame")
+    scrollingFrame.Name = "PlayerList"
+    scrollingFrame.Size = UDim2.new(1, -10, 1, -40)
+    scrollingFrame.Position = UDim2.new(0, 5, 0, 35)
+    scrollingFrame.BackgroundTransparency = 1
+    scrollingFrame.ScrollBarThickness = 6
+    scrollingFrame.Parent = frame
+end
+
+local frame = screenGui:WaitForChild("MainFrame")
+local scrollingFrame = frame:WaitForChild("PlayerList")
+
+local function findLoadCharacter()
+    return ReplicatedStorage:FindFirstChild("LoadCharacter", true)
+end
+
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+player.CharacterAdded:Connect(function(newChar)
+    char = newChar
+    hrp = char:WaitForChild("HumanoidRootPart")
+end)
+
+local function updateList()
+    scrollingFrame:ClearAllChildren()
+    local y = 0
+    for _, plr in pairs(Players:GetPlayers()) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 30)
+        btn.Position = UDim2.new(0, 0, 0, y)
+        btn.Text = plr.Name
+        btn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
+        btn.TextColor3 = Color3.new(0, 0, 0)
+        btn.Parent = scrollingFrame
+        y = y + 35
+        btn.MouseButton1Click:Connect(function()
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                target = plr.Character.HumanoidRootPart
+                active = true
+                StarterGui:SetCore("SendNotification", {
+                    Title = "FLASH BANG";
+                    Text = "Activated on "..plr.Name;
+                    Duration = 3;
+                })
+            end
+        end)
+    end
+    local ayu = workspace:FindFirstChild("Ayuwoki")
+    if ayu and ayu:FindFirstChild("HumanoidRootPart") then
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 30)
+        btn.Position = UDim2.new(0, 0, 0, y)
+        btn.Text = "Ayuwoki"
+        btn.BackgroundColor3 = Color3.new(1, 0, 1)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Parent = scrollingFrame
+        btn.MouseButton1Click:Connect(function()
+            target = ayu.HumanoidRootPart
+            active = true
+            StarterGui:SetCore("SendNotification", {
+                Title = "FLASH BANG";
+                Text = "Activated on Ayuwoki";
+                Duration = 3;
+            })
+        end)
+        y = y + 35
+    end
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, y)
+end
+
+Players.PlayerAdded:Connect(updateList)
+Players.PlayerRemoving:Connect(updateList)
+updateList()
+
+spawn(function()
+    while true do
+        RunService.RenderStepped:Wait()
+        if active and target and char and hrp then
+            local lookVector = target.CFrame.LookVector
+            local frontPos = target.Position + lookVector * 20
+            hrp.CFrame = CFrame.new(frontPos, target.Position)
+            workspace.CurrentCamera.CFrame = CFrame.new(hrp.Position, target.Position)
+            local tool = player.Backpack:FindFirstChild(camaraToolName) or char:FindFirstChild(camaraToolName)
+            if tool then
+                char.Humanoid:EquipTool(tool)
+                if tool:FindFirstChild("Activate") then
+                    tool.Activate:FireServer()
+                else
+                    tool:Activate()
+                end
+                wait(2)
+                local loadChar = findLoadCharacter()
+                if loadChar then
+                    if loadChar:IsA("RemoteEvent") then
+                        loadChar:FireServer()
+                    elseif loadChar:IsA("RemoteFunction") then
+                        loadChar:InvokeServer()
+                    end
+                end
+            end
+            wait(0.5)
+        end
+    end
+end)
+print("HI")
+end)
