@@ -1890,6 +1890,63 @@ local Tab = Window:CreateTab("Server/client", nil)
 local Section = Tab:CreateSection("Server")
 
 local Button = Tab:CreateButton({
+   Name = "Hack Sniper",
+   Callback = function()
+-- services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local lplr = Players.LocalPlayer
+local char = lplr.Character or lplr.CharacterAdded:Wait()
+
+-- equip sniper
+ReplicatedStorage.Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+
+-- wait sniper
+local Sniper
+repeat
+    Sniper = lplr:FindFirstChild("Sniper", true) or char:FindFirstChild("Sniper", true)
+    task.wait()
+until Sniper and Sniper:FindFirstChild("LocalScript")
+
+-- hook script
+local scr = getsenv(Sniper.LocalScript)
+local shoot = debug.getupvalue(scr.FireGun, 5)
+local calc = debug.getupvalue(scr.FireGun, 6)
+local sound = Sniper.Handle["Sniper fire sound"]
+
+scr.FireGun = function(...)
+    local sc = sound:Clone()
+    sc.Playing = true
+    sc.Parent = Sniper.Handle
+    task.delay(sc.TimeLength, function()
+        sc:Destroy()
+    end)
+
+    shoot(Sniper.Flash2.Position, calc(...))
+end
+
+-- minigun logic
+local mouse = lplr:GetMouse()
+local buttonDown = false
+
+mouse.Button1Down:Connect(function()
+    if not buttonDown and Sniper.Parent == char then
+        buttonDown = true
+        repeat
+            coroutine.wrap(scr.FireGun)(mouse.X, mouse.Y)
+            task.wait()
+        until not buttonDown
+    end
+end)
+
+mouse.Button1Up:Connect(function()
+    buttonDown = false
+end)
+   end,
+})
+
+local Button = Tab:CreateButton({
    Name = "Summon Zombie",
    Callback = function()
 game:GetService("ReplicatedStorage").Remotes.ZombieRelated.Necro.AbilityPlayer:FireServer()
