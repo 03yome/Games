@@ -168,6 +168,13 @@ local TeamBarriers = {
     "NoZombie"
 }
 
+pcall(function()
+    NetworkClient:SetOutgoingKBPSLimit(tonumber("-inf"))
+end)
+
+local function rejoin()
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+end
 -----------------------------
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -853,6 +860,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Remotes = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Guns")
 local ShopRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon")
+local NetworkClient = game:GetService("NetworkClient")
+local TeleportService = game:GetService("TeleportService")
 
 local restrictedPart = workspace.Map:GetChildren()[153] 
 local restrictedCFrame = restrictedPart.CFrame
@@ -1967,6 +1976,125 @@ local Button = Tab:CreateButton({
 game:GetService("ReplicatedStorage").NetworkEvents.RemoteEvent:FireServer("PLACE_LANDMINE")
    end,
 })
+
+local landmineLag = false
+local landmineRemote = ReplicatedStorage:FindFirstChild("Remotes", true)
+
+Tab:CreateToggle({
+    Name = "Lag Server (Landmine Edition)",
+    CurrentValue = false,
+    Flag = "LandmineLag",
+    Callback = function(Value)
+        landmineLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if landmineLag and landmineRemote then
+            for _ = 1, 24 do
+                task.spawn(function()
+                    for _ = 1, 24000 do
+                        landmineRemote:FireServer()
+                    end
+                end)
+            end
+        end
+    end
+end)
+
+local necroLag = false
+local necroRemote =
+    ReplicatedStorage.Remotes.ZombieRelated.Necro.AbilityPlayer
+
+Tab:CreateToggle({
+    Name = "Lag Server (Necro Edition)",
+    CurrentValue = false,
+    Flag = "NecroLag",
+    Callback = function(Value)
+        necroLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if necroLag then
+            for _ = 1, 24 do
+                task.spawn(function()
+                    for _ = 1, 24000 do
+                        necroRemote:FireServer()
+                    end
+                end)
+            end
+        end
+    end
+end)
+
+local acidLag = false
+local acidRemote =
+    ReplicatedStorage.Remotes.ZombieRelated.AcidSpit
+
+Tab:CreateToggle({
+    Name = "Lag Server (Acid Edition)",
+    CurrentValue = false,
+    Flag = "AcidLag",
+    Callback = function(Value)
+        acidLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if acidLag then
+            for x = -266, 378, 18 do
+                for z = -268, 378, 18 do
+                    acidRemote:FireServer(
+                        Vector3.new(x,255,z),
+                        Vector3.new()
+                    )
+                end
+            end
+        end
+    end
+end)
+
+local acidRain = false
+
+Tab:CreateToggle({
+    Name = "Acid Rain",
+    CurrentValue = false,
+    Flag = "AcidRain",
+    Callback = function(Value)
+        acidRain = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait(0.3) do
+        if acidRain then
+            for x = -266, 378, 18 do
+                for z = -268, 378, 18 do
+                    acidRemote:FireServer(
+                        Vector3.new(x,255,z),
+                        Vector3.new()
+                    )
+                end
+            end
+        end
+    end
+end)
 
 local Section = Tab:CreateSection("Client")
 
