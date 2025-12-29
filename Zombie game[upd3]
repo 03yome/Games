@@ -2019,9 +2019,6 @@ end)
    end,
 })
 
-local Button = Tab:CreateButton({
-   Name = Remove barrires",
-   Callback = function()
 local TeamBarriers = {
     "ZombieSIGN",
     "ZombieDoor",
@@ -2030,13 +2027,15 @@ local TeamBarriers = {
     "NoZombie"
 }
 
+local Button = Tab:CreateButton({
+   Name = Remove barrires",
+   Callback = function()
 for _, name in ipairs(TeamBarriers) do
     local obj = workspace:FindFirstChild(name, true)
     if obj then
         obj:Destroy()
     end
 end
-
    end,
 })
 
