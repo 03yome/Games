@@ -845,7 +845,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local Remotes = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Guns")
 local ShopRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon")
-local WeaponsFolder = ReplicatedStorage:WaitForChild("Assets"):WaitForChild("Weapons")
 
 local restrictedPart = workspace.Map:GetChildren()[153] 
 local restrictedCFrame = restrictedPart.CFrame
@@ -1408,12 +1407,6 @@ local Toggle = Tab:CreateToggle({
    end,
 })
 
-local WeaponList = {}
-for _, v in WeaponsFolder:GetChildren() do
-    if v:IsA("Tool") then
-        table.insert(WeaponList, v.Name)
-    end
-end
 ---------------------------------------------------------
 local Section = Tab:CreateSection("Spawn Cool Items")
 local Button = Tab:CreateButton({
@@ -1721,27 +1714,6 @@ game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"
    end,
 })
 
-local SelectedWeapon = WeaponList[1]
-
-Tab:CreateDropdown({
-    Name = "Select Weapon",
-    Options = WeaponList,
-    CurrentOption = {SelectedWeapon},
-    MultipleOptions = false,
-    Callback = function(opt)
-        SelectedWeapon = opt[1]
-    end
-})
-
-Tab:CreateButton({
-    Name = "Give Selected Weapon",
-    Callback = function()
-        if SelectedWeapon then
-            ShopRemote:InvokeServer(SelectedWeapon)
-        end
-    end
-})
-
 local Tab = Window:CreateTab("Items", nil)
 
 local Button = Tab:CreateButton({
@@ -2044,6 +2016,27 @@ UIS.InputBegan:Connect(function(input, gpe)
         toggleUnload()
     end
 end)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = Remove barrires",
+   Callback = function()
+local TeamBarriers = {
+    "ZombieSIGN",
+    "ZombieDoor",
+    "ZombieDoor2",
+    "ZombieDoor3",
+    "NoZombie"
+}
+
+for _, name in ipairs(TeamBarriers) do
+    local obj = workspace:FindFirstChild(name, true)
+    if obj then
+        obj:Destroy()
+    end
+end
+
    end,
 })
 
