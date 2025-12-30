@@ -1,0 +1,84 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GiveFishRemote = ReplicatedStorage:WaitForChild("GiveFishTool")
+local SaveStats = ReplicatedStorage:WaitForChild("SaveStats")
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "câu cá vạn cân",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "câu cá vạn cân",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = Vietnamvodich, 
+      FileName = "ควย" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Main", nil)
+
+local Input = Tab:CreateInput({
+    Name = "Give Fish",
+    CurrentValue = "",
+    PlaceholderText = "Nhập số (ví dụ: 92770)",
+    RemoveTextAfterFocusLost = false,
+    Flag = "GiveFishInput",
+    Callback = function(Text)
+        local amount = tonumber(Text)
+        if amount then
+            local args = {
+                amount
+            }
+            GiveFishRemote:FireServer(unpack(args))
+        end
+    end,
+})
+
+local Input = Tab:CreateInput({
+    Name = "Save Stats (cân,lv,exp)",
+    CurrentValue = "",
+    PlaceholderText = "VD: 99999,100,0",
+    RemoveTextAfterFocusLost = false,
+    Flag = "SaveStatsInput",
+    Callback = function(Text)
+        -- tách theo dấu ,
+        local parts = {}
+        for v in string.gmatch(Text, "[^,]+") do
+            table.insert(parts, tonumber(v))
+        end
+
+        -- kiểm tra đủ 3 giá trị
+        if #parts == 3 and parts[1] and parts[2] and parts[3] then
+            local args = {
+                parts[1], -- cân
+                parts[2], -- lv
+                parts[3]  -- exp
+            }
+
+            SaveStats:FireServer(unpack(args))
+        end
+    end,
+})
