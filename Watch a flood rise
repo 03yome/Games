@@ -1,0 +1,178 @@
+--==================================================
+-- AUTO PRESENT + STUD FARM (FULL MERGED)
+--==================================================
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+--==================================================
+-- VAR
+--==================================================
+local farming = false
+
+--==================================================
+-- HELPER
+--==================================================
+local function getHRP()
+    local char = player.Character or player.CharacterAdded:Wait()
+    return char:FindFirstChild("HumanoidRootPart")
+end
+
+--==================================================
+-- PRESENT FUNCTIONS
+--==================================================
+local function getOnePresent()
+    local map = workspace:FindFirstChild("Map")
+    local presents = map and map:FindFirstChild("Presents")
+    if not presents then return nil end
+
+    for _, present in ipairs(presents:GetChildren()) do
+        local box = present:FindFirstChild("Box", true)
+        local prompt = box and box:FindFirstChild("OpenPrompt", true)
+        if prompt and prompt:IsA("ProximityPrompt") then
+            return present, box, prompt
+        end
+    end
+    return nil
+end
+
+local function countValidPresents()
+    local count = 0
+    local map = workspace:FindFirstChild("Map")
+    local presents = map and map:FindFirstChild("Presents")
+    if not presents then return 0 end
+
+    for _, present in ipairs(presents:GetChildren()) do
+        if present:FindFirstChild("Box", true)
+        and present:FindFirstChild("OpenPrompt", true) then
+            count += 1
+        end
+    end
+    return count
+end
+
+--==================================================
+-- GUI
+--==================================================
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.ResetOnSpawn = false
+gui.Name = "AutoFarmGui"
+
+local btn = Instance.new("TextButton", gui)
+btn.Size = UDim2.fromScale(0.25, 0.1)
+btn.Position = UDim2.fromScale(0.375, 0.45)
+btn.TextScaled = true
+btn.Text = "START FARM"
+
+-- Counter
+local counter = Instance.new("TextLabel", gui)
+counter.Size = UDim2.fromOffset(260, 40)
+counter.Position = UDim2.new(1, -270, 0, 20)
+counter.BackgroundTransparency = 0.2
+counter.BackgroundColor3 = Color3.fromRGB(0,0,0)
+counter.TextColor3 = Color3.new(1,1,1)
+counter.TextScaled = true
+counter.Text = "Loading..."
+
+--==================================================
+-- TOGGLE LOGIC
+--==================================================
+btn.MouseButton1Click:Connect(function()
+    farming = not farming
+    btn.Text = farming and "STOP FARM" or "START FARM"
+end)
+
+--==================================================
+-- MAIN FARM LOOP
+--==================================================
+task.spawn(function()
+    while true do
+        if farming then
+            local present, box, prompt = getOnePresent()
+
+            -- 🔴 PRIORITY: OPEN PRESENT
+            if present and box and prompt then
+                local hrp = getHRP()
+                if hrp then
+                    hrp.CFrame = box.CFrame + Vector3.new(0, 3, 0)
+                    task.wait(0.25)
+                    fireproximityprompt(prompt)
+                    task.wait(1) -- đợi hộp bị destroy
+                end
+            else
+                -- 🟢 NO PRESENT → FARM STUD
+                local studs = workspace:FindFirstChild("Studs")
+                if studs then
+                    for _, stud in ipairs(studs:GetChildren()) do
+                        if not farming then break end
+                        if stud:IsA("BasePart") then
+                            local hrp = getHRP()
+                            if hrp then
+                                hrp.CFrame = stud.CFrame + Vector3.new(0, 3, 0)
+                            end
+                            task.wait(0.9)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.15)
+    end
+end)
+
+--==================================================
+-- COUNTER LOOP
+--==================================================
+task.spawn(function()
+    while true do
+        local studs = workspace:FindFirstChild("Studs")
+        counter.Text =
+            "Studs: " .. (studs and #studs:GetChildren() or 0)
+            .. " | Presents: " .. countValidPresents()
+        task.wait(0.5)
+    end
+end)
+--// CHAT FRAGMENT DETECTOR
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local function findFragment()
+    local map = workspace:FindFirstChild("Map")
+    if not map then return nil end
+
+    for _, v in ipairs(map:GetDescendants()) do
+        if v.Name == "Fragment" and v:IsA("BasePart") then
+            return v
+        end
+    end
+    return nil
+end
+
+local function getHRP()
+    local char = lp.Character or lp.CharacterAdded:Wait()
+    return char:FindFirstChild("HumanoidRootPart")
+end
+
+lp.Chatted:Connect(function(msg)
+    msg = msg:lower()
+
+    if msg == "fragment" then
+        local fragment = findFragment()
+        if fragment then
+            print("✅ Đã thấy Fragment – nếu muốn tele đến thì chat: Fragment claim")
+        else
+            print("❌ Không tìm thấy Fragment trong Map")
+        end
+    end
+
+    if msg == "fragment claim" then
+        local fragment = findFragment()
+        local hrp = getHRP()
+        if fragment and hrp then
+            hrp.CFrame = fragment.CFrame + Vector3.new(0, 3, 0)
+            print("🚀 Đã teleport tới Fragment")
+        else
+            print("❌ Không thể teleport (Fragment hoặc nhân vật không tồn tại)")
+        end
+    end
+end)
