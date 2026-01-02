@@ -2096,6 +2096,49 @@ task.spawn(function()
     end
 end)
 
+local Button = Tab:CreateButton({
+   Name = "Summon Acid",
+   Callback = function()
+local AcidRemote = game:GetService("ReplicatedStorage").Remotes.ZombieRelated.AcidSpit
+
+for coverX = -266, 378, 18 do
+    for coverZ = -268, 378, 18 do
+        AcidRemote:FireServer(
+            Vector3.new(coverX, 255, coverZ),
+            Vector3.new(0,0,0)
+        )
+    end
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Button Example",
+   Callback = function()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local AcidRemote = game:GetService("ReplicatedStorage")
+    .Remotes.ZombieRelated.AcidSpit
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr ~= LocalPlayer then
+        local char = plr.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local pos = char.HumanoidRootPart.Position
+
+            -- Thả acid từ trên đầu
+            AcidRemote:FireServer(
+                Vector3.new(pos.X, pos.Y + 50, pos.Z),
+                Vector3.new(0, 0, 0)
+            )
+        end
+    end
+end
+
+   end,
+})
+
 local Section = Tab:CreateSection("Client")
 
 local Button = Tab:CreateButton({
