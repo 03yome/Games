@@ -1,0 +1,213 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "[OGs] The Untiteld Infection☢️",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Admin Panel",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = , 
+      FileName = "" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("kill", 4483362458)
+
+Tab:CreateParagraph({
+    Title = "ONLY USE THE KNIFE",
+    Content = "Since im lazy, only the knife works. It is basically insta-kill!"
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local AutoHit = false
+local HitRange = 10
+local AutoHitThread = nil
+
+-- ===== SLIDER =====
+Tab:CreateSlider({
+    Name = "Auto hit Range",
+    Range = {0, 15},
+    Increment = 1,
+    Suffix = "Studs",
+    CurrentValue = 10,
+    Flag = "AutoHitRange",
+    Callback = function(Value)
+        HitRange = Value
+    end,
+})
+
+-- ===== AUTO HIT FUNCTION =====
+local function StartAutoHit()
+    if AutoHitThread then return end
+
+    AutoHitThread = task.spawn(function()
+        while AutoHit do
+            task.wait(0.15)
+
+            local char = LocalPlayer.Character
+            if not char then continue end
+
+            -- ❗ Chỉ hoạt động khi Local thuộc team Infected
+            if not LocalPlayer.Team or LocalPlayer.Team.Name ~= "Infected" then
+                continue
+            end
+
+            local knife = char:FindFirstChild("Knife")
+            if not knife then continue end
+
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if not root then continue end
+
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= LocalPlayer
+                and plr.Team == LocalPlayer.Team -- ✅ TEAM CHECK
+                and plr.Character
+                and plr.Character:FindFirstChild("Head")
+                and plr.Character:FindFirstChild("Humanoid")
+                and plr.Character:FindFirstChild("HumanoidRootPart") then
+
+                    local dist = (plr.Character.HumanoidRootPart.Position - root.Position).Magnitude
+                    if dist <= HitRange then
+                        knife.Remote.Hit:FireServer(
+                            plr.Character.Head,
+                            plr.Character.Humanoid,
+                            plr.Character.Head.Position
+                        )
+                    end
+                end
+            end
+        end
+        AutoHitThread = nil
+    end)
+end
+
+-- ===== TOGGLE =====
+Tab:CreateToggle({
+    Name = "Auto hit (Infected only)",
+    CurrentValue = false,
+    Flag = "AutoHitToggle",
+    Callback = function(Value)
+        AutoHit = Value
+        if Value then
+            StartAutoHit()
+        end
+    end,
+})
+
+Tab:CreateParagraph({
+    Title = "Important",
+    Content = "You need to buy the gun for 750 coins before using Silent Aim."
+})
+
+local RunService = game:GetService("RunService")
+
+local SilentAim = false
+local AutoFire = false
+local FireDelay = 0.12
+
+-- ===== TÌM TARGET GẦN NHẤT =====
+local function GetClosestTarget()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+
+    local root = char.HumanoidRootPart
+    local closest, dist = nil, math.huge
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer
+        and plr.Character
+        and plr.Character:FindFirstChild("HumanoidRootPart")
+        and plr.Character:FindFirstChild("Humanoid")
+        and plr.Character.Humanoid.Health > 0 then
+
+            local d = (plr.Character.HumanoidRootPart.Position - root.Position).Magnitude
+            if d < dist then
+                dist = d
+                closest = plr
+            end
+        end
+    end
+
+    return closest
+end
+
+-- ===== AUTO FIRE LOOP =====
+task.spawn(function()
+    while true do
+        task.wait(FireDelay)
+
+        if not AutoFire then continue end
+
+        local char = LocalPlayer.Character
+        if not char then continue end
+
+        local gun = char:FindFirstChild("Gun")
+        if not gun or not gun:FindFirstChild("Shoot") then continue end
+
+        local shootPos
+
+        if SilentAim then
+            local target = GetClosestTarget()
+            if target then
+                shootPos = target.Character.HumanoidRootPart.Position
+            end
+        end
+
+        -- fallback nếu không có target
+        shootPos = shootPos or Vector3.new(0, 0, -10000)
+
+        gun.Shoot:FireServer(shootPos)
+    end
+end)
+
+-- ===== TOGGLE SILENT AIM =====
+Tab:CreateToggle({
+    Name = "Silent aim",
+    CurrentValue = false,
+    Flag = "SilentAim",
+    Callback = function(Value)
+        SilentAim = Value
+    end,
+})
+
+-- ===== TOGGLE AUTO FIRE =====
+Tab:CreateToggle({
+    Name = "Auto fire",
+    CurrentValue = false,
+    Flag = "AutoFire",
+    Callback = function(Value)
+        AutoFire = Value
+    end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "next",
+   Callback = function()
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/03yome/Games/refs/heads/main/%F0%9F%94%A5%F0%9F%92%80%20AURA%20WORM%20TROLL%20TOWER!'))()
+   end,
+})
