@@ -2161,6 +2161,41 @@ do
     })
 end
 
+do
+    local rStor = game:GetService("ReplicatedStorage")
+    local Teams = game:GetService("Teams")
+    local lplr = game.Players.LocalPlayer
+
+    local event = rStor:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
+
+    Tab:CreateButton({
+        Name = "Kill Zombies",
+        Callback = function()
+            if lplr.Team ~= Teams.Human then return end
+
+            task.spawn(function()
+                if not find.Sniper(true) then
+                    rStor.Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+                    find.Sniper(true)
+                end
+
+                getzombies()
+
+                for i = #zombieTbl, 1, -1 do
+                    local v = zombieTbl[i]
+                    if v and v:FindFirstChild("Humanoid") then
+                        event:FireServer("GUN_DAMAGE", v)
+                        table.remove(zombieTbl, i)
+                        task.wait(0.05)
+                    end
+                end
+
+                table.clear(zombieTbl)
+            end)
+        end
+    })
+end
+
 
 local Section = Tab:CreateSection("Client")
 
