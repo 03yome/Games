@@ -1,0 +1,628 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🔥💀 AURA WORM TROLL TOWER!",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Admin Panel",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = Vietnamvodich, 
+      FileName = "ควย" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Troll Section", 4483362458)
+local Section = Tab:CreateSection("Troll Actions")
+
+local Button = Tab:CreateButton({
+   Name = "Kill all Players",
+   Callback = function()
+game:GetService("ReplicatedStorage").KillAll:FireServer()
+game:GetService("ReplicatedStorage").RemoteEvents.KillALL:FireServer()
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Killed all players!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Fling all Players",
+   Callback = function()
+game:GetService("ReplicatedStorage").FlingAll:FireServer()
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Flinging all players!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+    Name = "Explode All Players",
+    Callback = function()
+        game:GetService("ReplicatedStorage").ExplodeAll:FireServer()
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Exploded all players!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+
+local Tab = Window:CreateTab("Wheel Spinner", nill)
+local Section = Tab:CreateSection("Admin Commands")
+
+local Button = Tab:CreateButton({
+    Name = "Give Admin",
+    Callback = function()
+local args = {
+    [1] = "admin"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Admin command sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+
+local Section = Tab:CreateSection("Add Spins")
+
+local Input = Tab:CreateInput({
+    Name = "Custom Spin Amount",
+    CurrentValue = "",
+    PlaceholderText = "Enter number of spins",
+    RemoveTextAfterFocusLost = false,
+    Flag = "InputSpin",
+    Callback = function(Text)
+        local amount = tonumber(Text)
+        if not amount then
+            Rayfield:Notify({
+                Title = "Lỗi",
+                Content = "Vui lòng nhập số hợp lệ!",
+                Duration = 3
+            })
+            return
+        end
+
+        local args = {
+            [1] = amount
+        }
+
+        game:GetService("ReplicatedStorage")
+            .RemoteEvents
+            .SpinAdd
+            :FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added " .. amount .. " spin!",
+            Duration = 3
+        })
+    end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+1 Spin",
+   Callback = function()
+local args = {  1 } game:GetService("ReplicatedStorage").RemoteEvents.SpinAdd:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added 1 spin!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+5 Spin",
+   Callback = function()
+local args = {  5 } game:GetService("ReplicatedStorage").RemoteEvents.SpinAdd:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added 5 spin!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+10 Spin",
+   Callback = function()
+local args = {  10 } game:GetService("ReplicatedStorage").RemoteEvents.SpinAdd:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added 10 spin!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+50 Spin",
+   Callback = function()
+local args = {  50 } game:GetService("ReplicatedStorage").RemoteEvents.SpinAdd:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added 50 spin!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+100 Spin",
+   Callback = function()
+local args = {  100 } game:GetService("ReplicatedStorage").RemoteEvents.SpinAdd:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Added 100 spin!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "turn Gui spin",
+   Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.MainFrame.FullScreen.Spins.Visible = true
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "100 Coins sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Section = Tab:CreateSection("Coin Rewards")
+
+local Button = Tab:CreateButton({
+   Name = "+100 Coins",
+   Callback = function()
+local args = {
+    [1] = "coins_100"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "100 Coins sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+200 Coins",
+   Callback = function()
+local args = {
+    [1] = "coins_200"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "200 Coins sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "+500 Coins",
+   Callback = function()
+local args = {
+    [1] = "coins_500"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "500 Coins sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+    Name = "+1000 Coins",
+    Callback = function()
+local args = {
+    [1] = "coins_1000"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "1000 Coins sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+local Section = Tab:CreateSection("Special Items")
+
+local Button = Tab:CreateButton({
+   Name = "RainBow Carpet",
+   Callback = function()
+local args = {
+    [1] = "rainbow_carpet"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Rainbow carpet sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gravity Coil",
+   Callback = function()
+local args = {
+    [1] = "gravity_coil"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Gravity Coil sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+    Name = "Speed Coil",
+    Callback = function()
+   local args = {
+    [1] = "speed_coil"
+}
+
+game:GetService("ReplicatedStorage").RemoteEvents.SpinWheelGiver:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Speed Coil sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+
+local Button = Tab:CreateButton({
+    Name = "Speed Coil gift",
+    Callback = function()
+   local args = {
+    [1] = 8689243344
+}
+
+game:GetService("ReplicatedStorage").Gifts.GiveSpeedCoilEvent:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Speed Coil sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+local Tab = Window:CreateTab("Miscellaneous", nil)
+local Section = Tab:CreateSection("Lucky Block Rewards")
+
+local Button = Tab:CreateButton({
+   Name = "Give Lucky Block",
+   Callback = function()
+game:GetService("ReplicatedStorage").LuckyBlockGive:FireServer()
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Lucky Block sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Common Lucky Block",
+   Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Model", "Model"),
+    [2] = "Common"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Common Lucky Block collected!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Uncommon Lucky Block",
+   Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Model", "Model"),
+    [2] = "Uncommon"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Uncommon Lucky Block collected!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Rare Lucky Block",
+   Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Model", "Model"),
+    [2] = "Rare"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Rare Lucky Block collected!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Epic Lucky Block",
+   Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Model", "Model"),
+    [2] = "Epic"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Epic Lucky Block collected!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Mythic Lucky Block",
+   Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Model", "Model"),
+    [2] = "Mythical"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "MythicLucky Block collected!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+    Name = "Slap",
+    Callback = function()
+function getNil(name,class) for _,v in pairs(getnilinstances())do if v.ClassName==class and v.Name==name then return v;end end end
+
+local args = {
+    [1] = getNil("Common", "Model"),
+    [2] = "Slap"
+}
+
+game:GetService("ReplicatedStorage").LuckyBlockCollected:FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Slap sent!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+    end,
+})
+local Section = Tab:CreateSection("Coin Collection")
+
+Tab:CreateButton({
+    Name = "Touch All Coins",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local lp = Players.LocalPlayer
+        local char = lp.Character or lp.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        local CoinsFolder = workspace:WaitForChild("Map"):WaitForChild("Coins")
+        local touchedCount = 0
+
+        -- Notify bắt đầu
+        Rayfield:Notify({
+            Title = "Starting",
+            Content = "Touching all coins...",
+            Duration = 2
+        })
+
+        for _, coin in ipairs(CoinsFolder:GetChildren()) do
+            local part
+
+            if coin:IsA("BasePart") then
+                part = coin
+            elseif coin:IsA("Model") then
+                part = coin:FindFirstChildWhichIsA("BasePart")
+            end
+
+            if part then
+                -- Tele tới coin
+                hrp.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+
+                -- Touch coin
+                firetouchinterest(hrp, part, 0)
+                task.wait()
+                firetouchinterest(hrp, part, 1)
+
+                touchedCount += 1
+                task.wait(0.01)
+            end
+        end
+
+        -- Notify kết thúc
+        Rayfield:Notify({
+            Title = "Complete",
+            Content = "Touched " .. touchedCount .. " coins",
+            Duration = 3
+        })
+    end
+})
+
+local Tab = Window:CreateTab("Troll player", nil)
+
+local Button = Tab:CreateButton({
+   Name = "Fart",
+   Callback = function()
+game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3416135976, true)
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Trolled player!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Freeze",
+   Callback = function()
+game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3416135132, true)
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Trolled player!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Jumpscare",
+   Callback = function()
+game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3416135132, true)
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Trolled player!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Kill",
+   Callback = function()
+game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3416135763, true)
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Trolled player!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Nuke",
+   Callback = function()
+game.MarketplaceService:SignalPromptProductPurchaseFinished(game.Players.LocalPlayer.UserId, 3416135976, true)
+        Rayfield:Notify({
+            Title = "Success",
+            Content = "Trolled player!",
+            Duration = 3,
+            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
+        })
+   end,
+})
