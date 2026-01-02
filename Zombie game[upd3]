@@ -2112,6 +2112,56 @@ end
    end,
 })
 
+do
+    local tgl
+    local rStor = game:GetService("ReplicatedStorage")
+    local lplr = game.Players.LocalPlayer
+    local char = lplr.Character or lplr.CharacterAdded:Wait()
+
+    local event = rStor.Remotes.ZombieRelated.PlayerAttack
+    local eventC = 0
+    local Attack = rStor.Attack:Clone()
+
+    tgl = Tab:CreateToggle({
+        Name = "Annoy all",
+        CurrentValue = false,
+        Flag = "AnnoyAll",
+        Callback = function(c)
+            -- đảm bảo có tool Attack
+            if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then
+                Attack.Parent = lplr:WaitForChild("Backpack")
+            end
+
+            if c then
+                task.spawn(function()
+                    while tgl.CurrentValue do
+                        if find.Weapon(true) then
+                            for _, v in living:GetChildren() do
+                                if v ~= lplr.Character then
+                                    local hum = v:FindFirstChildWhichIsA("Humanoid")
+                                    local root = v:FindFirstChild("HumanoidRootPart")
+
+                                    if hum and root and hum.Health > 0 then
+                                        if eventC < 100 then
+                                            task.spawn(function()
+                                                eventC += 1
+                                                event:InvokeServer(root)
+                                                eventC -= 1
+                                            end)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        task.wait()
+                    end
+                end)
+            end
+        end
+    })
+end
+
+
 local Section = Tab:CreateSection("Client")
 
 local Button = Tab:CreateButton({
