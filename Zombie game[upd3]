@@ -2117,26 +2117,24 @@ local Button = Tab:CreateButton({
    Callback = function()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+
 local AcidRemote = game:GetService("ReplicatedStorage")
     .Remotes.ZombieRelated.AcidSpit
 
 for _, plr in ipairs(Players:GetPlayers()) do
     if plr ~= LocalPlayer then
         local char = plr.Character
-        if char and char:FindFirstChild("Head") then
-            local head = char.Head
-
-            -- Dự đoán vị trí (anti lệch)
-            local velocity = head.AssemblyLinearVelocity or Vector3.zero
-            local predictedPos = head.Position + (velocity * 0.15)
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
 
             AcidRemote:FireServer(
-                predictedPos + Vector3.new(0, 35, 0),
-                Vector3.zero
+                hrp.Position + Vector3.new(0, 30, 0), -- chỉ offset Y
+                Vector3.new(0, 0, 0)
             )
         end
     end
 end
+
    end,
 })
 
