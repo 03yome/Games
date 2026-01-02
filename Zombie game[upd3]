@@ -2112,32 +2112,6 @@ end
    end,
 })
 
-local Button = Tab:CreateButton({
-   Name = "Acid rocket",
-   Callback = function()
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local AcidRemote = game:GetService("ReplicatedStorage")
-    .Remotes.ZombieRelated.AcidSpit
-
-for _, plr in ipairs(Players:GetPlayers()) do
-    if plr ~= LocalPlayer then
-        local char = plr.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            local hrp = char.HumanoidRootPart
-
-            AcidRemote:FireServer(
-                hrp.Position + Vector3.new(0, 30, 0), -- chỉ offset Y
-                Vector3.new(0, 0, 0)
-            )
-        end
-    end
-end
-
-   end,
-})
-
 local Section = Tab:CreateSection("Client")
 
 local Button = Tab:CreateButton({
