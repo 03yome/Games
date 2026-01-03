@@ -1,16 +1,11 @@
-local TARGET_NAME = "TransfurPart"  -- 🔥 ĐỔI TÊN TẠI ĐÂY
+local folderName = "TransformationParts"
 
-local workspace = game:GetService("Workspace")
-local count = 0
-
-for _, obj in ipairs(workspace:GetDescendants()) do
-    if obj:IsA("BasePart") and obj.Name == TARGET_NAME then
-        obj:Destroy()
-        count += 1
+for _, v in ipairs(game:GetDescendants()) do
+    if v:IsA("Folder") and v.Name == folderName then
+        v:Destroy()
     end
 end
 
-print("Đã xóa tổng cộng:", count, "part tên", TARGET_NAME)
 -------------------------------
 -- Gui
 -------------------------------
@@ -126,6 +121,7 @@ local oneClick26 = makeBtn("Chibaku")
 local oneClick27 = makeBtn("Katon")
 local oneClick28 = makeBtn("Meteor")
 local oneClick29 = makeBtn("Susanoo")
+local oneClick30 = makeBtn("ConquerorActivate")
 
 -------------------------------
 -- Auto loops
@@ -286,6 +282,10 @@ end)
 
 oneClick29.MouseButton1Click:Connect(function() 
 game:GetService("ReplicatedStorage").SkillsMadara.Madara.Susanoo.One:FireServer()
+end)
+
+oneClick30.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").RogerStuffRS.ConquerorActivate:FireServer()
 end)
 
 -------------------------------
