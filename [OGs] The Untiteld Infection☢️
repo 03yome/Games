@@ -109,11 +109,11 @@ local oneClick15 = makeBtn("PachinkoBall")
 local oneClick16 = makeBtn("ShutterDoors")
 local oneClick17 = makeBtn("Atomic")
 local oneClick18 = makeBtn("Chainsaw man")
-
 local oneClick19 = makeBtn("IgrisEvent")
 local oneClick20 = makeBtn("MalevolentShrine")
 local oneClick21 = makeBtn("Okarun")
 local oneClick22 = makeBtn("Luffy")
+
 local oneClick23 = makeBtn("BajrangGun")
 local oneClick24 = makeBtn("BallBarrage")
 local oneClick25 = makeBtn("Kaminari")
@@ -122,6 +122,8 @@ local oneClick27 = makeBtn("Katon")
 local oneClick28 = makeBtn("Meteor")
 local oneClick29 = makeBtn("Susanoo")
 local oneClick30 = makeBtn("ConquerorActivate")
+local oneClick31 = makeBtn("Move2Remote")
+local oneClick32 = makeBtn("Move4Remote")
 
 -------------------------------
 -- Auto loops
@@ -288,6 +290,14 @@ oneClick30.MouseButton1Click:Connect(function()
 game:GetService("ReplicatedStorage").RogerStuffRS.ConquerorActivate:FireServer()
 end)
 
+oneClick31.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").RogerStuffRS.Move2Remote:FireServer()
+end)
+
+oneClick32.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").RogerStuffRS.Move4Remote:FireServer() 
+end)
+
 -------------------------------
 -- Drag UI
 -------------------------------
@@ -316,4 +326,3 @@ title.InputChanged:Connect(function(input)
         )
     end
 end)
-
