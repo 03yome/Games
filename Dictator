@@ -1,0 +1,209 @@
+--// Services
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+--// Remove old GUI
+local oldGui = CoreGui:FindFirstChild("NeedsGUI")
+if oldGui then
+    oldGui:Destroy()
+end
+
+--// Global states
+getgenv().infstamina = false
+getgenv().infhunger = false
+getgenv().infthirst = false
+
+--// ScreenGui
+local NeedsGUI = Instance.new("ScreenGui")
+NeedsGUI.Name = "NeedsGUI"
+NeedsGUI.Parent = CoreGui
+NeedsGUI.ResetOnSpawn = false
+
+--// Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = NeedsGUI
+MainFrame.BackgroundColor3 = Color3.fromRGB(30,35,45)
+MainFrame.Position = UDim2.new(0.4,0,0.3,0)
+MainFrame.Size = UDim2.new(0,350,0,330)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.BorderSizePixel = 0
+
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,12)
+
+--// Header
+local Header = Instance.new("Frame")
+Header.Parent = MainFrame
+Header.BackgroundColor3 = Color3.fromRGB(80,100,255)
+Header.Size = UDim2.new(1,0,0,60)
+Header.BorderSizePixel = 0
+
+Instance.new("UICorner", Header).CornerRadius = UDim.new(0,12)
+
+local HeaderGradient = Instance.new("UIGradient")
+HeaderGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80,100,255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(150,80,255))
+}
+HeaderGradient.Rotation = 90
+HeaderGradient.Parent = Header
+
+--// Title
+local Title = Instance.new("TextLabel")
+Title.Parent = Header
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1,0,1,0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "Food, Thirst & Stamina"
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextSize = 22
+
+--// Toggle creator
+local function createToggle(parent, yPos, text, activeColor)
+    local container = Instance.new("Frame")
+    container.Parent = parent
+    container.BackgroundTransparency = 1
+    container.Position = UDim2.new(0,20,0,yPos)
+    container.Size = UDim2.new(1,-40,0,50)
+
+    local label = Instance.new("TextLabel")
+    label.Parent = container
+    label.BackgroundTransparency = 1
+    label.Size = UDim2.new(0,200,1,0)
+    label.Font = Enum.Font.GothamBold
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(220,220,230)
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local bg = Instance.new("Frame")
+    bg.Parent = container
+    bg.BackgroundColor3 = Color3.fromRGB(60,65,75)
+    bg.Position = UDim2.new(1,-60,0.5,-14)
+    bg.Size = UDim2.new(0,60,0,28)
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(1,0)
+
+    local btn = Instance.new("TextButton")
+    btn.Parent = bg
+    btn.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    btn.Position = UDim2.new(0,2,0,2)
+    btn.Size = UDim2.new(0,24,0,24)
+    btn.Text = ""
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(1,0)
+
+    return btn, bg, activeColor
+end
+
+--// Toggles
+local staminaBtn, staminaBg, staminaColor =
+    createToggle(MainFrame, 80, "Infinite Stamina", Color3.fromRGB(0,200,100))
+
+local foodBtn, foodBg, foodColor =
+    createToggle(MainFrame, 140, "Infinite Food", Color3.fromRGB(139,69,19))
+
+local waterBtn, waterBg, waterColor =
+    createToggle(MainFrame, 200, "Infinite Water", Color3.fromRGB(0,150,255))
+
+--// Active features panel
+local ActiveFrame = Instance.new("Frame")
+ActiveFrame.Parent = MainFrame
+ActiveFrame.BackgroundColor3 = Color3.fromRGB(25,28,35)
+ActiveFrame.Position = UDim2.new(0,15,0,265)
+ActiveFrame.Size = UDim2.new(1,-30,0,50)
+ActiveFrame.BorderSizePixel = 0
+Instance.new("UICorner", ActiveFrame).CornerRadius = UDim.new(0,8)
+
+local ActiveTitle = Instance.new("TextLabel")
+ActiveTitle.Parent = ActiveFrame
+ActiveTitle.BackgroundTransparency = 1
+ActiveTitle.Position = UDim2.new(0,0,0,5)
+ActiveTitle.Size = UDim2.new(1,0,0,15)
+ActiveTitle.Font = Enum.Font.Gotham
+ActiveTitle.Text = "Active Features:"
+ActiveTitle.TextColor3 = Color3.fromRGB(120,120,130)
+ActiveTitle.TextSize = 11
+
+local ActiveText = Instance.new("TextLabel")
+ActiveText.Parent = ActiveFrame
+ActiveText.BackgroundTransparency = 1
+ActiveText.Position = UDim2.new(0,0,0,22)
+ActiveText.Size = UDim2.new(1,0,0,22)
+ActiveText.Font = Enum.Font.GothamBold
+ActiveText.Text = "None"
+ActiveText.TextColor3 = Color3.fromRGB(150,150,160)
+ActiveText.TextSize = 14
+ActiveText.RichText = true
+
+--// Update active list
+local function updateActive()
+    local list = {}
+
+    if getgenv().infstamina then
+        table.insert(list,'<font color="rgb(0,200,100)">Stamina</font>')
+    end
+    if getgenv().infhunger then
+        table.insert(list,'<font color="rgb(139,69,19)">Food</font>')
+    end
+    if getgenv().infthirst then
+        table.insert(list,'<font color="rgb(0,150,255)">Water</font>')
+    end
+
+    if #list > 0 then
+        ActiveText.Text = table.concat(list,", ")
+        ActiveText.TextColor3 = Color3.fromRGB(255,255,255)
+    else
+        ActiveText.Text = "None"
+        ActiveText.TextColor3 = Color3.fromRGB(150,150,160)
+    end
+end
+
+--// Toggle logic
+local function bindToggle(button, bg, color, var)
+    button.MouseButton1Click:Connect(function()
+        getgenv()[var] = not getgenv()[var]
+
+        if getgenv()[var] then
+            bg.BackgroundColor3 = color
+            button:TweenPosition(UDim2.new(1,-26,0,2), "Out", "Quad", 0.2, true)
+        else
+            bg.BackgroundColor3 = Color3.fromRGB(60,65,75)
+            button:TweenPosition(UDim2.new(0,2,0,2), "Out", "Quad", 0.2, true)
+        end
+
+        updateActive()
+    end)
+end
+
+bindToggle(staminaBtn, staminaBg, staminaColor, "infstamina")
+bindToggle(foodBtn, foodBg, foodColor, "infhunger")
+bindToggle(waterBtn, waterBg, waterColor, "infthirst")
+
+--// Toggle GUI keybind (K)
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.K then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+--// Apply cheats loop
+task.spawn(function()
+    local player = Players.LocalPlayer
+    while task.wait(0.5) do
+        local char = player.Character
+        if char then
+            if getgenv().infstamina then
+                char:SetAttribute("Stamina", 100)
+            end
+            if getgenv().infhunger then
+                player:SetAttribute("Hunger", 100)
+            end
+            if getgenv().infthirst then
+                player:SetAttribute("Thirst", 100)
+            end
+        end
+    end
+end)
+
+print("GUI Loaded Successfully")
