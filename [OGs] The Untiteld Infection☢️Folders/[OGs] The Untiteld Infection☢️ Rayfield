@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "[OGs] The Untiteld Infection☢️",
+   Name = "[OGs] The Untiteld Infection☢️ Rayfield",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Admin Panel",
    LoadingSubtitle = "Script By romd3976",
