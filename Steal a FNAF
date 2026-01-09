@@ -1,0 +1,345 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Steal a FNAF",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "#001",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "Dark", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil, 
+      FileName = "" -- "Cock" (slang)
+   }
+})
+
+local Tab = Window:CreateTab("Main",nil)
+
+-- Services
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+-- Base cần lock
+local lockBase = workspace.Bases["x5_oz6"].Scriptables.LockBase
+
+-- State
+local autoLockRunning = false
+local autoLockThread
+
+-- Hàm check có lock được hay không (theo sơ đồ bạn đưa)
+local function canLock()
+    local lockedForText = lockBase:FindFirstChild("LockedForText")
+    if not lockedForText then return true end
+
+    local lockedText = lockedForText:FindFirstChild("LockedText")
+    if not lockedText then return true end
+
+    local countDown = lockedText:FindFirstChild("CountDown")
+    if not countDown then return true end
+
+    if countDown:IsA("TextLabel") then
+        local t = tonumber(countDown.Text)
+        return not t or t <= 0
+    end
+
+    if countDown:IsA("IntValue") or countDown:IsA("NumberValue") then
+        return countDown.Value <= 0
+    end
+
+    if countDown:IsA("StringValue") then
+        local t = tonumber(countDown.Value)
+        return not t or t <= 0
+    end
+
+    return true
+end
+
+-- Toggle Rayfield
+local Toggle = Tab:CreateToggle({
+    Name = "Auto Lock Base",
+    CurrentValue = false,
+    Flag = "AutoLockBase_x5_oz6",
+    Callback = function(Value)
+        autoLockRunning = Value
+
+        if Value then
+            autoLockThread = task.spawn(function()
+                while autoLockRunning do
+                    local char = lp.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
+                    if hrp and canLock() then
+                        firetouchinterest(hrp, lockBase, 0)
+                        task.wait(0.3)
+                        firetouchinterest(hrp, lockBase, 1)
+                    end
+
+                    task.wait(1)
+                end
+            end)
+        end
+    end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Get Christmas Base Skin",
+   Callback = function()
+local args = {
+    [1] = 14,
+    [2] = "Christmas Base Skin"
+}
+
+game:GetService("ReplicatedStorage").RES.AdventClaim:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Dupe money",
+   Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local claiming = false
+local connection
+local speed = 1
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MoneyGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 220, 0, 180)
+mainFrame.Position = UDim2.new(0.75, -110, 0.5, -90)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -35, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 2)
+title.BackgroundTransparency = 1
+title.Text = "Steal a FNAF"
+title.TextColor3 = Color3.fromRGB(255, 165, 0)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = mainFrame
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 25, 0, 25)
+closeBtn.Position = UDim2.new(1, -30, 0, 2)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 14
+closeBtn.Parent = mainFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeBtn
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(1, -20, 0, 50)
+toggleBtn.Position = UDim2.new(0, 10, 0, 40)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+toggleBtn.Text = "OFF"
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 24
+toggleBtn.AutoButtonColor = false
+toggleBtn.Parent = mainFrame
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 10)
+toggleCorner.Parent = toggleBtn
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Size = UDim2.new(1, -20, 0, 20)
+speedLabel.Position = UDim2.new(0, 10, 0, 100)
+speedLabel.BackgroundTransparency = 1
+speedLabel.Text = "Speed: 1"
+speedLabel.TextColor3 = Color3.fromRGB(150, 150, 255)
+speedLabel.Font = Enum.Font.Gotham
+speedLabel.TextSize = 14
+speedLabel.TextXAlignment = Enum.TextXAlignment.Center
+speedLabel.Parent = mainFrame
+
+local sliderFrame = Instance.new("Frame")
+sliderFrame.Size = UDim2.new(1, -40, 0, 20)
+sliderFrame.Position = UDim2.new(0, 20, 0, 125)
+sliderFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+sliderFrame.Parent = mainFrame
+
+local sliderCorner = Instance.new("UICorner")
+sliderCorner.CornerRadius = UDim.new(0, 10)
+sliderCorner.Parent = sliderFrame
+
+local sliderFill = Instance.new("Frame")
+sliderFill.Size = UDim2.new(0.01, 0, 1, 0)
+sliderFill.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+sliderFill.Parent = sliderFrame
+
+local fillCorner = Instance.new("UICorner")
+fillCorner.CornerRadius = UDim.new(0, 10)
+fillCorner.Parent = sliderFill
+
+local sliderKnob = Instance.new("Frame")
+sliderKnob.Size = UDim2.new(0, 24, 0, 24)
+sliderKnob.Position = UDim2.new(0.01, -12, 0.5, -12)
+sliderKnob.BackgroundColor3 = Color3.new(1, 1, 1)
+sliderKnob.ZIndex = 2
+sliderKnob.Parent = sliderFrame
+
+local knobCorner = Instance.new("UICorner")
+knobCorner.CornerRadius = UDim.new(0, 12)
+knobCorner.Parent = sliderKnob
+
+local knobStroke = Instance.new("UIStroke")
+knobStroke.Thickness = 2
+knobStroke.Color = Color3.fromRGB(0, 80, 200)
+knobStroke.Parent = sliderKnob
+
+local function updateSlider()
+    local percent = math.clamp((speed - 1) / 99, 0, 1)
+    sliderFill.Size = UDim2.new(percent, 0, 1, 0)
+    sliderKnob.Position = UDim2.new(percent, -12, 0.5, -12)
+    speedLabel.Text = "Speed: " .. speed
+end
+
+local dragging = false
+sliderFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        local relX = math.clamp((input.Position.X - sliderFrame.AbsolutePosition.X) / sliderFrame.AbsoluteSize.X, 0, 1)
+        speed = math.floor(relX * 99 + 1)
+        updateSlider()
+    end
+end)
+
+sliderKnob.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local relX = math.clamp((input.Position.X - sliderFrame.AbsolutePosition.X) / sliderFrame.AbsoluteSize.X, 0, 1)
+        speed = math.floor(relX * 99 + 1)
+        updateSlider()
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+local draggingGUI = false
+local dragStart, startPos
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingGUI = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if draggingGUI and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingGUI = false
+    end
+end)
+
+toggleBtn.MouseButton1Click:Connect(function()
+    claiming = not claiming
+
+    if claiming then
+        toggleBtn.Text = "ON"
+        TweenService:Create(toggleBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(50, 200, 50)}):Play()
+        
+        connection = task.spawn(function()
+            while claiming do
+                for i = 1, speed do
+                    if not claiming then break end
+                    pcall(function()
+                        ReplicatedStorage.RES.StartTutorial.Give250Money:FireServer()
+                    end)
+                end
+                task.wait()
+            end
+        end)
+    else
+        toggleBtn.Text = "OFF"
+        TweenService:Create(toggleBtn, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(200, 50, 50)}):Play()
+        
+        if connection then
+            task.cancel(connection)
+        end
+    end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    claiming = false
+    if connection then task.cancel(connection) end
+    screenGui:Destroy()
+end)
+
+updateSlider()
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Hack Gingerbread",
+   Callback = function()
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lp = Players.LocalPlayer
+
+local claims = {
+    {13, "50k Gingerbread"},
+    {14, "50k Gingerbread"}
+}
+
+for _, args in ipairs(claims) do
+    ReplicatedStorage.RES.AdventClaim:FireServer(unpack(args))
+    task.wait(1) -- bắt buộc để server kịp lưu
+end
+
+TeleportService:Teleport(game.PlaceId, lp)
+   end,
+})
+--------------------------
+soucre
+--------------------------
+while true do
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, game:GetService("Workspace").Parts.Decoration["Healing Pond"].Pad, 0)
+task.wait(0.5)
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, game:GetService("Workspace").Parts.Decoration["Healing Pond"].Pad, 1)
+task.wait(0.5)
+end
