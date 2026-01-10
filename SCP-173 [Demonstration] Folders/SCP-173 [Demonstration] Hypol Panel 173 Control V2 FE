@@ -1,0 +1,247 @@
+-- FULL VERSION: Hypol Panel 173 Control V2 FE
+-- Includes: Fixed Minimize, Super Fling, Full Features
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Remove existing GUI
+if LocalPlayer.PlayerGui:FindFirstChild("Hypol Panel 173 Control V2 FE") then
+    LocalPlayer.PlayerGui["Hypol Panel 173 Control V2 FE"]:Destroy()
+end
+
+-- Create GUI
+local gui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+gui.Name = "Hypol Panel 173 Control V2 FE"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 260, 0, 360)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+local frameStroke = Instance.new("UIStroke", frame)
+frameStroke.Color = Color3.fromRGB(0, 255, 255)
+frameStroke.Thickness = 2
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 35)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Text = "Hypol Panel 173 Control V2 FE"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(0, 255, 255)
+title.BackgroundTransparency = 1
+
+-- Minimize Button
+local minBtn = Instance.new("TextButton", gui)
+minBtn.Size = UDim2.new(0, 35, 0, 35)
+minBtn.Position = UDim2.new(0.5, -17, 0, 5)
+minBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
+minBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+minBtn.Font = Enum.Font.GothamBlack
+minBtn.TextSize = 22
+minBtn.Text = "-"
+minBtn.Name = "Minimize"
+minBtn.Active = true
+minBtn.Draggable = true
+minBtn.ZIndex = 100
+
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
+local uiStroke = Instance.new("UIStroke", minBtn)
+uiStroke.Color = Color3.fromRGB(0, 255, 255)
+uiStroke.Thickness = 2
+
+local minimized = false
+minBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    frame.Visible = not minimized
+    minBtn.Text = minimized and "+" or "-"
+end)
+
+-- Notification function
+local function notify(text)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Hypol Panel",
+            Text = text,
+            Duration = 3
+        })
+    end)
+end
+
+-- Get SCP-173
+local function getSCP()
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc.Name:lower():find("173") then
+            return npc
+        end
+    end
+    return nil
+end
+
+-- Button creator
+local buttonY = 40
+local buttons = {}
+local function createButton(text, callback)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(1, -20, 0, 32)
+    btn.Position = UDim2.new(0, 10, 0, buttonY)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 30, 40)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Text = text
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = true
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = Color3.fromRGB(0, 255, 255)
+    stroke.Thickness = 1.5
+    btn.MouseButton1Click:Connect(function()
+        callback(btn)
+    end)
+    table.insert(buttons, btn)
+    buttonY += 37
+end
+
+-- Delete Fling SCP-173 (Super Power)
+local flingOn = false
+createButton("Toggle Delete 173 (FE)", function(btn)
+    flingOn = not flingOn
+    btn.BackgroundColor3 = flingOn and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(25, 30, 40)
+    notify("Delete 173 " .. (flingOn and "ON" or "OFF"))
+    while flingOn do
+        local scp = getSCP()
+        if scp and scp:FindFirstChild("HumanoidRootPart") then
+            local bv = Instance.new("BodyVelocity")
+            bv.Velocity = Vector3.new(9e9, 9e8, 9e9)
+            bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            bv.P = math.huge
+            bv.Name = "FLING_FORCE"
+            bv.Parent = scp.HumanoidRootPart
+            Debris:AddItem(bv, 0.1)
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- Noclip Toggle
+local noclipOn = false
+createButton("Toggle Noclip 173 (FE)", function(btn)
+    noclipOn = not noclipOn
+    btn.BackgroundColor3 = noclipOn and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(25, 30, 40)
+    notify("Noclip 173 " .. (noclipOn and "ON" or "OFF"))
+    spawn(function()
+        while noclipOn do
+            local scp = getSCP()
+            if scp then
+                for _, part in pairs(scp:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+            task.wait(0.3)
+        end
+    end)
+end)
+
+-- Bring SCP
+createButton("Bring 173", function()
+    local scp = getSCP()
+    if scp and scp:FindFirstChild("HumanoidRootPart") then
+        scp.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+        notify("Brought 173 to you.")
+    else
+        notify("SCP-173 not found.")
+    end
+end)
+
+-- Toggle View SCP
+local viewOn = false
+createButton("Toggle View 173", function(btn)
+    viewOn = not viewOn
+    btn.BackgroundColor3 = viewOn and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(25, 30, 40)
+    if viewOn then
+        spawn(function()
+            while viewOn do
+                local scp = getSCP()
+                if scp and scp:FindFirstChild("Head") then
+                    Camera.CameraSubject = scp.Head
+                end
+                task.wait(0.2)
+            end
+            Camera.CameraSubject = LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+        end)
+    end
+end)
+
+-- Teleport to SCP
+local lastPos
+createButton("Teleport to 173", function()
+    local scp = getSCP()
+    if scp and scp:FindFirstChild("HumanoidRootPart") then
+        lastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+        LocalPlayer.Character.HumanoidRootPart.CFrame = scp.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+        notify("Teleported to SCP-173.")
+    else
+        notify("SCP-173 not found.")
+    end
+end)
+
+-- Teleport Back
+createButton("Teleport Back", function()
+    if lastPos then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = lastPos
+        notify("Returned to last position.")
+    else
+        notify("No previous position saved.")
+    end
+end)
+
+-- Toggle ESP
+local espOn = false
+createButton("Toggle ESP 173", function(btn)
+    espOn = not espOn
+    btn.BackgroundColor3 = espOn and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(25, 30, 40)
+    notify("ESP " .. (espOn and "Enabled" or "Disabled"))
+    if espOn then
+        spawn(function()
+            while espOn do
+                local scp = getSCP()
+                if scp and scp:FindFirstChild("Head") and not scp:FindFirstChild("ESP") then
+                    local bb = Instance.new("BillboardGui", scp)
+                    bb.Name = "ESP"
+                    bb.Size = UDim2.new(0, 100, 0, 40)
+                    bb.Adornee = scp.Head
+                    bb.AlwaysOnTop = true
+                    local txt = Instance.new("TextLabel", bb)
+                    txt.Size = UDim2.new(1, 0, 1, 0)
+                    txt.BackgroundTransparency = 1
+                    txt.TextColor3 = Color3.fromRGB(0, 255, 255)
+                    txt.Text = "SCP-173"
+                    txt.TextStrokeTransparency = 0.5
+                    txt.TextScaled = true
+                end
+                task.wait(1)
+            end
+        end)
+    else
+        local scp = getSCP()
+        if scp and scp:FindFirstChild("ESP") then
+            scp.ESP:Destroy()
+        end
+    end
+end)
