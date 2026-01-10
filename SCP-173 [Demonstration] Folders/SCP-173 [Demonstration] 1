@@ -1,0 +1,271 @@
+--// SCP 173 //-- Made by @FindNulla0.2
+local player = game.Players.LocalPlayer
+local debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
+local cam = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+-- GUI
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "Gui SCP173"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 280, 0, 340)
+frame.Position = UDim2.new(0.5, -140, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 15)
+
+local function createButton(y, text)
+	local btn = Instance.new("TextButton", frame)
+	btn.Size = UDim2.new(1, -20, 0, 45)
+	btn.Position = UDim2.new(0, 10, 0, y)
+	btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Text = text
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextSize = 18
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+	return btn
+end
+
+local flingButton       = createButton(10,  "Fling Scp: OFF")
+local blastButton       = createButton(60,  "Void Scp: OFF")
+local mildButton        = createButton(110, "MILD MODE SCP: OFF")
+local espButton         = createButton(160, "ESP Scp: OFF")
+local lookingCamButton  = createButton(210, "Looking Cam Scp: OFF")
+local antiRaycastButton = createButton(260, "Anti SCP Raycast Beta: OFF")
+
+-- Variáveis
+local flingOn, blastOn, mildOn, espOn, lookingCamOn, antiRaycastOn = false,false,false,false,false,false
+local blastRange, blastForce = 50, 25e26
+local espNPCs = {}
+local lookingConnection = nil
+
+-- SCP-173 Referências
+local scpModel = workspace:WaitForChild("SCP-173")
+local torso = scpModel:WaitForChild("Torso")
+local lookingFolder = torso:WaitForChild("Looking173")
+local target = torso:WaitForChild("Target")
+local targetPoint = torso:WaitForChild("TargetPoint")
+
+local scpParts = {}
+for _, v in pairs(scpModel:GetDescendants()) do
+	if v:IsA("BasePart") then table.insert(scpParts, v) end
+end
+
+-- SUAS 3 POSIÇÕES ORIGINAIS (NÃO MEXI EM NADA)
+local safeTeleports = {
+	CFrame.new(-51.8797798,250.284332,-192.626358),
+	CFrame.new(-88.3121643,259.801849,-224.911743),
+	CFrame.new(-103.652138,259.802368,-190.050079)
+}
+
+-- ANTI SCP RAYCAST 
+local lastMovePos = Vector3.new()
+
+local function safeTP()
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	local scp = workspace:FindFirstChild("SCP-173")
+	if not scp then return end
+	local head = scp:FindFirstChild("Head") or scp:FindFirstChild("Torso") or scp:FindFirstChild("HumanoidRootPart") or scp:FindFirstChild("movePart")
+	if not head then return end
+
+	local scpPosNow = head.Position
+
+	for _, cf in ipairs(safeTeleports) do
+		if (scpPosNow - cf.Position).Magnitude > 35 then
+			hrp.CFrame = cf + Vector3.new(0, 3, 0)
+			return
+		end
+	end
+
+	hrp.CFrame = hrp.CFrame + Vector3.new(0, 60, 0)
+end
+
+task.spawn(function()
+	while task.wait(0.001) do
+		if not antiRaycastOn then continue end
+		local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if not hrp then continue end
+
+		local scp = workspace:FindFirstChild("SCP-173")
+		if not scp then continue end
+		local head = scp:FindFirstChild("Head") or scp:FindFirstChild("Torso") or scp:FindFirstChild("HumanoidRootPart") or scp:FindFirstChild("movePart")
+		if not head then continue end
+
+		local scpPos = head.Position
+		local dist = (scpPos - hrp.Position).Magnitude
+
+		local moveDir = scpPos - lastMovePos
+		lastMovePos = scpPos
+		local lockedOn = moveDir.Magnitude > 1 and moveDir.Unit:Dot((hrp.Position - scpPos).Unit) > 0.9
+
+		local ray = Ray.new(scpPos, hrp.Position - scpPos)
+		local hit = workspace:FindPartOnRayWithIgnoreList(ray, {scp})
+		local canSee = not hit or hit:IsDescendantOf(player.Character)
+
+		local torso = scp:FindFirstChild("Torso")
+		local lookingYou = torso and torso:FindFirstChild("Looking173"):FindFirstChild(player.Name)
+		local isTargeting = torso and torso:FindFirstChild("Target") and torso.Target.Value == player.Character
+		local pointClose = torso and torso:FindFirstChild("TargetPoint") and (torso.TargetPoint.Value - hrp.Position).Magnitude < 14
+
+		if dist < 15 or lockedOn or canSee or lookingYou or isTargeting or pointClose then
+			safeTP()
+		end
+	end
+end)
+
+-- ESP
+local function addESP(npc)
+	if npc:FindFirstChild("HumanoidRootPart") and not espNPCs[npc] then
+		local hl = Instance.new("Highlight", npc)
+		hl.FillColor = Color3.fromRGB(255,0,0)
+		hl.OutlineColor = Color3.fromRGB(255,255,255)
+		hl.FillTransparency = 0.5
+		espNPCs[npc] = hl
+	end
+end
+
+local function removeESP()
+	for _, hl in pairs(espNPCs) do if hl then hl:Destroy() end end
+	espNPCs = {}
+end
+
+-- BOTÕES (tudo igual)
+flingButton.MouseButton1Click:Connect(function()
+	flingOn = not flingOn
+	flingButton.Text = "Fling Scp: "..(flingOn and "ON" or "OFF")
+	flingButton.BackgroundColor3 = flingOn and Color3.fromRGB(0,170,0) or Color3.fromRGB(50,50,50)
+end)
+
+blastButton.MouseButton1Click:Connect(function()
+	blastOn = not blastOn
+	blastButton.Text = "Void Scp: "..(blastOn and "ON" or "OFF")
+	blastButton.BackgroundColor3 = blastOn and Color3.fromRGB(255,150,0) or Color3.fromRGB(50,50,50)
+end)
+
+mildButton.MouseButton1Click:Connect(function()
+	mildOn = not mildOn
+	mildButton.Text = "MILD MODE SCP: "..(mildOn and "ON" or "OFF")
+	mildButton.BackgroundColor3 = mildOn and Color3.fromRGB(140,40,220) or Color3.fromRGB(50,50,50)
+end)
+
+espButton.MouseButton1Click:Connect(function()
+	espOn = not espOn
+	espButton.Text = "ESP Scp: "..(espOn and "ON" or "OFF")
+	espButton.BackgroundColor3 = espOn and Color3.fromRGB(0,170,255) or Color3.fromRGB(50,50,50)
+	if not espOn then removeESP() end
+end)
+
+lookingCamButton.MouseButton1Click:Connect(function()
+	lookingCamOn = not lookingCamOn
+	lookingCamButton.Text = "Looking Cam Scp: " .. (lookingCamOn and "ON" or "OFF")
+	lookingCamButton.BackgroundColor3 = lookingCamOn and Color3.fromRGB(255,215,0) or Color3.fromRGB(50,50,50)
+
+	if not lookingCamOn then
+		if lookingConnection then lookingConnection:Disconnect() lookingConnection = nil end
+		return
+	end
+
+	lookingConnection = RunService.RenderStepped:Connect(function()
+		if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+		local scp = workspace:FindFirstChild("SCP-173")
+		if not scp then return end
+		local head = scp:FindFirstChild("Head") or scp:FindFirstChild("Torso") or scp:FindFirstChild("HumanoidRootPart") or scp:FindFirstChild("movePart")
+		if not head then return end
+		local camPos = cam.CFrame.Position
+		cam.CFrame = CFrame.new(camPos, Vector3.new(head.Position.X, camPos.Y, head.Position.Z))
+	end)
+end)
+
+antiRaycastButton.MouseButton1Click:Connect(function()
+	antiRaycastOn = not antiRaycastOn
+	antiRaycastButton.Text = "Anti SCP Raycast Beta: "..(antiRaycastOn and "ON" or "OFF")
+	antiRaycastButton.BackgroundColor3 = antiRaycastOn and Color3.fromRGB(220,20,20) or Color3.fromRGB(50,50,50)
+end)
+
+-- LOOP PRINCIPAL (Fling + Void FIXADO)
+task.spawn(function()
+	while task.wait(0.1) do
+		if flingOn then
+			for _, npc in workspace:GetChildren() do
+				if npc.Name == "SCP-173" and npc:FindFirstChild("HumanoidRootPart") then
+					local bv = Instance.new("BodyVelocity", npc.HumanoidRootPart)
+					bv.Velocity = Vector3.new(43e29,43e29,43e29)
+					bv.MaxForce = Vector3.new(50e50,50e50,50e50)
+					debris:AddItem(bv,0.1)
+					if npc:FindFirstChild("Humanoid") then npc.Humanoid.Health = 0 end
+				end
+			end
+		end
+
+		if blastOn and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local myRoot = player.Character.HumanoidRootPart
+			for _, npc in workspace:GetChildren() do
+				if npc ~= player.Character and npc:FindFirstChild("HumanoidRootPart") then
+					local dist = (npc.HumanoidRootPart.Position - myRoot.Position).Magnitude
+					if dist <= blastRange then
+						local bv = Instance.new("BodyVelocity", npc.HumanoidRootPart)
+						bv.Velocity = (npc.HumanoidRootPart.Position - myRoot.Position).Unit * blastForce
+						bv.MaxForce = Vector3.new(60e60,60e60,60e60)
+						debris:AddItem(bv, 0.15)
+					end
+				end
+			end
+		end
+	end
+end)
+
+-- Mild Mode
+task.spawn(function()
+	while task.wait() do
+		for _, part in pairs(scpParts) do
+			if part and part.Parent then
+				if mildOn then
+					part.CustomPhysicalProperties = PhysicalProperties.new(0.01, 0.25, 0.1, 1, 1)
+				else
+					part.CustomPhysicalProperties = PhysicalProperties.new(7, 0.7, 0, 1, 1)
+				end
+			end
+		end
+	end
+end)
+
+-- ESP
+task.spawn(function()
+	while task.wait(1) do
+		if espOn then
+			for _, v in workspace:GetChildren() do
+				if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and not game.Players:GetPlayerFromCharacter(v) then
+					addESP(v)
+				end
+			end
+		end
+	end
+end)
+
+-- NOTIFICAÇÃO
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Made By Old Scripts";
+    Text = "Script loaded";
+    Icon = "rbxassetid://6034509993";
+    Duration = 6;
+    Button1 = "OK"
+})
+
+task.spawn(function()
+    local s = Instance.new("Sound")
+    s.SoundId = "rbxassetid://3023237993"
+    s.Volume = 0.4
+    s.Parent = game:GetService("SoundService")
+    s:Play()
+    task.delay(3, function() s:Destroy() end)
+end)
+
+print("[Old Scripts]")
