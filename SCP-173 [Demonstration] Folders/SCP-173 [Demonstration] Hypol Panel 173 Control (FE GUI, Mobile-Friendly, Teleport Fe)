@@ -1,0 +1,200 @@
+-- Hypol Panel 173 Control (FE GUI, Mobile-Friendly, Teleport Fe)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+-- Remove existing GUI if exists
+if LocalPlayer.PlayerGui:FindFirstChild("Hypol Panel 173 Control") then
+    LocalPlayer.PlayerGui["Hypol Panel 173 Control"]:Destroy()
+end
+
+-- GUI Setup
+local gui = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+gui.Name = "Hypol Panel 173 Control"
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 250, 0, 350)
+frame.Position = UDim2.new(0.5, -125, 0.5, -175)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local title = Instance.new("TextLabel", frame)
+title.Text = "Hypol Panel 173 Control"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamSemibold
+title.TextSize = 18
+
+-- Notification function
+local function notify(text)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Hypol Panel",
+            Text = text,
+            Duration = 3
+        })
+    end)
+end
+
+-- Utility: Find SCP-173
+local function getSCP()
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc.Name:lower():find("173") then
+            return npc
+        end
+    end
+    return nil
+end
+
+-- Create button
+local function createButton(text, callback)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(1, -20, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, 35 * (#frame:GetChildren() - 1))
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Text = text
+    btn.AutoButtonColor = true
+    btn.MouseButton1Click:Connect(function()
+        callback(btn)
+    end)
+end
+
+-- Delete (Fling) Toggle
+local flingOn = false
+createButton("Toggle Delete 173 (FE)", function(btn)
+    flingOn = not flingOn
+    btn.BackgroundColor3 = flingOn and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 60)
+    notify("Delete 173 " .. (flingOn and "ON" or "OFF"))
+    while flingOn do
+        local scp = getSCP()
+        if scp and scp:FindFirstChild("HumanoidRootPart") then
+            local bv = Instance.new("BodyVelocity")
+            bv.Velocity = Vector3.new(1e6, 1e6, 1e6)
+            bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+            bv.Parent = scp.HumanoidRootPart
+            game.Debris:AddItem(bv, 0.1)
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- Bring
+createButton("Bring 173", function()
+    local scp = getSCP()
+    if scp and scp:FindFirstChild("HumanoidRootPart") then
+        scp.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+        notify("Brought 173 to you.")
+    else
+        notify("SCP-173 not found.")
+    end
+end)
+
+-- View
+local viewOn = false
+createButton("Toggle View 173", function(btn)
+    viewOn = not viewOn
+    btn.BackgroundColor3 = viewOn and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 60)
+    if viewOn then
+        spawn(function()
+            while viewOn do
+                local scp = getSCP()
+                if scp and scp:FindFirstChild("Head") then
+                    Camera.CameraSubject = scp.Head
+                end
+                task.wait(0.2)
+            end
+            Camera.CameraSubject = LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid")
+        end)
+    end
+end)
+
+-- Teleport to and back
+local lastPos = nil
+createButton("Teleport to 173", function()
+    local scp = getSCP()
+    if scp and scp:FindFirstChild("HumanoidRootPart") then
+        local pos = scp.HumanoidRootPart.Position
+        if pos.Y > -50 and pos.Magnitude > 10 then
+            lastPos = LocalPlayer.Character.HumanoidRootPart.CFrame
+            LocalPlayer.Character.HumanoidRootPart.CFrame = scp.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+            notify("Teleported to SCP-173.")
+        else
+            notify("173 not in valid position yet!")
+        end
+    else
+        notify("SCP-173 not found.")
+    end
+end)
+
+createButton("Teleport Back", function()
+    if lastPos then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = lastPos
+        notify("Returned to last position.")
+    else
+        notify("No previous position saved.")
+    end
+end)
+
+-- ESP
+local espOn = false
+createButton("Toggle ESP 173", function(btn)
+    espOn = not espOn
+    btn.BackgroundColor3 = espOn and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(60, 60, 60)
+    notify("ESP " .. (espOn and "Enabled" or "Disabled"))
+    if espOn then
+        spawn(function()
+            while espOn do
+                local scp = getSCP()
+                if scp and scp:FindFirstChild("Head") and not scp:FindFirstChild("ESP") then
+                    local bb = Instance.new("BillboardGui", scp)
+                    bb.Name = "ESP"
+                    bb.Size = UDim2.new(0, 100, 0, 40)
+                    bb.Adornee = scp.Head
+                    bb.AlwaysOnTop = true
+                    local txt = Instance.new("TextLabel", bb)
+                    txt.Size = UDim2.new(1, 0, 1, 0)
+                    txt.BackgroundTransparency = 1
+                    txt.TextColor3 = Color3.new(1, 0, 0)
+                    txt.Text = "SCP-173"
+                    txt.TextSize = 14
+                    txt.Font = Enum.Font.Gotham
+                end
+                task.wait(2)
+            end
+            for _, model in pairs(workspace:GetDescendants()) do
+                if model:IsA("Model") and model:FindFirstChild("ESP") then
+                    model.ESP:Destroy()
+                end
+            end
+        end)
+    end
+end)
+
+-- Minimize Button
+local minimized = false
+local minBtn = Instance.new("TextButton", gui)
+minBtn.Size = UDim2.new(0, 50, 0, 30)
+minBtn.Position = UDim2.new(0.5, -25, 0, 10)
+minBtn.Text = "-"
+minBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.Font = Enum.Font.Gotham
+minBtn.TextSize = 16
+minBtn.ZIndex = 10
+minBtn.Draggable = true
+minBtn.Active = true
+
+minBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    frame.Visible = not minimized
+    minBtn.Text = minimized and "+" or "-"
+end)
