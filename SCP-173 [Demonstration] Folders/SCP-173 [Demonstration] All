@@ -1,0 +1,65 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "!!",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Admin Panel",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = Vietnamvodich, 
+      FileName = "ควย" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("All", 4483362458)
+
+local Button = Tab:CreateButton({
+   Name = "Open doors",
+   Callback = function()
+  loadstring(game:HttpGet('https://protected-roblox-scripts.onrender.com/1104ff0636da99e7065fa797a952c01e'))()
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Button Example",
+   Callback = function()
+   -- The function that takes place when the button is pressed
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Button Example",
+   Callback = function()
+   -- The function that takes place when the button is pressed
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Button Example",
+   Callback = function()
+   -- The function that takes place when the button is pressed
+   end,
+})
