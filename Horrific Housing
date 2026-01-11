@@ -1,0 +1,69 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Horrific Housing",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Admin Panel",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = , 
+      FileName = "" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Main", 4483362458)
+
+local Button = Tab:CreateButton({
+   Name = "Hatch all Eggs",
+   Callback = function()
+   local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local lp = Players.LocalPlayer
+local eggsFolder = lp:WaitForChild("Eggs")
+local remote = ReplicatedStorage:WaitForChild("EggHatched")
+
+for _, egg in ipairs(eggsFolder:GetChildren()) do
+    if egg:IsA("StringValue") or egg:IsA("Folder") or egg:IsA("ValueBase") then
+        remote:FireServer(egg.Name)
+        task.wait(0.1) -- tránh spam quá nhanh
+    end
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Get all item",
+   Callback = function()
+local replicated_storage = game:GetService("ReplicatedStorage");
+
+for _, item in (replicated_storage.ShopPurchaseRemotes:GetChildren()) do
+    for i = 1,100 do
+        replicated_storage.ShopPurchase:FireServer(1, item.Name);
+    end
+end
+   end,
+})
