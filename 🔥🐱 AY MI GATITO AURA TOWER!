@@ -34,53 +34,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local Tab = Window:CreateTab("Troll Section", 4483362458)
-local Section = Tab:CreateSection("Troll Actions")
-
-local Button = Tab:CreateButton({
-   Name = "Kill all Players",
-   Callback = function()
-game:GetService("ReplicatedStorage").KillAll:FireServer()
-game:GetService("ReplicatedStorage").RemoteEvents.KillALL:FireServer()
-
-        Rayfield:Notify({
-            Title = "Success",
-            Content = "Killed all players!",
-            Duration = 3,
-            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
-        })
-   end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Fling all Players",
-   Callback = function()
-game:GetService("ReplicatedStorage").FlingAll:FireServer()
-
-        Rayfield:Notify({
-            Title = "Success",
-            Content = "Flinging all players!",
-            Duration = 3,
-            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
-        })
-   end,
-})
-
-local Button = Tab:CreateButton({
-    Name = "Explode All Players",
-    Callback = function()
-        game:GetService("ReplicatedStorage").ExplodeAll:FireServer()
-
-        Rayfield:Notify({
-            Title = "Success",
-            Content = "Exploded all players!",
-            Duration = 3,
-            Image = 4483362458 -- icon tuỳ chọn, có thể xoá dòng này
-        })
-    end,
-})
-
-local Tab = Window:CreateTab("Wheel Spinner", nill)
+local Tab = Window:CreateTab("Wheel Spinner", 4483362458)
 local Section = Tab:CreateSection("Admin Commands")
 
 local Button = Tab:CreateButton({
