@@ -1,42 +1,179 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+--// Horrific Housing | Refactored
+--// Original by @611v - corex
+--// Refactor by ChatGPT
 
+-- Rayfield
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+-- Window
 local Window = Rayfield:CreateWindow({
-   Name = "Horrific Housing",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-   LoadingTitle = "Admin Panel",
-   LoadingSubtitle = "Script By romd3976",
-   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
-
-   ConfigurationSaving = {
-      Enabled = false,
-      FolderName = , 
-      FileName = "" -- "Cock" (slang)
-   },
-
-   Discord = {
-      Enabled = false, 
-      Invite = "noinvitelink", 
-      RememberJoins = true 
-   },
-
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "My rolbox profile 'romd3976'",
-      Subtitle = "Key",
-      Note = "Key is on the YT", -- Use this to tell the user how to get a key
-      FileName = "Key", 
-      SaveKey = true, 
-      GrabKeyFromSite = false,
-      Key = {"222554"} 
-   }
+    Name = "Crytpon 有   | Horrific Housing",
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "by @romd3976",
+    Theme = "Default",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "crypton00",
+        FileName = "crypton_hh"
+    }
 })
 
-local Tab = Window:CreateTab("Main", 4483362458)
+-- Utils
+local function getHRP()
+    return (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait())
+        :WaitForChild("HumanoidRootPart")
+end
 
-local Button = Tab:CreateButton({
+local function loopToggle(flagName, callback)
+    getgenv()[flagName] = true
+    task.spawn(function()
+        while getgenv()[flagName] do
+            callback()
+            task.wait()
+        end
+    end)
+end
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- HOME
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local HomeTab = Window:CreateTab("Home", 7539983773)
+local Section = HomeTab:CreateSection("Starting place")
+
+HomeTab:CreateLabel('Not Patched', 6935098545, Color3.fromRGB(75, 75, 75), false)
+HomeTab:CreateLabel('Game: Horrific Housing', 133603530536689, Color3.fromRGB(75, 75, 75), false)
+HomeTab:CreateLabel('Status: Working', 4458804262, Color3.fromRGB(75, 75, 75), false)
+HomeTab:CreateLabel('Script by @romd3976', 86591853167234, Color3.fromRGB(75, 75, 75), false)
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ITEMS
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local ItemsTab = Window:CreateTab("Items", 129306263749313)
+
+local Section = ItemsTab:CreateSection("Items Settings")
+ItemsTab:CreateToggle({
+    Name = 'NoCooldown Blade (dueling sword)',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().bladeLoop = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().bladeLoop do
+                    game:GetService('Players').LocalPlayer.Character.Blade.Event:FireServer()
+                    task.wait(0)
+                end
+            end)
+        else
+            getgenv().bladeLoop = false
+        end
+    end,
+})
+
+ItemsTab:CreateToggle({
+    Name = 'NoCooldown Sword',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().swordLoop = state
+
+        if state then
+            task.spawn(function()
+                while getgenv().swordLoop do
+                    game:GetService('Players').LocalPlayer.Character.Sword.Event:FireServer()
+                    task.wait(0)
+                end
+            end)
+        else
+            getgenv().swordLoop = false
+        end
+    end,
+})
+
+ItemsTab:CreateButton({
+    Name = "No Cooldown Prompts",
+    Callback = function()
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") then
+                obj.HoldDuration = 0
+            end
+        end
+    end
+})
+
+ItemsTab:CreateButton({
+    Name = "Auto Get Map",
+    Callback = function()
+        local hrp = getHRP()
+        local oldCFrame = hrp.CFrame
+
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj.Name == "MapModel" or obj.Name == "Point" then
+                local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                if prompt then
+                    hrp.CFrame = obj:GetPivot()
+                    task.wait(0.2)
+                    fireproximityprompt(prompt)
+                end
+            end
+        end
+
+        hrp.CFrame = oldCFrame
+    end
+})
+
+ItemsTab:CreateButton({
+    Name = 'Auto touch Illumina',
+    Callback = function()
+        local LocalPlayer = game.Players.LocalPlayer
+        local HumanoidRootPart =
+            (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait())
+            :WaitForChild('HumanoidRootPart')
+
+        local OriginalCFrame = HumanoidRootPart.CFrame
+        local Iterator, State, Index = ipairs(workspace:GetDescendants())
+        local FoundIllumina = nil
+
+        while true do
+            local CurrentInstance
+
+            Index, CurrentInstance = Iterator(State, Index)
+
+            if Index == nil then
+                CurrentInstance = FoundIllumina
+                break
+            end
+
+            if CurrentInstance.Name == 'Illumina'
+                and (CurrentInstance:IsA('BasePart') or CurrentInstance:IsA('Model')) then
+                break
+            end
+        end
+
+        if CurrentInstance then
+            local TargetCFrame = nil
+
+            if CurrentInstance:IsA('Model') then
+                if CurrentInstance.PrimaryPart then
+                    TargetCFrame = CurrentInstance.PrimaryPart.CFrame
+                else
+                    TargetCFrame = CurrentInstance:GetPivot()
+                end
+            elseif CurrentInstance:IsA('BasePart') then
+                TargetCFrame = CurrentInstance.CFrame
+            end
+
+            if TargetCFrame then
+                HumanoidRootPart.CFrame = TargetCFrame
+                task.wait(0.25)
+                HumanoidRootPart.CFrame = OriginalCFrame
+            end
+        end
+    end,
+})
+
+ItemsTab:CreateButton({
    Name = "Hatch all Eggs",
    Callback = function()
    local Players = game:GetService("Players")
@@ -55,8 +192,8 @@ end
    end,
 })
 
-local Button = Tab:CreateButton({
-   Name = "Get all item",
+ItemsTab:CreateButton({
+   Name = "Get all item idk",
    Callback = function()
 local replicated_storage = game:GetService("ReplicatedStorage");
 
@@ -66,4 +203,393 @@ for _, item in (replicated_storage.ShopPurchaseRemotes:GetChildren()) do
     end
 end
    end,
+})
+
+
+ItemsTab:CreateButton({
+    Name = "Get All Items / Tokens (Lag)",
+    Callback = function()
+task.spawn(function()
+            while true do
+                game:GetService('ReplicatedStorage'):WaitForChild('ShopPurchase'):FireServer(unpack({
+                    1e-10,
+                    'HouseChest',
+                }))
+                game:GetService('ReplicatedStorage'):WaitForChild('ShopPurchase'):FireServer(unpack({
+                    1e-8,
+                    'Furniture',
+                }))
+                game:GetService('ReplicatedStorage'):WaitForChild('ShopPurchase'):FireServer(unpack({
+                    1e-9,
+                    'EggPets',
+                }))
+                game:GetService('ReplicatedStorage'):WaitForChild('ShopPurchase'):FireServer(unpack({
+                    1e-7,
+                    'Ornament',
+                }))
+                game:GetService('ReplicatedStorage'):WaitForChild('ShopPurchase'):FireServer(unpack({
+                    1e-10,
+                    'Death',
+                }))
+                task.wait(0)
+            end
+        end)
+    end,
+})
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- EFFECTS
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local EffectsTab = Window:CreateTab("Effects", 13518130183)
+local Section = EffectsTab:CreateSection("Effects Settings")
+
+EffectsTab:CreateButton({
+    Name = "Use Random Potion",
+    Callback = function() game:GetService('ReplicatedStorage'):WaitForChild('EventRemotes'):WaitForChild('Potion'):FireServer(unpack({true}))
+    end,
+})
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- GUI
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local GuiTab = Window:CreateTab("Guis", 103950363563606)
+local Section = GuiTab:CreateSection("Guis Settings")
+
+GuiTab:CreateToggle({
+    Name = "Hide Status Effects",
+    Callback = function(state)
+        local gui = LocalPlayer.PlayerGui:FindFirstChild("statusAffects")
+        if gui then
+            gui.Enabled = not state
+        end
+    end
+})
+
+GuiTab:CreateToggle({
+    Name = "Hide Ads",
+    Callback = function(state)
+        loopToggle("HideAds", function()
+            local ads = LocalPlayer.PlayerGui:FindFirstChild("Ads")
+            if ads then ads.Enabled = not state end
+        end)
+    end
+})
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- ANTI
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local AntiTab = Window:CreateTab("Anti", 13793170713)
+local Section = AntiTab:CreateSection("Anti Settings")
+
+AntiTab:CreateButton({
+    Name = 'Anti-Lava',
+    Callback = function()
+        local Iterator, State, Index = ipairs(workspace:GetDescendants())
+        while true do
+            local Instance
+            Index, Instance = Iterator(State, Index)
+            if Index == nil then
+                break
+            end
+            if Instance:IsA('Part') and Instance.Name == 'LavaPlate' then
+                Instance:Destroy()
+            end
+        end
+    end,
+})
+
+AntiTab:CreateButton({
+    Name = 'Anti-LavaSpinner',
+    Callback = function()
+        local Iterator, State, Index = ipairs(workspace:GetDescendants())
+
+        while true do
+            local Instance
+
+            Index, Instance = Iterator(State, Index)
+
+            if Index == nil then
+                break
+            end
+
+            if Instance:IsA('Model') and Instance.Name == 'Spinner' then
+                Instance:Destroy()
+            end
+        end
+    end,
+})
+
+AntiTab:CreateToggle({
+    Name = 'Anti-void',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(p65)
+        getgenv().giantPartToggle = p65
+
+        if p65 then
+            local GiantPart = Instance.new('Part')
+
+            GiantPart.Size = Vector3.new(2000, 1, 2000)
+            GiantPart.Position = Vector3.new(1.2150108814239502, -0.8852427005767822, 65.64254760742188)
+            GiantPart.Anchored = true
+            GiantPart.CanCollide = true
+            GiantPart.Transparency = 0.5
+            GiantPart.Name = 'GiantPart'
+            GiantPart.Parent = workspace
+        else
+            local ExistingPart = workspace:FindFirstChild('GiantPart')
+
+            if ExistingPart then
+                ExistingPart:Destroy()
+            end
+        end
+    end,
+})
+
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-- TROLL
+--━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+local TrollTab = Window:CreateTab("Troll", 9213175381)
+local Section = TrollTab:CreateSection("Troll Settings")
+
+TrollTab:CreateToggle({
+    Name = 'Kill all; use rocket item',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().rocketSpam = state
+        if state then
+            task.spawn(function()
+                local LocalPlayer = game.Players.LocalPlayer
+                while getgenv().rocketSpam do
+                    local playerIterator, playerState, playerIndex = pairs(game.Players:GetPlayers())
+                    while true do
+                        local targetPlayer
+                        playerIndex, targetPlayer = playerIterator(playerState, playerIndex)
+                        if playerIndex == nil then
+                            break
+                        end
+                        if targetPlayer ~= LocalPlayer
+                            and targetPlayer.Character
+                            and targetPlayer.Character:FindFirstChild('HumanoidRootPart') then
+                            local directionVector = {
+                                (targetPlayer.Character.HumanoidRootPart.Position
+                                - LocalPlayer.Character.HumanoidRootPart.Position).Unit,
+                            }
+                            LocalPlayer.Character.RocketLauncher.fire:FireServer(unpack(directionVector))
+                            task.wait(0)
+                        end
+                    end
+                end
+            end)
+        else
+            getgenv().rocketSpam = false
+        end
+    end,
+})
+
+TrollTab:CreateToggle({
+    Name = 'Freeze all; use freeze ray',
+    CurrentValue = false,
+    Flag = 'FreezeRayToggle',
+    Callback = function(state)
+        getgenv().freezeRaySpam = state
+        if state then
+            task.spawn(function()
+                while getgenv().freezeRaySpam do
+                    local playerIterator, playerState, playerIndex = ipairs(game:GetService('Players'):GetPlayers())
+                    while true do
+                        local otherPlayer
+                        playerIndex, otherPlayer = playerIterator(playerState, playerIndex)
+                        if playerIndex == nil then
+                            break
+                        end
+                        if otherPlayer ~= game.Players.LocalPlayer
+                            and otherPlayer.Character
+                            and otherPlayer.Character:FindFirstChild('HumanoidRootPart') then
+                            local position = otherPlayer.Character.HumanoidRootPart.Position
+                            local targetPosition = {Vector3.new(position.X, position.Y, position.Z)}
+                            local freezeRayTool = game.Players.LocalPlayer.Character:FindFirstChild('Freeze Ray')
+                            if freezeRayTool and freezeRayTool:FindFirstChild('fire') then
+                                freezeRayTool.fire:FireServer(unpack(targetPosition))
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        else
+            getgenv().freezeRaySpam = false
+        end
+    end,
+})
+
+TrollTab:CreateToggle({
+    Name = 'Kill all 2; equip SnowBall',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().autoKillEnabled = state
+        if state then
+            task.spawn(function()
+                while getgenv().autoKillEnabled do
+                    local playerIterator, playerState, playerIndex = pairs(game.Players:GetPlayers())
+                    while true do
+                        local targetPlayer
+                        playerIndex, targetPlayer = playerIterator(playerState, playerIndex)
+                        if playerIndex == nil then
+                            break
+                        end
+                        if targetPlayer ~= game.Players.LocalPlayer
+                            and targetPlayer.Character
+                            and targetPlayer.Character:FindFirstChild('HumanoidRootPart') then
+                            local targetPosition = {targetPlayer.Character.HumanoidRootPart.Position}
+                            game:GetService('Players').LocalPlayer.Character.Snowball.remote:FireServer(unpack(targetPosition))
+                            task.wait(0.01)
+                        end
+                    end
+                    task.wait(0)
+                end
+            end)
+        else
+            getgenv().autoKillEnabled = false
+        end
+    end,
+})
+
+TrollTab:CreateToggle({
+    Name = 'Kill all 3; use paintball item',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().paintballAll = state
+        if state then
+            task.spawn(function()
+                while getgenv().paintballAll do
+                    local playerIterator, playerState, playerIndex = pairs(game:GetService('Players'):GetPlayers())
+                    while true do
+                        local targetPlayer
+                        playerIndex, targetPlayer = playerIterator(playerState, playerIndex)
+                        if playerIndex == nil or not getgenv().paintballAll then
+                            break
+                        end
+                        if targetPlayer ~= game:GetService('Players').LocalPlayer
+                            and targetPlayer.Character
+                            and targetPlayer.Character:FindFirstChild('HumanoidRootPart') then
+                            local paintballPos = {targetPlayer.Character.HumanoidRootPart.Position}
+                            game:GetService('Players').LocalPlayer.Character.PaintballGun.remote:FireServer(unpack(paintballPos))
+                            task.wait(0)
+                        end
+                    end
+                    task.wait(0)
+                end
+            end)
+        else
+            getgenv().paintballAll = false
+        end
+    end,
+})
+
+TrollTab:CreateInput({
+    Name = 'How many coconuts do you have; important for kill all 4',
+    CurrentValue = '',
+    PlaceholderText = 'Enter number of coconuts',
+    RemoveTextAfterFocusLost = false,
+    Flag = 'Input1',
+    Callback = function(Text)
+        getgenv().coconutCount = tonumber(Text) or 0
+    end,
+})
+
+TrollTab:CreateToggle({
+    Name = 'Kill all 4; use coconut',
+    CurrentValue = false,
+    Flag = 'Toggle1',
+    Callback = function(state)
+        getgenv().coconutLaunch = state
+        if state then
+            task.spawn(function()
+                local LocalPlayer = game.Players.LocalPlayer
+                local coconutAmount = getgenv().coconutCount
+                while getgenv().coconutLaunch do
+                    local playerIterator, playerState, playerIndex = pairs(game.Players:GetPlayers())
+                    while true do
+                        local targetPlayer
+                        playerIndex, targetPlayer = playerIterator(playerState, playerIndex)
+                        if playerIndex == nil then
+                            break
+                        end
+                        if targetPlayer.Character
+                            and targetPlayer.Character:FindFirstChild('HumanoidRootPart') then
+                            local throwParams = {
+                                targetPlayer.Character.HumanoidRootPart.Position,
+                                targetPlayer.Character.UpperTorso,
+                                coconutAmount,
+                            }
+                            LocalPlayer.Character.Coconut.throwEvent:FireServer(unpack(throwParams))
+                        end
+                    end
+                    task.wait(0)
+                end
+            end)
+        else
+            getgenv().coconutLaunch = false
+        end
+    end,
+})
+
+local TeleportTab = Window:CreateTab("Teleport", 6723742952)
+local Section = TeleportTab:CreateSection("Teleport Settings")
+
+local Players = game:GetService("Players")
+
+local function GetPlayerNames()
+    local list = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    return list
+end
+
+local SelectedPlayer = nil
+
+local PlayerDropdown = TeleportTab:CreateDropdown({
+    Name = "Select Player",
+    Options = GetPlayerNames(), -- ⚠️ QUAN TRỌNG
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "TeleportPlayerDropdown",
+    Callback = function(Options)
+        SelectedPlayer = Options[1]
+    end,
+})
+
+local function RefreshDropdown()
+    PlayerDropdown:Set(GetPlayerNames())
+end
+
+Players.PlayerAdded:Connect(RefreshDropdown)
+Players.PlayerRemoving:Connect(RefreshDropdown)
+
+TeleportTab:CreateButton({
+    Name = "Teleport to Player",
+    Callback = function()
+        if not SelectedPlayer then return end
+
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+        local TargetPlayer = Players:FindFirstChild(SelectedPlayer)
+
+        if TargetPlayer
+            and TargetPlayer.Character
+            and TargetPlayer.Character:FindFirstChild("HumanoidRootPart")
+            and LocalPlayer.Character
+            and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+
+            LocalPlayer.Character.HumanoidRootPart.CFrame =
+                TargetPlayer.Character.HumanoidRootPart.CFrame
+        end
+    end,
 })
