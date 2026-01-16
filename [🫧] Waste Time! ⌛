@@ -2,110 +2,79 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "[🫧] Waste Time! ⌛",
-   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   Icon = 0,
    LoadingTitle = "[🫧] Waste Time! ⌛",
    LoadingSubtitle = "Script By romd3976",
-   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
-
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
+   Theme = "DarkBlue",
 
    ConfigurationSaving = {
       Enabled = false,
-      FolderName = Vietnamvodich, 
-      FileName = "ควย" -- "Cock" (slang)
+      FolderName = "Vietnamvodich",
+      FileName = "ควย"
    },
 
-   Discord = {
-      Enabled = false, 
-      Invite = "noinvitelink", 
-      RememberJoins = true 
-   },
-
-   KeySystem = false, -- Set this to true to use our key system
-   KeySettings = {
-      Title = "My rolbox profile 'romd3976'",
-      Subtitle = "Key",
-      Note = "Key is on the YT", -- Use this to tell the user how to get a key
-      FileName = "Key", 
-      SaveKey = true, 
-      GrabKeyFromSite = false,
-      Key = {"222554"} 
-   }
+   KeySystem = false
 })
 
 local Tab = Window:CreateTab("Main", nil)
-local Section = Tab:CreateSection("TIER II")
+Tab:CreateSection("TIER II")
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "purpple roomd",
    Callback = function()
-local player = game:GetService("Players").LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
-hrp.CFrame = CFrame.new(-13.7689438, 750.074158, 72.6770554, -0.406715393, 0, 0.913554907, 0, -1, 0, 0.913554907, 0, 0.406715453) -- đổi tọa độ tại đây
-   end,
+      local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+      hrp.CFrame = CFrame.new(
+         -13.7689438, 750.074158, 72.6770554,
+         -0.406715393, 0, 0.913554907,
+         0, -1, 0,
+         0.913554907, 0, 0.406715453
+      )
+   end
 })
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "Button",
    Callback = function()
-local player = game:GetService("Players").LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
-hrp.CFrame = CFrame.new(-51.76577, 0.997487426, -352.126892, 0, 0, 1, 0, 1, -0, -1, 0, 0) -- đổi tọa độ tại đây
-   end,
+      local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+      hrp.CFrame = CFrame.new(-51.76577, 0.997487426, -352.126892)
+   end
 })
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "Back TIER I",
    Callback = function()
-local player = game:GetService("Players").LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
-hrp.CFrame = CFrame.new(-66.1050186, 9.43068027, -303.698792, -6.711483e-05, -0.422694325, -0.906272292, 1, -6.711483e-05, -4.27365303e-05, -4.27365303e-05, -0.906272292, 0.422694325) -- đổi tọa độ tại đây
-   end,
+      local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+      hrp.CFrame = CFrame.new(-66.1050186, 9.43068027, -303.698792)
+   end
 })
 
-local Section = Tab:CreateSection("TIER I")
+Tab:CreateSection("TIER I")
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "Lava",
    Callback = function()
-local plr = game:GetService("Players").LocalPlayer
-local char = plr.Character or plr.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
-local targetPos = Vector3.new(1205, 86, -2812) -- vị trí bạn muốn
-
-hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
-   end,
+      local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+      local targetPos = Vector3.new(1205, 86, -2812)
+      hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
+   end
 })
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "30x",
    Callback = function()
-local plr = game:GetService("Players").LocalPlayer
-local char = plr.Character or plr.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-
-local targetPos = Vector3.new(1129, 1045, -2712) -- vị trí bạn muốn
-
-hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
-   end,
+      local hrp = game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+      local targetPos = Vector3.new(1129, 1045, -2712)
+      hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
+   end
 })
 
-local Button = Tab:CreateButton({
+Tab:CreateButton({
    Name = "clicks",
    Callback = function()
-local cd = workspace:WaitForChild("Clicks"):WaitForChild("n"):WaitForChild("ClickDetector")
-
-for i = 1, 50000 do -- click 50 lần
-    fireclickdetector(cd)
-    task.wait(0.1)
-end
-   end,
+      local cd = workspace:WaitForChild("Clicks"):WaitForChild("n"):WaitForChild("ClickDetector")
+      for i = 1, 50000 do
+         fireclickdetector(cd)
+         task.wait(0.1)
+      end
+   end
 })
