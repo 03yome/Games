@@ -75,21 +75,37 @@ local Section = Tab:CreateSection("TIER I")
 local Button = Tab:CreateButton({
    Name = "Lava",
    Callback = function()
-local player = game:GetService("Players").LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
+local plr = game:GetService("Players").LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
-hrp.Position = Vector3.new(1205, 86, -2812) -- đổi tọa độ tại đây
+local targetPos = Vector3.new(1205, 86, -2812) -- vị trí bạn muốn
+
+hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0)
    end,
 })
 
 local Button = Tab:CreateButton({
    Name = "30x",
    Callback = function()
-local player = game:GetService("Players").LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
+local plr = game:GetService("Players").LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
-hrp.Position = Vector3.new(1129, 1045, -2712) -- đổi tọa độ tại đây
+local targetPos = Vector3.new(1129, 1045, -2712) -- vị trí bạn muốn
+
+hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "clicks",
+   Callback = function()
+local cd = workspace:WaitForChild("Clicks"):WaitForChild("n"):WaitForChild("ClickDetector")
+
+for i = 1, 50000 do -- click 50 lần
+    fireclickdetector(cd)
+    task.wait(0.1)
+end
    end,
 })
