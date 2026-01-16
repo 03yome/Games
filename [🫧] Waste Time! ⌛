@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "câu cá ",
+   Name = "[🫧] Waste Time! ⌛",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "[🫧] Waste Time! ⌛",
    LoadingSubtitle = "Script By romd3976",
@@ -56,6 +56,17 @@ local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
 hrp.CFrame = CFrame.new(-51.76577, 0.997487426, -352.126892, 0, 0, 1, 0, 1, -0, -1, 0, 0) -- đổi tọa độ tại đây
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Back TIER II",
+   Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+hrp.CFrame = CFrame.new(-66.1050186, 9.43068027, -303.698792, -6.711483e-05, -0.422694325, -0.906272292, 1, -6.711483e-05, -4.27365303e-05, -4.27365303e-05, -0.906272292, 0.422694325) -- đổi tọa độ tại đây
    end,
 })
 
