@@ -81,7 +81,7 @@ local hrp = char:WaitForChild("HumanoidRootPart")
 
 local targetPos = Vector3.new(1205, 86, -2812) -- vị trí bạn muốn
 
-hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0)
+hrp.CFrame = CFrame.new(targetPos + Vector3.new(0, 5, 0))
    end,
 })
 
