@@ -30,7 +30,7 @@ Tab:CreateInput({
 })
 
 Tab:CreateInput({
-    Name = "Nhập số (luôn thành số âm)",
+    Name = "Nhập số (đảo dấu)",
     PlaceholderText = "VD: 20 hoặc -20",
     RemoveTextAfterFocusLost = false,
     Callback = function(Text)
@@ -38,16 +38,15 @@ Tab:CreateInput({
         if not value then
             Rayfield:Notify({
                 Title = "Lỗi",
-                Content = "Vui lòng nhập số",
+                Content = "Vui lòng nhập số hợp lệ",
                 Duration = 3
             })
             return
         end
 
-        -- ép thành số âm
-        local finalValue = -math.abs(value)
+        -- 🔁 đảo dấu
+        local finalValue = -value
 
-        -- args
         local args = {
             game:GetService("Players").LocalPlayer
                 :WaitForChild("Hidden_leaderstats")
@@ -56,7 +55,7 @@ Tab:CreateInput({
                 :WaitForChild("Xmas Shades"),
 
             "Customization",
-            finalValue, -- 👈 luôn là số âm
+            finalValue,
             game:GetService("Players").LocalPlayer
                 :WaitForChild("Hidden_leaderstats")
                 :WaitForChild("Matches")
@@ -70,7 +69,7 @@ Tab:CreateInput({
 
         Rayfield:Notify({
             Title = "Đã gửi",
-            Content = "Giá trị: "..finalValue,
+            Content = "Giá trị gửi: "..finalValue,
             Duration = 3
         })
     end
