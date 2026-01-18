@@ -29,6 +29,53 @@ Tab:CreateInput({
     end
 })
 
+Tab:CreateInput({
+    Name = "Nhập số (luôn thành số âm)",
+    PlaceholderText = "VD: 20 hoặc -20",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local value = tonumber(Text)
+        if not value then
+            Rayfield:Notify({
+                Title = "Lỗi",
+                Content = "Vui lòng nhập số",
+                Duration = 3
+            })
+            return
+        end
+
+        -- ép thành số âm
+        local finalValue = -math.abs(value)
+
+        -- args
+        local args = {
+            game:GetService("Players").LocalPlayer
+                :WaitForChild("Hidden_leaderstats")
+                :WaitForChild("ShopPurchases")
+                :WaitForChild("Face")
+                :WaitForChild("Xmas Shades"),
+
+            "Customization",
+            finalValue, -- 👈 luôn là số âm
+            game:GetService("Players").LocalPlayer
+                :WaitForChild("Hidden_leaderstats")
+                :WaitForChild("Matches")
+        }
+
+        game:GetService("ReplicatedStorage")
+            :WaitForChild("Modules")
+            :WaitForChild("RemoteFunc_Module")
+            :WaitForChild("MatchesEventClient")
+            :FireServer(unpack(args))
+
+        Rayfield:Notify({
+            Title = "Đã gửi",
+            Content = "Giá trị: "..finalValue,
+            Duration = 3
+        })
+    end
+})
+
 -- ===== BUTTON MUA =====
 Tab:CreateButton({
     Name = "Buy Pig Body",
