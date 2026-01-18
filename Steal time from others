@@ -1,1 +1,23 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
+local PhantomForcesWindow = Library:NewWindow("steal from others")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+KillingCheats:CreateButton("unlock all", function()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local pstats = player:WaitForChild("PlayerStats")
+local ps = pstats:FindFirstChild("PlayerSwords")
+
+for _, sword in pairs(ReplicatedStorage.Assets.Swords:GetChildren()) do
+    if not ps:FindFirstChild(sword.Name) then
+        local bool = Instance.new("BoolValue")
+        bool.Name = sword.Name
+        bool.Value = true
+        bool.Parent = ps
+    end
+end
+
+print("HI")
+end)
