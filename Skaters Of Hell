@@ -1,0 +1,374 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Skaters Of Hell",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Admin Panel",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = Gui, 
+      FileName = "" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Free Trails", 4483362458)
+
+local Button = Tab:CreateButton({
+   Name = "Red",
+   Callback = function()
+local args = {
+    [1] = "Red",
+    [2] = -9999999999,
+    [3] = "Trail1"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Cyan",
+   Callback = function()
+local args = {
+    [1] = "Cyan",
+    [2] = -9999999999,
+    [3] = "Trail2"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Pink",
+   Callback = function()
+local args = {
+    [1] = "Pink",
+    [2] = -9999999999,
+    [3] = "Trail3"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Black",
+   Callback = function()
+local args = {
+    [1] = "Black",
+    [2] = -9999999999,
+    [3] = "Trail4"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Sky",
+   Callback = function()
+local args = {
+    [1] = "Sky",
+    [2] = -9999999999,
+    [3] = "Trail5"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "RedDark",
+   Callback = function()
+local args = {
+    [1] = "RedDark",
+    [2] = -9999999999,
+    [3] = "Trail6"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Yellow",
+   Callback = function()
+local args = {
+    [1] = "Yellow",
+    [2] = -9999999999,
+    [3] = "Trail7"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Blue",
+   Callback = function()
+local args = {
+    [1] = "Blue",
+    [2] = -9999999999,
+    [3] = "Trail8"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Scary",
+   Callback = function()
+local args = {
+    [1] = "Scary",
+    [2] = -9999999999,
+    [3] = "Trail9"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Deep",
+   Callback = function()
+local args = {
+    [1] = "Deep",
+    [2] = -9999999999,
+    [3] = "Trail10"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Rainbow",
+   Callback = function()
+local args = {
+    [1] = "Rainbow",
+    [2] = -9999999999,
+    [3] = "Trail11"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gray",
+   Callback = function()
+local args = {
+    [1] = "Gray",
+    [2] = -9999999999,
+    [3] = "Trail12"
+}
+
+game:GetService("ReplicatedStorage").BuyPower:FireServer(unpack(args))
+   end,
+})
+
+local Section = Tab:CreateSection("Skates")
+
+local Button = Tab:CreateButton({
+   Name = "Starter",
+   Callback = function()
+local args = {
+    [1] = "Starter",
+    [2] = -99999999,
+    [3] = "Skate1"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Strawberry",
+   Callback = function()
+local args = {
+    [1] = "Strawberry",
+    [2] = -99999999,
+    [3] = "Skate2"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Baby Blue",
+   Callback = function()
+local args = {
+    [1] = "Baby Blue",
+    [2] = -99999999,
+    [3] = "Skate3"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Classic",
+   Callback = function()
+local args = {
+    [1] = "Classic",
+    [2] = -99999999,
+    [3] = "Skate4"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Greenish",
+   Callback = function()
+local args = {
+    [1] = "Greenish",
+    [2] = -99999999,
+    [3] = "Skate5"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Magenta",
+   Callback = function()
+local args = {
+    [1] = "Magenta",
+    [2] = -99999999,
+    [3] = "Skate6"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "BlueBerry",
+   Callback = function()
+local args = {
+    [1] = "BlueBerry",
+    [2] = -99999999,
+    [3] = "Skate7"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Electric Blue",
+   Callback = function()
+local args = {
+    [1] = "Electric Blue",
+    [2] = -99999999,
+    [3] = "Skate8"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Neon Green",
+   Callback = function()
+local args = {
+    [1] = "Neon Green",
+    [2] = -99999999,
+    [3] = "Skate9"
+}
+
+game:GetService("ReplicatedStorage").BuySkates:FireServer(unpack(args))
+   end,
+})
+
+local Section = Tab:CreateSection("Wheel")
+
+local Button = Tab:CreateButton({
+   Name = "Spins",
+   Callback = function()
+local args = {
+	"Spin"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Fly",
+   Callback = function()
+local args = {
+	"Fly"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Coins",
+   Callback = function()
+local args = {
+	"Coins"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Coil",
+   Callback = function()
+local args = {
+	"Coil"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gravity",
+   Callback = function()
+local args = {
+	"Gravity"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Skip",
+   Callback = function()
+local args = {
+	"Skips"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
+   end,
+})
