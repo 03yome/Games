@@ -93,3 +93,30 @@ local Toggle = Tab:CreateToggle({
       end
    end,
 })
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DamageValue = 0
+
+local Input = Tab:CreateInput({
+   Name = "Set Damage",
+   CurrentValue = "",
+   PlaceholderText = "Enter damage amount",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input_Damage",
+   Callback = function(Text)
+      local number = tonumber(Text)
+
+      if number then
+         DamageValue = number
+
+         local args = {
+            DamageValue
+         }
+
+         ReplicatedStorage
+            :WaitForChild("Remotes")
+            :WaitForChild("TakeDamage")
+            :FireServer(unpack(args))
+      end
+   end,
+})
