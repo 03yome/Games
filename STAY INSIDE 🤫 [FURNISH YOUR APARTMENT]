@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "câu cá ",
+   Name = "STAY INSIDE 🤫 [FURNISH YOUR APARTMENT]",
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "STAY INSIDE 🤫 [FURNISH YOUR APARTMENT]",
    LoadingSubtitle = "Script By romd3976",
@@ -68,7 +68,7 @@ local Toggle = Tab:CreateToggle({
 local running2 = false
 
 local Toggle = Tab:CreateToggle({
-   Name = "Auto Hunger",
+   Name = "Auto Thirst",
    CurrentValue = false,
    Flag = "Toggle_Hunger",
    Callback = function(Value)
@@ -88,6 +88,35 @@ local Toggle = Tab:CreateToggle({
                   :FireServer(unpack(args))
 
                task.wait(10) -- chỉnh tốc độ spam tại đây
+            end
+         end)
+      end
+   end,
+})
+
+local running3 = false
+
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Health",
+   CurrentValue = false,
+   Flag = "Toggle_Hunger",
+   Callback = function(Value)
+      running = Value
+
+      if running then
+         task.spawn(function()
+            while running do
+               local args = {
+                  true,
+                  1000
+               }
+
+               game:GetService("ReplicatedStorage")
+                  :WaitForChild("Remotes")
+                  :WaitForChild("Health")
+                  :FireServer(unpack(args))
+
+               task.wait(0.1) -- chỉnh tốc độ spam tại đây
             end
          end)
       end
