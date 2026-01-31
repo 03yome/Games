@@ -124,6 +124,7 @@ local oneClick29 = makeBtn("Susanoo")
 local oneClick30 = makeBtn("ConquerorActivate")
 local oneClick31 = makeBtn("Move2Remote")
 local oneClick32 = makeBtn("Move4Remote")
+local oneClick33 = makeBtn("RigTranfo")
 
 -------------------------------
 -- Auto loops
@@ -296,6 +297,10 @@ end)
 
 oneClick32.MouseButton1Click:Connect(function() 
 game:GetService("ReplicatedStorage").RogerStuffRS.Move4Remote:FireServer() 
+end)
+
+oneClick33.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").AntiSpiralStuff.RigTranfoEvent:FireServer()
 end)
 
 -------------------------------
