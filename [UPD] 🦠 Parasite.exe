@@ -94,13 +94,35 @@ local Tab = Window:CreateTab("Kill monters", 4483362458)
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local OrganismsFolder = workspace:WaitForChild("Organisms")
 
 local SelectedTargetName = nil
-local DamageValue = 25 -- mặc định
+local DamageValue = 25
+local AuraRange = 50
+local AuraEnabled = false
 
--- INPUT DAMAGE
-local Input = Tab:CreateInput({
+-- ==============================
+-- HÀM LẤY DANH SÁCH TARGET
+-- ==============================
+
+local function GetTargetList()
+    local list = {}
+
+    for _, v in pairs(OrganismsFolder:GetChildren()) do
+        if v:FindFirstChild("Humanoid") then
+            table.insert(list, v.Name)
+        end
+    end
+
+    return list
+end
+
+-- ==============================
+-- DAMAGE INPUT
+-- ==============================
+
+Tab:CreateInput({
     Name = "Damage",
     CurrentValue = "",
     PlaceholderText = "Enter Damage...",
@@ -114,17 +136,31 @@ local Input = Tab:CreateInput({
     end,
 })
 
--- LẤY DANH SÁCH MỤC TIÊU TRONG ORGANISMS
-local targetNames = {}
+-- ==============================
+-- AURA RANGE INPUT
+-- ==============================
 
-for _, v in pairs(OrganismsFolder:GetChildren()) do
-    table.insert(targetNames, v.Name)
-end
+Tab:CreateInput({
+    Name = "Aura Range",
+    CurrentValue = "",
+    PlaceholderText = "Enter Range...",
+    RemoveTextAfterFocusLost = false,
+    Flag = "RangeInput",
+    Callback = function(Text)
+        local number = tonumber(Text)
+        if number then
+            AuraRange = number
+        end
+    end,
+})
 
--- DROPDOWN CHỌN TÊN
+-- ==============================
+-- DROPDOWN TARGET
+-- ==============================
+
 local Dropdown = Tab:CreateDropdown({
-    Name = "Select Target",
-    Options = targetNames,
+    Name = "Select Dummy",
+    Options = GetTargetList(),
     CurrentOption = {},
     MultipleOptions = false,
     Flag = "TargetDropdown",
@@ -133,56 +169,95 @@ local Dropdown = Tab:CreateDropdown({
     end,
 })
 
--- HÀM TÌM TARGET GẦN NHẤT (nếu trùng tên)
-local function GetClosestTargetByName(name)
-    local closest = nil
-    local shortestDistance = math.huge
+-- ==============================
+-- AUTO REFRESH DROPDOWN
+-- ==============================
 
-    for _, v in pairs(OrganismsFolder:GetChildren()) do
-        if v.Name == name then
-            local humanoidRoot = v:FindFirstChild("HumanoidRootPart")
-            if humanoidRoot then
-                local distance = (LocalPlayer.Character.HumanoidRootPart.Position - humanoidRoot.Position).Magnitude
+local function RefreshDropdown()
+    Dropdown:Refresh(GetTargetList())
+end
 
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closest = v
+OrganismsFolder.ChildAdded:Connect(RefreshDropdown)
+OrganismsFolder.ChildRemoved:Connect(RefreshDropdown)
+
+-- ==============================
+-- HÀM GÂY DAMAGE
+-- ==============================
+
+local function DamageTarget(target)
+    local humanoid = target:FindFirstChild("Humanoid")
+    local root = target:FindFirstChild("HumanoidRootPart")
+
+    if humanoid and root and humanoid.Health > 0 then
+        local args = {
+            humanoid,
+            root,
+            DamageValue,
+            Vector3.new(0.6275, 0.2666, 0.7315),
+            0,
+            0,
+            false
+        }
+
+        Character
+            :WaitForChild("AR")
+            :WaitForChild("GunScript_Server")
+            :WaitForChild("InflictTarget")
+            :FireServer(unpack(args))
+    end
+end
+
+-- ==============================
+-- BUTTON KILL SELECTED
+-- ==============================
+
+Tab:CreateButton({
+    Name = "Kill Selected",
+    Callback = function()
+        if not SelectedTargetName then return end
+
+        local target = OrganismsFolder:FindFirstChild(SelectedTargetName)
+        if target then
+            DamageTarget(target)
+        end
+    end,
+})
+
+-- ==============================
+-- TOGGLE KILL AURA
+-- ==============================
+
+Tab:CreateToggle({
+    Name = "Kill Aura",
+    CurrentValue = false,
+    Flag = "AuraToggle",
+    Callback = function(Value)
+        AuraEnabled = Value
+    end,
+})
+
+-- ==============================
+-- VÒNG LẶP AURA
+-- ==============================
+
+task.spawn(function()
+    while task.wait(0.2) do
+        if AuraEnabled and Character and Character:FindFirstChild("HumanoidRootPart") then
+
+            local myPos = Character.HumanoidRootPart.Position
+
+            for _, target in pairs(OrganismsFolder:GetChildren()) do
+                local root = target:FindFirstChild("HumanoidRootPart")
+                local humanoid = target:FindFirstChild("Humanoid")
+
+                if root and humanoid and humanoid.Health > 0 then
+                    local distance = (myPos - root.Position).Magnitude
+
+                    if distance <= AuraRange then
+                        DamageTarget(target)
+                    end
                 end
             end
         end
     end
-
-    return closest
-end
-
--- BUTTON BẮN
-local Button = Tab:CreateButton({
-    Name = "Fire",
-    Callback = function()
-        if not SelectedTargetName then return end
-
-        local target = GetClosestTargetByName(SelectedTargetName)
-        if not target then return end
-
-        local humanoid = target:FindFirstChild("Humanoid")
-        local root = target:FindFirstChild("HumanoidRootPart")
-
-        if humanoid and root then
-            local args = {
-                humanoid,
-                root,
-                DamageValue,
-                Vector3.new(0.6275, 0.2666, 0.7315),
-                0,
-                0,
-                false
-            }
-
-            LocalPlayer.Character
-                :WaitForChild("AR")
-                :WaitForChild("GunScript_Server")
-                :WaitForChild("InflictTarget")
-                :FireServer(unpack(args))
-        end
-    end
-})
+end)
