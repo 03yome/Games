@@ -91,119 +91,98 @@ game.ReplicatedStorage:WaitForChild("ClaimWheelPrize"):FireServer(unpack(args))
 })
 
 local Tab = Window:CreateTab("Kill monters", 4483362458)
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local OrganismsFolder = workspace:WaitForChild("Organisms")
 
-local DamageValue = 25
-local SelectedTarget = nil
+local SelectedTargetName = nil
+local DamageValue = 25 -- mặc định
 
--- LẤY DANH SÁCH MONSTER
-local function GetMonsters()
-    local list = {}
-    for _, mob in ipairs(workspace.Organisms:GetChildren()) do
-        if mob:IsA("Model") and mob:FindFirstChild("Humanoid") and mob:FindFirstChild("HumanoidRootPart") then
-            table.insert(list, mob.Name)
+-- INPUT DAMAGE
+local Input = Tab:CreateInput({
+    Name = "Damage",
+    CurrentValue = "",
+    PlaceholderText = "Enter Damage...",
+    RemoveTextAfterFocusLost = false,
+    Flag = "DamageInput",
+    Callback = function(Text)
+        local number = tonumber(Text)
+        if number then
+            DamageValue = number
         end
-    end
-    return list
+    end,
+})
+
+-- LẤY DANH SÁCH MỤC TIÊU TRONG ORGANISMS
+local targetNames = {}
+
+for _, v in pairs(OrganismsFolder:GetChildren()) do
+    table.insert(targetNames, v.Name)
 end
 
--- TÌM MONSTER GẦN NHẤT
-local function GetNearestMonster()
-    local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then
-        return nil
-    end
+-- DROPDOWN CHỌN TÊN
+local Dropdown = Tab:CreateDropdown({
+    Name = "Select Target",
+    Options = targetNames,
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "TargetDropdown",
+    Callback = function(Options)
+        SelectedTargetName = Options[1]
+    end,
+})
 
-    local hrp = character.HumanoidRootPart
-    local nearest, shortest = nil, math.huge
+-- HÀM TÌM TARGET GẦN NHẤT (nếu trùng tên)
+local function GetClosestTargetByName(name)
+    local closest = nil
+    local shortestDistance = math.huge
 
-    for _, mob in ipairs(workspace.Organisms:GetChildren()) do
-        if mob:IsA("Model")
-            and mob:FindFirstChild("Humanoid")
-            and mob:FindFirstChild("HumanoidRootPart")
-            and mob.Humanoid.Health > 0 then
+    for _, v in pairs(OrganismsFolder:GetChildren()) do
+        if v.Name == name then
+            local humanoidRoot = v:FindFirstChild("HumanoidRootPart")
+            if humanoidRoot then
+                local distance = (LocalPlayer.Character.HumanoidRootPart.Position - humanoidRoot.Position).Magnitude
 
-            local dist = (mob.HumanoidRootPart.Position - hrp.Position).Magnitude
-            if dist < shortest then
-                shortest = dist
-                nearest = mob
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closest = v
+                end
             end
         end
     end
 
-    return nearest
+    return closest
 end
 
--- INPUT DAMAGE
-Tab:CreateInput({
-    Name = "Damage",
-    CurrentValue = "25",
-    PlaceholderText = "Enter damage",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-        local num = tonumber(Text)
-        if num then
-            DamageValue = num
+-- BUTTON BẮN
+local Button = Tab:CreateButton({
+    Name = "Fire",
+    Callback = function()
+        if not SelectedTargetName then return end
+
+        local target = GetClosestTargetByName(SelectedTargetName)
+        if not target then return end
+
+        local humanoid = target:FindFirstChild("Humanoid")
+        local root = target:FindFirstChild("HumanoidRootPart")
+
+        if humanoid and root then
+            local args = {
+                humanoid,
+                root,
+                DamageValue,
+                Vector3.new(0.6275, 0.2666, 0.7315),
+                0,
+                0,
+                false
+            }
+
+            LocalPlayer.Character
+                :WaitForChild("AR")
+                :WaitForChild("GunScript_Server")
+                :WaitForChild("InflictTarget")
+                :FireServer(unpack(args))
         end
-    end,
-})
-
--- DROPDOWN MONSTER
-local Dropdown
-Dropdown = Tab:CreateDropdown({
-    Name = "Monster",
-    Options = GetMonsters(),
-    CurrentOption = {GetMonsters()[1]},
-    MultipleOptions = false,
-    Callback = function(Options)
-        SelectedTarget = Options[1]
-    end,
-})
-
-SelectedTarget = GetMonsters()[1]
-
--- BUTTON KILL MONSTER ĐƯỢC CHỌN
-Tab:CreateButton({
-    Name = "Kill Selected Monster",
-    Callback = function()
-        if not SelectedTarget then return end
-        local target = workspace.Organisms:FindFirstChild(SelectedTarget)
-        if not target then return end
-
-        local args = {
-            target.Humanoid,
-            target.HumanoidRootPart,
-            DamageValue,
-            Vector3.new(-0.97, 0.09, -0.20),
-            0,
-            0,
-            false
-        }
-
-        LocalPlayer.Backpack.AR.GunScript_Server.InflictTarget
-            :FireServer(unpack(args))
-    end,
-})
-
--- 🔥 BUTTON KILL MONSTER GẦN NHẤT
-Tab:CreateButton({
-    Name = "Kill Nearest Monster",
-    Callback = function()
-        local target = GetNearestMonster()
-        if not target then return end
-
-        local args = {
-            target.Humanoid,
-            target.HumanoidRootPart,
-            DamageValue,
-            Vector3.new(-0.97, 0.09, -0.20),
-            0,
-            0,
-            false
-        }
-
-        LocalPlayer.Backpack.AR.GunScript_Server.InflictTarget
-            :FireServer(unpack(args))
-    end,
+    end
 })
