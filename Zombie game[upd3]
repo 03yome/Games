@@ -13,6 +13,12 @@ end)
 local function rejoin()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 end
+
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+local floorSize = 0
 -----------------------------
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -2108,12 +2114,6 @@ end
 
    end,
 })
-
-local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local root = char:WaitForChild("HumanoidRootPart")
-
-local floorSize = 0
 
 -- Hàm bắn remote
 local function fireAcid(pos)
