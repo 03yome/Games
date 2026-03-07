@@ -13,9 +13,6 @@ end)
 local function rejoin()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 end
-
-local player = game.Players.LocalPlayer
-
 -----------------------------
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -1747,6 +1744,65 @@ end
 local Tab = Window:CreateTab("Server/client", nil)
 local Section = Tab:CreateSection("Server")
 
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+local floorSize = 0
+
+local function fireAcid(pos)
+    local remote = game:GetService("ReplicatedStorage")
+        :WaitForChild("setomeR":reverse())
+        :WaitForChild("ZombieRelated")
+        :WaitForChild("AcidSpit")
+
+    remote:FireServer(pos, Vector3.new(10.1639,1,46.50549))
+end
+
+-- INPUT
+Tab:CreateInput({
+   Name = "Floor Size",
+   CurrentValue = "",
+   PlaceholderText = "Enter floor size",
+   RemoveTextAfterFocusLost = false,
+   Flag = "FloorSizeInput",
+
+   Callback = function(Text)
+        local num = tonumber(Text)
+        if num then
+            floorSize = num
+        end
+   end,
+})
+
+
+-- BUTTON
+Tab:CreateButton({
+   Name = "FIRE",
+   Callback = function()
+
+        if floorSize <= 0 then return end
+
+        local root = getRoot()
+        local spacing = 5
+
+        for a = 1, floorSize do
+            for b = 1, floorSize do
+
+                local offsetX = (a - (floorSize / 2)) * spacing
+                local offsetZ = (b - (floorSize / 2)) * spacing
+
+                local pos = root.Position + Vector3.new(offsetX,0,offsetZ)
+
+                fireAcid(pos)
+
+            end
+        end
+
+   end,
+})
+
+
 local Button = Tab:CreateButton({
    Name = "Hack Sniper",
    Callback = function()
@@ -2108,68 +2164,6 @@ for _, name in ipairs(TeamBarriers) do
         end
     end
 end
-
-   end,
-})
-
-local floorSize = 0
-
--- Hàm lấy root an toàn
-local function getRoot()
-    local char = player.Character or player.CharacterAdded:Wait()
-    return char:WaitForChild("HumanoidRootPart")
-end
-
--- Hàm bắn remote
-local function fireAcid(pos)
-    local remote = game:GetService("ReplicatedStorage")
-        :WaitForChild("setomeR":reverse())
-        :WaitForChild("ZombieRelated")
-        :WaitForChild("AcidSpit")
-
-    remote:FireServer(pos, Vector3.new(10.1639,1,46.50549))
-end
-
-
--- INPUT
-Tab:CreateInput({
-   Name = "Floor Size",
-   CurrentValue = "",
-   PlaceholderText = "Enter floor size",
-   RemoveTextAfterFocusLost = false,
-   Flag = "FloorSizeInput",
-
-   Callback = function(Text)
-        local num = tonumber(Text)
-        if num then
-            floorSize = num
-        end
-   end,
-})
-
-
--- BUTTON
-Tab:CreateButton({
-   Name = "FIRE",
-   Callback = function()
-
-        if floorSize <= 0 then return end
-
-        local root = getRoot()
-        local spacing = 5
-
-        for a = 1, floorSize do
-            for b = 1, floorSize do
-
-                local offsetX = (a - (floorSize / 2)) * spacing
-                local offsetZ = (b - (floorSize / 2)) * spacing
-
-                local pos = root.Position + Vector3.new(offsetX,0,offsetZ)
-
-                fireAcid(pos)
-
-            end
-        end
 
    end,
 })
