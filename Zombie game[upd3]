@@ -14,10 +14,6 @@ local function rejoin()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 end
 
-local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local root = char:WaitForChild("HumanoidRootPart")
-
 local floorSize = 0
 -----------------------------
 
@@ -2117,6 +2113,9 @@ end
 
 -- Hàm bắn remote
 local function fireAcid(pos)
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
     local remote = game:GetService("ReplicatedStorage")
         :WaitForChild("setomeR":reverse())
         :WaitForChild("ZombieRelated")
