@@ -1744,65 +1744,6 @@ end
 local Tab = Window:CreateTab("Server/client", nil)
 local Section = Tab:CreateSection("Server")
 
-local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local root = char:WaitForChild("HumanoidRootPart")
-
-local floorSize = 0
-
-local function fireAcid(pos)
-    local remote = game:GetService("ReplicatedStorage")
-        :WaitForChild("setomeR":reverse())
-        :WaitForChild("ZombieRelated")
-        :WaitForChild("AcidSpit")
-
-    remote:FireServer(pos, Vector3.new(10.1639,1,46.50549))
-end
-
--- INPUT
-Tab:CreateInput({
-   Name = "Floor Size",
-   CurrentValue = "",
-   PlaceholderText = "Enter floor size",
-   RemoveTextAfterFocusLost = false,
-   Flag = "FloorSizeInput",
-
-   Callback = function(Text)
-        local num = tonumber(Text)
-        if num then
-            floorSize = num
-        end
-   end,
-})
-
-
--- BUTTON
-Tab:CreateButton({
-   Name = "FIRE",
-   Callback = function()
-
-        if floorSize <= 0 then return end
-
-        local root = getRoot()
-        local spacing = 5
-
-        for a = 1, floorSize do
-            for b = 1, floorSize do
-
-                local offsetX = (a - (floorSize / 2)) * spacing
-                local offsetZ = (b - (floorSize / 2)) * spacing
-
-                local pos = root.Position + Vector3.new(offsetX,0,offsetZ)
-
-                fireAcid(pos)
-
-            end
-        end
-
-   end,
-})
-
-
 local Button = Tab:CreateButton({
    Name = "Hack Sniper",
    Callback = function()
@@ -2165,6 +2106,102 @@ for _, name in ipairs(TeamBarriers) do
     end
 end
 
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "acid",
+   Callback = function()
+local u = game.Players.LocalPlayer
+local c = u.Character or u.CharacterAdded:Wait()
+local p = c:WaitForChild("HumanoidRootPart")
+
+local g = Instance.new
+local d = g("ScreenGui", game:GetService("CoreGui"))
+d.Name = string.reverse("iUGtiucri");
+
+local f = g("Frame", d)
+f.Name = "m"
+f.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+f.Size = UDim2.new(0, 260, 0, 140)
+f.Position = UDim2.new(0.5, -130, 0.5, -70)
+f.Active = true
+f.Draggable = true
+
+local l = g("TextButton", f)
+l.Text = "-"
+l.Size = UDim2.new(0, 30, 0, 25)
+l.Position = UDim2.new(1, -60, 0, 0)
+l.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local x = g("TextButton", f)
+x.Text = "X"
+x.Size = UDim2.new(0, 30, 0, 25)
+x.Position = UDim2.new(1, -30, 0, 0)
+x.BackgroundColor3 = Color3.fromRGB(80, 30, 30)
+
+local i = g("TextBox", f)
+i.PlaceholderText = "Enter floor size"
+i.Size = UDim2.new(0, 120, 0, 30)
+i.Position = UDim2.new(0, 10, 0, 40)
+i.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+i.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local r = g("TextButton", f)
+r.Text = "FIRE"
+r.Size = UDim2.new(0, 100, 0, 30)
+r.Position = UDim2.new(0, 140, 0, 40)
+r.BackgroundColor3 = Color3.fromRGB(60, 100, 60)
+
+local z = f:Clone()
+z.Size = UDim2.new(0, 260, 0, 30)
+z.Position = UDim2.new(0, 0, 0, 25)
+z.Visible = false
+z.Name = "m2"
+z.Parent = f
+
+l.MouseButton1Click:Connect(function()
+    for _,v in pairs(f:GetChildren()) do
+        if v ~= l and v ~= x and v:IsA("TextButton") or v:IsA("TextBox") then
+            v.Visible = not v.Visible
+        end
+    end
+end)
+
+x.MouseButton1Click:Connect(function()
+    d:Destroy()
+end)
+
+local function h(pos)
+    local o = game:GetService("ReplicatedStorage")
+        :WaitForChild(string.reverse("setomeR"))
+        :WaitForChild("ZombieRelated")
+        :WaitForChild(string.rep("AcidSpit", 1))
+
+    local v1 = 10 + 0.1639
+    local v2 = 1
+    local v3 = 46 + 0.50549
+    local args = {
+        [1] = pos,
+        [2] = Vector3.new(v1, v2, v3)
+    }
+    o:FireServer(unpack(args))
+end
+
+r.MouseButton1Click:Connect(function()
+    local n = tonumber(i.Text)
+    if not n then return end
+    local s = 5
+
+    for a = 1, n do
+        for b = 1, n do
+            local ox = (a - (n / 2)) * s
+            local oz = (b - (n / 2)) * s
+            local pos = p.Position + Vector3.new(ox, 0, oz)
+            h(pos)
+        end
+    end
+end)
    end,
 })
 
