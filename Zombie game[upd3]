@@ -13,6 +13,9 @@ end)
 local function rejoin()
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 end
+
+local player = game.Players.LocalPlayer
+
 -----------------------------
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -2109,7 +2112,6 @@ end
    end,
 })
 
-local player = game.Players.LocalPlayer
 local floorSize = 0
 
 -- Hàm lấy root an toàn
