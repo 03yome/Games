@@ -1,0 +1,682 @@
+local Library = loadstring(game:HttpGet("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+
+local Window = Library:CreateWindow{
+	Title = "Random tool | v1",
+	SubTitle = "by @romd3976",
+	TabWidth = 160,
+	Size = UDim2.fromOffset(830, 525),
+	Resize = true,
+	MinSize = Vector2.new(470, 380),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.RightControl
+}
+
+local Tabs = {
+	Main = Window:CreateTab{
+		Title = "Exploits",
+		Icon = "delete"
+	},
+	Main2 = Window:CreateTab{
+		Title = "OP",
+		Icon = "delete"
+	},
+	Main3 = Window:CreateTab{
+		Title = "Tool Settings",
+		Icon = "delete"
+	},
+	Script = Window:CreateTab{
+		Title = "Teleports",
+		Icon = "database"
+	},
+	Anti = Window:CreateTab{
+		Title = "Antis",
+		Icon = "database"
+	},
+	Main4 = Window:CreateTab{
+		Title = "Misc",
+		Icon = "database"
+	},
+	Settings = Window:CreateTab{
+		Title = "Gui settings",
+		Icon = "settings"
+	},
+}
+
+Tabs.Main3:AddButton({
+    Title = 'Half-Zatoichi',
+    Description = 'Instant Charge Use',
+    Callback = function()
+        local player = game:GetService('Players').LocalPlayer
+        local tool = (player.Character or player.CharacterAdded:Wait()):WaitForChild('Half-Zatoichi [0]')
+        local startCharge = tool.WaitForChild(tool, 'StartCharge')
+
+        local function getCharge(name)
+            local num = string.match(name, '%[(%d+)%]')
+            return tonumber(num)
+        end
+
+        tool.GetPropertyChangedSignal(tool, 'Name'):Connect(function()
+            local charge = getCharge(tool.Name)
+
+            if charge and (0 <= charge and charge <= 25) then
+                startCharge:FireServer()
+            end
+        end)
+    end,
+})
+
+Tabs.Main3:AddButton({
+    Title = 'Black Flash',
+    Description = 'Instant Charge Use',
+    Callback = function()
+        game:GetService('Players').LocalPlayer.Character:WaitForChild('Black Flash'):WaitForChild('PlaySound'):FireServer()
+    end,
+})
+
+Tabs.Main3:AddButton({
+    Title = 'Eyelander',
+    Description = 'Instant Use',
+    Callback = function()
+        local player = game:GetService('Players').LocalPlayer
+        local tool = (player.Character or player.CharacterAdded:Wait()):WaitForChild('Eyelander [CHARGE READY]')
+        local startCharge = tool.WaitForChild(tool, 'StartCharge')
+
+        local function getCharge(name)
+            local num = string.match(name, '%[(%d+)%]')
+            return tonumber(num)
+        end
+
+        tool.GetPropertyChangedSignal(tool, 'Name'):Connect(function()
+            local charge = getCharge(tool.Name)
+
+            if charge and (0 <= charge and charge <= 25) then
+                startCharge:FireServer()
+            end
+        end)
+    end,
+})
+
+Tabs.Main3:AddButton({
+    Title = 'MEGAFUNK SHOTGUN SPAM',
+    Description = 'Press E To Work',
+    Callback = function()
+        local userInputService = game:GetService('UserInputService')
+        local player = game:GetService('Players').LocalPlayer
+        local mouse = player:GetMouse()
+        local shootEvent = (player.Character or player.CharacterAdded:Wait())
+            :WaitForChild('MEGAFUNK SHOTGUN')
+            :WaitForChild('ShootEvent')
+
+        userInputService.InputBegan:Connect(function(input, gameProcessed)
+            if not gameProcessed then
+                if input.KeyCode == Enum.KeyCode.E then
+                    local hitPos = mouse.Hit.p
+
+                    local args = {
+                        Vector3.new(hitPos.X, hitPos.Y, hitPos.Z),
+                        32
+                    }
+
+                    shootEvent:FireServer(unpack(args))
+                end
+            end
+        end)
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Get Fanta',
+    Description = 'if auto not works use',
+    Callback = function()
+        fireclickdetector(game.Workspace.Interactable.Fanta.ClickDetector)
+    end,
+})
+Tabs.Main:AddButton({
+    Title = 'Get Sentry',
+    Description = 'if auto not works use',
+    Callback = function()
+        fireclickdetector(game.Workspace.Interactable.construction.ClickDetector)
+    end,
+})
+Tabs.Main:AddButton({
+    Title = 'Get ticket gamble',
+    Description = 'if auto not works use',
+    Callback = function()
+fireclickdetector(
+    game.Workspace.Interactable:WaitForChild("Gambling Island Ticket"):WaitForChild("ClickDetector")
+)
+    end,
+})
+
+local loopFanta = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop Get Fanta",
+    Description = "Toggle description",
+    Default = false,
+    Callback = function(state)
+        loopFanta = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopFanta do
+                    fireclickdetector(
+                        game.Workspace.Interactable:WaitForChild("Fanta"):WaitForChild("ClickDetector")
+                    )
+                    task.wait(1)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+Tabs.Main2:AddButton({
+    Title = 'Damage All',
+    Description = '1 Time',
+    Callback = function()
+        local Players = game:GetService('Players')
+        local LocalPlayer = Players.LocalPlayer
+        local Tool = (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()):FindFirstChildOfClass('Tool')
+
+        if Tool then
+            local iter, state, index = ipairs(Players:GetPlayers())
+
+            local remotes = {
+                damage = function(player)
+                    return {
+                        player.Character:FindFirstChild('Humanoid'),
+                    }
+                end,
+
+                damageAndGrip = function(player)
+                    return {
+                        player.Character:FindFirstChild('Humanoid'),
+                        true,
+                    }
+                end,
+            }
+
+            while true do
+                local player
+                index, player = iter(state, index)
+
+                if index == nil then
+                    break
+                end
+
+                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild('Humanoid') then
+                    local rIter, rState, rIndex = pairs(remotes)
+
+                    while true do
+                        local func
+                        rIndex, func = rIter(rState, rIndex)
+
+                        if rIndex == nil then
+                            break
+                        end
+
+                        local remote = Tool:FindFirstChild(rIndex)
+
+                        if remote and remote:IsA('RemoteFunction') then
+                            local args = func(player)
+                            remote:InvokeServer(unpack(args))
+                        end
+                    end
+                end
+            end
+        end
+    end,
+})
+
+local Toggle = Tabs.Main2:AddToggle("MyToggle", {
+    Title = "Toggle",
+    Description = "Toggle description",
+    Default = false,
+    Callback = function(state)
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while state do
+                    local Players = game:GetService('Players')
+                    local LocalPlayer = Players.LocalPlayer
+                    local Tool = (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()):FindFirstChildOfClass('Tool')
+
+                    if Tool then
+                        local iter, state2, index = ipairs(Players:GetPlayers())
+
+                        local remotes = {
+                            damage = function(player)
+                                local char = player.Character
+                                local hum = char and char:FindFirstChild('Humanoid')
+                                return hum and {hum} or nil
+                            end,
+
+                            damageAndGrip = function(player)
+                                local char = player.Character
+                                local hum = char and char:FindFirstChild('Humanoid')
+                                return hum and {hum, true} or nil
+                            end,
+                        }
+
+                        while true do
+                            local player
+                            index, player = iter(state2, index)
+
+                            if index == nil then
+                                break
+                            end
+
+                            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild('Humanoid') then
+                                local rIter, rState, rIndex = pairs(remotes)
+
+                                while true do
+                                    local func
+                                    rIndex, func = rIter(rState, rIndex)
+
+                                    if rIndex == nil then
+                                        break
+                                    end
+
+                                    local remote = Tool:FindFirstChild(rIndex)
+
+                                    if remote and remote:IsA('RemoteFunction') then
+                                        local args = func(player)
+
+                                        if args then
+                                            pcall(function()
+                                                remote:InvokeServer(unpack(args))
+                                            end)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+local Toggle = Tabs.Main2:AddToggle("toggle", {
+    Title = "INF HEALTH Needs yello phone",
+    Description = "",
+    Default = false,
+    Callback = function(state)
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while state do
+                    game:GetService('Players').LocalPlayer
+                        :WaitForChild('Backpack')
+                        :WaitForChild('yello phone')
+                        :WaitForChild('ApplyBuff')
+                        :FireServer(unpack({
+                            'Heal',
+                        }))
+
+                    task.wait(0.1)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = 'Get All Radios',
+    Description = 'From Workspace',
+    Callback = function()
+        local Backpack = game:GetService('Players').LocalPlayer:WaitForChild('Backpack')
+        local iter, state, index = ipairs(workspace:GetChildren())
+
+        while true do
+            local obj
+
+            index, obj = iter(state, index)
+
+            if index == nil then
+                break
+            end
+
+            if obj:IsA('Tool') and obj.Name == 'Radio' then
+                obj.Parent = Backpack
+            end
+        end
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Get All Normal Revolver',
+    Description = 'From Workspace',
+    Callback = function()
+        local Backpack = game:GetService('Players').LocalPlayer:WaitForChild('Backpack')
+        local iter, state, index = ipairs(workspace:GetChildren())
+
+        while true do
+            local obj
+
+            index, obj = iter(state, index)
+
+            if index == nil then
+                break
+            end
+
+            if obj:IsA('Tool') and obj.Name == 'normal revolver' then
+                obj.Parent = Backpack
+            end
+        end
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Equip All Tools',
+    Description = 'its so OP in this game',
+    Callback = function()
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+        game.Players.LocalPlayer.Backpack:FindFirstChildOfClass('Tool').Parent = game.Players.LocalPlayer.Character
+    end,
+})
+
+Tabs.Anti:AddButton({
+    Title = 'Anti-Fall',
+    Description = 'When You Fall You Teleport Back Everywere',
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/zephyr10101/AntiFall/main/Script'))()
+    end,
+})
+Tabs.Anti:AddButton({
+    Title = 'Anti-Void',
+    Description = 'You Dont Die \u{130}n The Void',
+    Callback = function()
+        loadstring(game:HttpGet('https://rawscripts.net/raw/Universal-Script-Anti-Void-Script-18124'))()
+    end,
+})
+
+Tabs.Script:AddButton({
+    Title = 'On Top',
+    Description = 'House',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(150.29281616210938, 85.05784606933594, -211.18728637695313)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Secret Place',
+    Description = 'Sentry',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(143.92185974121094, 3604.459228515625, -213.9867706298828)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'On Top',
+    Description = 'House',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(150.29281616210938, 85.05784606933594, -211.18728637695313)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Gambling island',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2134.986328125, 9.847549438476563, -297.7442626953125)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Cheese',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-2146.315185546875, 1.6939141750335693, -49.194427490234375)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Moai',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-927.1022338867188, 54.688655853271484, -179.8762664794922)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'BasketBall',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-174.28662109375, 57.46611022949219, -557.5974731445313)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Far Island 1',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(525.5909423828125, 3.3170604705810547, -572.7019653320313)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Far Island 2',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(762.8394165039063, 7.6392130851745605, 263.42218017578125)
+    end,
+})
+Tabs.Script:AddButton({
+    Title = 'Void',
+    Description = '',
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(493.447509765625, -35.626956939697266, -554.5174560546875)
+    end,
+})
+
+local function ApplyHitbox(size)
+    _G.HeadSize = size
+    _G.Disabled = true
+
+    game:GetService('RunService').RenderStepped:Connect(function()
+        if _G.Disabled then
+            local nextFunc = next
+            local players, index = game:GetService('Players'):GetPlayers()
+
+            while true do
+                local player
+                index, player = nextFunc(players, index)
+
+                if index == nil then
+                    break
+                end
+
+                if player.Name ~= game:GetService('Players').LocalPlayer.Name then
+                    pcall(function()
+                        local hrp = player.Character.HumanoidRootPart
+                        hrp.Size = Vector3.new(_G.HeadSize, _G.HeadSize, _G.HeadSize)
+                        hrp.Transparency = 0.9
+                        hrp.BrickColor = BrickColor.new('Really blue')
+                        hrp.Material = 'Neon'
+                        hrp.CanCollide = false
+                    end)
+                end
+            end
+        end
+    end)
+end
+
+Tabs.Main4:AddButton({
+    Title = 'Super Hitbox',
+    Description = 'Working!',
+    Callback = function()
+        ApplyHitbox(20)
+    end,
+})
+
+Tabs.Main4:AddButton({
+    Title = 'Mega Hitbox',
+    Description = 'Working!',
+    Callback = function()
+        ApplyHitbox(35)
+    end,
+})
+
+Tabs.Main4:AddButton({
+    Title = 'Disable Hitbox',
+    Description = '',
+    Callback = function()
+        ApplyHitbox(7)
+    end,
+})
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", 
+{
+    Title = "one hit kill tool work on Sword Tool", 
+    Description = "idk",
+    Default = false,
+    Callback = function(state)
+        if state then
+            print("Toggle On")
+
+            _G.hitkill = true
+
+            task.spawn(function()
+                while _G.hitkill do
+                    local pIter, pState, pIndex = pairs(game.Players.LocalPlayer.Backpack:GetDescendants())
+
+                    while true do
+                        local obj
+                        pIndex, obj = pIter(pState, pIndex)
+
+                        if pIndex == nil then
+                            break
+                        end
+
+                        if obj.ClassName == 'Tool' and obj:FindFirstChild('damage') then
+                            obj.LocalScript:Clone().Parent = obj
+                        end
+                    end
+
+                    local cIter, cState, cIndex = pairs(game.Players.LocalPlayer.Character:GetDescendants())
+
+                    while true do
+                        local obj
+                        cIndex, obj = cIter(cState, cIndex)
+
+                        if cIndex == nil then
+                            break
+                        end
+
+                        if obj.ClassName == 'Tool' and obj:FindFirstChild('damage') then
+                            obj.LocalScript:Clone().Parent = obj
+                        end
+                    end
+
+                    task.wait(0.1)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+            _G.hitkill = false
+        end
+    end 
+})
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Get all tool from All Player",
+    Description = "",
+    Default = false,
+    Callback = function(state)
+
+        _G.GetTool = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while _G.GetTool do
+                    local iter, state2, index = ipairs(game.Players:GetDescendants())
+
+                    while true do
+                        local obj
+                        index, obj = iter(state2, index)
+
+                        if index == nil then
+                            break
+                        end
+
+                        if obj.ClassName == "Tool" and obj:FindFirstChild("Handle") then
+                            obj.Handle.Anchored = false
+                            obj.Handle.CFrame = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame
+
+                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(obj)
+                            game.Players.LocalPlayer.Character.Humanoid:UnequipTools()
+                        end
+                    end
+
+                    task.wait(0.001)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Hit all Player if you spam click is will be kill all",
+    Description = "Working!",
+    Callback = function()
+
+        local Players = game:GetService("Players")
+        local lp = Players.LocalPlayer
+
+        -- lấy tất cả tool
+        for _,v in ipairs(Players:GetDescendants()) do
+            if v.ClassName == "Tool" and v:FindFirstChild("Handle") then
+                v.Handle.Anchored = false
+                v.Handle.CFrame = lp.Character.HumanoidRootPart.CFrame
+
+                lp.Character.Humanoid:EquipTool(v)
+                lp.Character.Humanoid:UnequipTools()
+            end
+        end
+
+        -- đổi tên tool có damage
+        for _,v in pairs(lp.Backpack:GetDescendants()) do
+            if v.ClassName == "Tool" and v:FindFirstChild("damage") then
+                v.Name = "backlostunking"
+            end
+        end
+
+        -- hit tất cả player
+        for _,plr in pairs(Players:GetChildren()) do
+            if plr ~= lp then
+                if lp.Backpack:FindFirstChild("backlostunking") then
+                    lp.Backpack.backlostunking.damage:InvokeServer(plr.Character.Humanoid)
+                end
+
+                if lp.Character:FindFirstChild("backlostunking") then
+                    lp.Character.backlostunking.damage:InvokeServer(plr.Character.Humanoid)
+                end
+            end
+        end
+
+    end,
+})
