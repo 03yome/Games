@@ -1,0 +1,230 @@
+--// SERVICES
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local backpack = player:WaitForChild("Backpack")
+
+--// FOLDERS
+local folders = {
+    ReplicatedStorage:WaitForChild("AllMoves"),
+    ReplicatedStorage:WaitForChild("CloseRange")
+}
+
+--// UPDATE BACKPACK
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    backpack = player:WaitForChild("Backpack")
+end)
+
+--// GET UNIQUE TOOLS
+local tools = {}
+local added = {}
+
+for _, folder in pairs(folders) do
+    for _, obj in pairs(folder:GetChildren()) do
+        if obj:IsA("Tool") and not added[obj.Name] then
+            added[obj.Name] = true
+            table.insert(tools, obj)
+        end
+    end
+end
+
+--// GUI MAIN
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "ToolSystem"
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 260, 0, 320)
+Main.Position = UDim2.new(0.1, 0, 0.2, 0)
+Main.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Main.Active = true
+Main.Draggable = true
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "Tool Grabber"
+Title.BackgroundColor3 = Color3.fromRGB(15,15,15)
+Title.TextColor3 = Color3.new(1,1,1)
+
+local MinBtn = Instance.new("TextButton", Main)
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -30, 0, 0)
+MinBtn.Text = "-"
+MinBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+MinBtn.TextColor3 = Color3.new(1,1,1)
+
+--// SCROLL GET TOOL
+local Scroll = Instance.new("ScrollingFrame", Main)
+Scroll.Size = UDim2.new(1, 0, 1, -30)
+Scroll.Position = UDim2.new(0, 0, 0, 30)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarThickness = 6
+Scroll.BackgroundTransparency = 1
+
+local Layout = Instance.new("UIListLayout", Scroll)
+
+--// GIVE TOOL
+local function giveTool(tool)
+    local char = player.Character or player.CharacterAdded:Wait()
+    local humanoid = char:WaitForChild("Humanoid")
+
+    local clone = tool:Clone()
+    clone.Parent = backpack
+
+    task.wait(0.15)
+
+    pcall(function()
+        humanoid:EquipTool(clone)
+    end)
+
+    if clone:FindFirstChild("Handle") then
+        pcall(function()
+            clone:Activate()
+        end)
+    end
+end
+
+--// CREATE BUTTON TOOL
+for _, tool in pairs(tools) do
+    local Btn = Instance.new("TextButton", Scroll)
+    Btn.Size = UDim2.new(1, -10, 0, 35)
+    Btn.Text = tool.Name
+    Btn.BackgroundColor3 = Color3.fromRGB(35,35,35)
+    Btn.TextColor3 = Color3.new(1,1,1)
+
+    Btn.MouseButton1Click:Connect(function()
+        giveTool(tool)
+    end)
+end
+
+task.wait()
+Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y)
+
+--// DELETE GUI
+local DelFrame = Instance.new("Frame", Main)
+DelFrame.Size = UDim2.new(0, 260, 0, 250)
+DelFrame.Position = UDim2.new(0, 270, 0, 0)
+DelFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+DelFrame.Active = true
+DelFrame.Draggable = true
+
+local DelTitle = Instance.new("TextLabel", DelFrame)
+DelTitle.Size = UDim2.new(1, 0, 0, 30)
+DelTitle.Text = "Delete Tools"
+DelTitle.BackgroundColor3 = Color3.fromRGB(15,15,15)
+DelTitle.TextColor3 = Color3.new(1,1,1)
+
+local DelScroll = Instance.new("ScrollingFrame", DelFrame)
+DelScroll.Size = UDim2.new(1, 0, 1, -30)
+DelScroll.Position = UDim2.new(0, 0, 0, 30)
+DelScroll.ScrollBarThickness = 6
+DelScroll.BackgroundTransparency = 1
+
+local DelLayout = Instance.new("UIListLayout", DelScroll)
+
+--// TOOL NAME SYSTEM (KHÔNG BUG)
+local function getAllToolNames()
+    local names = {}
+    local added = {}
+
+    backpack = player:WaitForChild("Backpack")
+
+    for _, v in pairs(backpack:GetChildren()) do
+        if v:IsA("Tool") and not added[v.Name] then
+            added[v.Name] = true
+            table.insert(names, v.Name)
+        end
+    end
+
+    local char = player.Character
+    if char then
+        for _, v in pairs(char:GetChildren()) do
+            if v:IsA("Tool") and not added[v.Name] then
+                added[v.Name] = true
+                table.insert(names, v.Name)
+            end
+        end
+    end
+
+    return names
+end
+
+local function findTool(name)
+    backpack = player:WaitForChild("Backpack")
+
+    for _, v in pairs(backpack:GetChildren()) do
+        if v:IsA("Tool") and v.Name == name then
+            return v
+        end
+    end
+
+    local char = player.Character
+    if char then
+        for _, v in pairs(char:GetChildren()) do
+            if v:IsA("Tool") and v.Name == name then
+                return v
+            end
+        end
+    end
+end
+
+--// REFRESH DELETE GUI (FINAL FIX)
+local function refreshDeleteGUI()
+    for _, v in pairs(DelScroll:GetChildren()) do
+        if v:IsA("TextButton") then
+            v:Destroy()
+        end
+    end
+
+    local names = getAllToolNames()
+
+    for _, name in pairs(names) do
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, -10, 0, 30)
+        Btn.Text = "Xóa: "..name
+        Btn.BackgroundColor3 = Color3.fromRGB(80,30,30)
+        Btn.TextColor3 = Color3.new(1,1,1)
+        Btn.Parent = DelScroll
+
+        Btn.MouseButton1Click:Connect(function()
+            local tool = findTool(name)
+            if tool then
+                tool:Destroy()
+            end
+            refreshDeleteGUI()
+        end)
+    end
+
+    task.wait()
+    DelScroll.CanvasSize = UDim2.new(0, 0, 0, DelLayout.AbsoluteContentSize.Y)
+end
+
+--// LOOP CHỐNG DIE (NHẸ)
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        pcall(refreshDeleteGUI)
+    end
+end)
+
+refreshDeleteGUI()
+
+--// MINIMIZE
+local minimized = false
+
+MinBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+
+    if minimized then
+        Scroll.Visible = false
+        DelFrame.Visible = false
+        Main.Size = UDim2.new(0, 260, 0, 30)
+        MinBtn.Text = "+"
+    else
+        Scroll.Visible = true
+        DelFrame.Visible = true
+        Main.Size = UDim2.new(0, 260, 0, 320)
+        MinBtn.Text = "-"
+    end
+end)
