@@ -1,0 +1,293 @@
+while true do
+    print("by 03y_o")
+    task.wait(1)
+end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Fix Your Trash Wi-Fi|x5_oz6",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Alls",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil, 
+      FileName = "nil" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Endings", 4483362458)
+
+local Button = Tab:CreateButton({
+   Name = "Ending 1",
+   Callback = function()
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local target = workspace:FindFirstChild("UnplugRouterPrompt", true)
+
+if target then
+    hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
+
+    local prompt = target:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+    if prompt then
+        fireproximityprompt(prompt)
+    else
+        warn("not found ProximityPrompt")
+    end
+else
+    warn("not found UnplugRouterPrompt")
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 2",
+   Callback = function()
+local player = game.Players.LocalPlayer
+local gui = player:WaitForChild("PlayerGui")
+
+local frame = gui:WaitForChild("CallEnding"):WaitForChild("Frame")
+
+frame.Visible = true
+
+local function clickButton(name)
+    local btn = frame:FindFirstChild(name, true)
+    if btn and (btn:IsA("TextButton") or btn:IsA("ImageButton")) then
+        firesignal(btn.MouseButton1Click)
+    else
+        warn("Not found button:", name)
+    end
+end
+
+task.wait(0.2)
+clickButton("3")
+
+task.wait(0.2)
+clickButton("1")
+
+task.wait(0.2)
+clickButton("3")
+
+task.wait(0.2)
+clickButton("Call")
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 3",
+   Callback = function()
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local function tpAndPrompt(partName, freeze)
+    local target = workspace:FindFirstChild(partName, true)
+
+    if target then
+        -- Teleport
+        hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
+
+        task.wait(0.3)
+
+        -- Tìm prompt
+        local prompt = target:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+        if prompt then
+            prompt.HoldDuration = 0
+            prompt.MaxActivationDistance = 20
+
+            fireproximityprompt(prompt)
+        else
+            warn("Không có ProximityPrompt:", partName)
+        end
+
+        if freeze then
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 0
+                humanoid.JumpPower = 0
+            end
+            hrp.Anchored = true
+        end
+
+    else
+        warn("Not found:", partName)
+    end
+end
+
+tpAndPrompt("TakeMoney", false)
+
+task.wait(1)
+
+tpAndPrompt("HomelessTalkPrompt", false)
+
+task.wait(1)
+
+tpAndPrompt("SatellitePart", true)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 4",
+   Callback = function()
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local target = workspace:FindFirstChild("StealPasswordPrompt", true)
+
+if target then
+    hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
+
+    local prompt = target:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+    if prompt then
+        fireproximityprompt(prompt)
+    else
+        warn("not found ProximityPrompt")
+    end
+else
+    warn("not found UnplugRouterPrompt")
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 5(helps",
+   Callback = function()
+local player = game.Players.LocalPlayer
+local guiParent = player:WaitForChild("PlayerGui")
+local testGui = guiParent:WaitForChild("Test")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = guiParent
+screenGui.Name = "TestControlGUI"
+
+local function runTeleportPrompt()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    local target = workspace:FindFirstChild("UnplugRouterPrompt", true)
+
+    if target then
+        hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
+
+        task.wait(0.3)
+
+        local prompt = target:FindFirstChildWhichIsA("ProximityPrompt", true)
+
+        if prompt then
+            prompt.HoldDuration = 0
+            prompt.MaxActivationDistance = 20
+            fireproximityprompt(prompt)
+        else
+            warn("not found ProximityPrompt")
+        end
+    else
+        warn("not found UnplugRouterPrompt")
+    end
+end
+
+local runBtn = Instance.new("TextButton")
+runBtn.Parent = screenGui
+runBtn.Size = UDim2.new(0, 200, 0, 50)
+runBtn.Position = UDim2.new(0, 20, 0, 100)
+runBtn.Text = "RUN TELEPORT"
+runBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+runBtn.TextScaled = true
+runBtn.Active = true
+runBtn.Draggable = true
+
+runBtn.MouseButton1Click:Connect(function()
+    runTeleportPrompt()
+end)
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 6",
+   Callback = function()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(728, -49.5, 444, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 7(Free ending)",
+   Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.WizardTalk.WizardTalk2.Visible = true
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 8",
+   Callback = function()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(9.0727005, 234, 45.4631119, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 9",
+   Callback = function()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-6.00000191, 256.75, -38, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 10",
+   Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.TribeTalk.Dialogue.Visible = true
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Ending 11",
+   Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.ScienceTalk.Dialogue3.Visible = true
+   end,
+})
+
+local Tab = Window:CreateTab("Helps", nil)
+
+local Button = Tab:CreateButton({
+   Name = "To",
+   Callback = function()
+game:GetService("Players").LocalPlayer.PlayerGui.Teacher.Dialogue.Visible = true
+   end,
+})
+
+local Paragraph = Tab:CreateParagraph({Title = "Answer 1", Content = "This One"})
+
+local Paragraph = Tab:CreateParagraph({Title = "Answer 2", Content = "Prison"})
+
+local Paragraph = Tab:CreateParagraph({Title = "Answer 3", Content = "67"})
+
+local Paragraph = Tab:CreateParagraph({Title = "Answer 4", Content = " An infinite current flows"})
+
+local Paragraph = Tab:CreateParagraph({Title = "Ending6", Content = "PullLever"})
