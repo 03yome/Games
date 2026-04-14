@@ -1,0 +1,129 @@
+local Library = loadstring(game:HttpGet("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+
+local Window = Library:CreateWindow{
+	Title = "Parasite : Protocol | v1",
+	SubTitle = "by @romd3976",
+	TabWidth = 160,
+	Size = UDim2.fromOffset(830, 525),
+	Resize = true,
+	MinSize = Vector2.new(470, 380),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.RightControl
+}
+
+local Tabs = {
+	Main = Window:CreateTab{
+		Title = "Exploits",
+		Icon = "delete"
+	},
+	Main2 = Window:CreateTab{
+		Title = "Kk",
+		Icon = "delete"
+	},
+}
+
+
+local loopGrab = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop Grab",
+    Description = "Toggle description",
+    Default = false,
+    Callback = function(state)
+        loopGrab = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopGrab do
+                    local args = {
+	game:GetService("Players"):WaitForChild("x5_oz6")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityRemote"):FireServer(unpack(args))
+
+                    wait()
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = 'Reveal',
+    Description = 'kkkk',
+    Callback = function()
+        local args = {
+	1000
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Reveal"):FireServer(unpack(args))
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Heavy',
+    Description = 'kkkk',
+    Callback = function()
+local args = {
+	true,
+	"sigmacodelol"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("HeavyEvent"):FireServer(unpack(args))
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Scream',
+    Description = 'kkkk',
+    Callback = function()
+local args = {
+	game:GetService("Players"):WaitForChild("x5_oz6"),
+	"whatthesigma"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ScreamEvent"):FireServer(unpack(args))
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'antiPuddles',
+    Description = 'kkkk',
+    Callback = function()
+        for _, v in pairs(game:GetDescendants()) do
+    if v.Name == "Puddles" and v:IsA("Folder") then
+        v:Destroy()
+        print("Đã xóa:", v:GetFullName())
+    end
+end
+    end,
+})
+
+Tabs.Main2:AddButton({
+    Title = 'landmine',
+    Description = 'kkkk',
+    Callback = function()
+       local args = {
+	CFrame.new(-70.80976867675781, 7.69347620010376, -28.06540298461914, -0.42215409874916077, -0.6256762742996216, 0.6559842228889465, -0, 0.723625898361206, 0.6901925802230835, -0.9065241813659668, 0.29136762022972107, -0.30548155307769775),
+	Instance.new("Tool", nil)
+}
+game:GetService("ReplicatedStorage"):WaitForChild("PlaceTrapEvent"):FireServer(unpack(args))
+    end,
+})
+
+Tabs.Main2:AddButton({
+    Title = 'split',
+    Description = 'only the infection',
+    Callback = function()
+   local args = {
+	"skibiditoilet",
+	Color3.new(0.4588235318660736, 1, 0.6313725709915161),
+	10,
+	9066038215,
+	84458284628886
+}
+game:GetService("ReplicatedStorage"):WaitForChild("SpitEvent"):FireServer(unpack(args))
+    end,
+})
