@@ -1,0 +1,618 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "FindWhoSlapped",
+    LoadingTitle = "by @romd3976",
+    LoadingSubtitle = "Price Control",
+    ConfigurationSaving = { Enabled = false }
+})
+
+local Tab = Window:CreateTab("Crates", 4483362458)
+
+Tab:CreateButton({
+    Name = "Chair crate common",
+    Callback = function()
+local args = {
+	"Chair Crate",
+	"Cammon",
+	4
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Rare",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Crate",
+    "Rare",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Epic",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Crate",
+    "Epic",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Legendary",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Crate",
+    "Legendary",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+local Section = Tab:CreateSection("Slap Crates")
+
+Tab:CreateButton({
+    Name = "Slap crate common",
+    Callback = function()
+local args = {
+	"Slap Crate",
+	"Cammon",
+	4
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Rare",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Crate",
+    "Rare",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Epic",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Crate",
+    "Epic",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Legendary",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Crate",
+    "Legendary",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+local Section = Tab:CreateSection("Crate Premium")
+
+Tab:CreateButton({
+    Name = "Chair crate common",
+    Callback = function()
+local args = {
+	"Chair Premium Crate",
+	"Cammon",
+	4
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Rare",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Premium Crate",
+    "Rare",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Epic",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Premium Crate",
+    "Epic",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Chair crate Legendary",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Chair Premium Crate",
+    "Legendary",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+local Section = Tab:CreateSection("Slap Premium Crates")
+
+Tab:CreateButton({
+    Name = "Slap crate common",
+    Callback = function()
+local args = {
+	"Slap Premium Crate",
+	"Cammon",
+	4
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Rare",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Premium Crate",
+    "Rare",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Epic",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Premium Crate",
+    "Epic",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+Tab:CreateButton({
+    Name = "Slap crate Legendary",
+    Callback = function()
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local spawnPosition = rootPart.Position + (rootPart.CFrame.LookVector * 5)
+
+local args = {
+    "Slap Premium Crate",
+    "Legendary",
+    1,
+    spawnPosition
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("CreateRE"):FireServer(unpack(args))
+    end
+})
+
+--[[
+    REMASTERED SCRIPT: AUTO-DODGE (HYBRID) & TRACKER & DROPDOWN
+    - Kết hợp: Quét chữ trên màn hình + Spam Remote né liên tục.
+    - Giao diện: Tối ưu Mobile, RGB Border.
+]]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local pGui = player:WaitForChild("PlayerGui")
+local isAutoDodgeEnabled = false
+
+---------------------------------------------------
+-- 1. HỆ THỐNG AUTO-DODGE (GỘP LOGIC)
+---------------------------------------------------
+local dodgeRemote = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Dodge")
+local dodgeKeys = {"E", "C", "X", "Z", "G", "F", "Q", "R"}
+local keyDict = {C = true, R = true, Q = true, E = true, Z = true}
+
+-- Logic 1: Né khi phát hiện chữ (Passive)
+local function handleTextDodge(text)
+    if isAutoDodgeEnabled then
+        local key = string.upper(text)
+        if keyDict[key] then
+            pcall(function() dodgeRemote:FireServer(key) end)
+        end
+    end
+end
+
+pGui.DescendantAdded:Connect(function(obj)
+    if obj:IsA("TextLabel") or obj:IsA("TextBox") then
+        obj:GetPropertyChangedSignal("Text"):Connect(function() handleTextDodge(obj.Text) end)
+    end
+end)
+
+-- Logic 2: Spam né chủ động (Active)
+task.spawn(function()
+    while true do
+        if isAutoDodgeEnabled then
+            for _, key in ipairs(dodgeKeys) do
+                pcall(function() dodgeRemote:FireServer(key) end)
+            end
+        end
+        task.wait(0.1) -- Khoảng nghỉ để tránh lag/kick
+    end
+end)
+
+---------------------------------------------------
+-- 2. GIAO DIỆN UI
+---------------------------------------------------
+local screenGui = Instance.new("ScreenGui", pGui)
+screenGui.Name = "Gemini_Final_V2"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+
+local function createStyledBtn(name, pos, size)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Size = size
+    btn.Position = pos
+    btn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    btn.BackgroundTransparency = 0.4
+    btn.Text = ""
+    btn.AutoButtonColor = false
+    btn.BorderSizePixel = 0
+    btn.Parent = screenGui
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+-- Nút Bật/Tắt Dodge
+local dodgeBtn = createStyledBtn("DodgeBtn", UDim2.new(0, 15, 1, -85), UDim2.new(0, 160, 0, 30))
+local statusLabel = Instance.new("TextLabel", dodgeBtn)
+statusLabel.Size = UDim2.new(1, -10, 1, 0); statusLabel.Position = UDim2.new(0, 10, 0, 0)
+statusLabel.BackgroundTransparency = 1; statusLabel.Font = Enum.Font.SourceSansBold
+statusLabel.TextSize = 15; statusLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left; statusLabel.Text = "+ Auto Dodge: OFF"
+
+-- Khung Closest Player
+local targetFrame = Instance.new("Frame", screenGui)
+targetFrame.Size = UDim2.new(0, 160, 0, 30); targetFrame.Position = UDim2.new(0, 15, 1, -50)
+targetFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); targetFrame.BackgroundTransparency = 0.4
+Instance.new("UICorner", targetFrame).CornerRadius = UDim.new(0, 6)
+
+local closestLabel = Instance.new("TextLabel", targetFrame)
+closestLabel.Size = UDim2.new(1, -10, 1, 0); closestLabel.Position = UDim2.new(0, 10, 0, 0)
+closestLabel.BackgroundTransparency = 1; closestLabel.Font = Enum.Font.SourceSansBold
+closestLabel.TextSize = 14; closestLabel.TextXAlignment = Enum.TextXAlignment.Left; closestLabel.Text = "Closest: None"
+
+local uiStroke = Instance.new("UIStroke", targetFrame)
+uiStroke.Thickness = 1.8; uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Dropdown Menu (Scroll)
+local dropdownMain = Instance.new("Frame", screenGui)
+dropdownMain.Size = UDim2.new(0, 120, 0, 30); dropdownMain.Position = UDim2.new(0, 185, 1, -50)
+dropdownMain.BackgroundColor3 = Color3.fromRGB(15, 15, 15); dropdownMain.BackgroundTransparency = 0.4
+Instance.new("UICorner", dropdownMain).CornerRadius = UDim.new(0, 6)
+
+local dropdownLabel = Instance.new("TextLabel", dropdownMain)
+dropdownLabel.Size = UDim2.new(1, -30, 1, 0); dropdownLabel.Position = UDim2.new(0, 10, 0, 0)
+dropdownLabel.BackgroundTransparency = 1; dropdownLabel.Text = "Hit Power"
+dropdownLabel.TextColor3 = Color3.new(1,1,1); dropdownLabel.Font = Enum.Font.SourceSansBold
+
+local arrowBtn = Instance.new("TextButton", dropdownMain)
+arrowBtn.Size = UDim2.new(0, 25, 0, 25); arrowBtn.Position = UDim2.new(1, -28, 0.5, -12)
+arrowBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0); arrowBtn.Text = "V"
+arrowBtn.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", arrowBtn)
+
+local scrollFrame = Instance.new("ScrollingFrame", screenGui)
+scrollFrame.Size = UDim2.new(0, 120, 0, 100); scrollFrame.Position = UDim2.new(0, 185, 1, -155)
+scrollFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); scrollFrame.Visible = false
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 350); scrollFrame.ScrollBarThickness = 3
+Instance.new("UICorner", scrollFrame)
+
+local vals = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1}
+for i, v in ipairs(vals) do
+    local b = Instance.new("TextButton", scrollFrame)
+    b.Size = UDim2.new(1, 0, 0, 30); b.Position = UDim2.new(0, 0, 0, (i-1)*35)
+    b.BackgroundTransparency = 1; b.Font = Enum.Font.SourceSansBold; b.TextSize = 16
+    b.TextColor3 = Color3.new(0.9, 0.9, 0.9); b.Text = "Power: " .. tostring(v)
+    b.MouseButton1Click:Connect(function()
+        dropdownLabel.Text = tostring(v)
+        scrollFrame.Visible = false; arrowBtn.Text = "V"
+        pcall(function() ReplicatedStorage.Events.Hit:FireServer(v) end)
+    end)
+end
+
+---------------------------------------------------
+-- 3. ĐIỀU KHIỂN & RGB
+---------------------------------------------------
+dodgeBtn.MouseButton1Click:Connect(function()
+    isAutoDodgeEnabled = not isAutoDodgeEnabled
+    statusLabel.Text = isAutoDodgeEnabled and "+ Auto Dodge: ON" or "+ Auto Dodge: OFF"
+    statusLabel.TextColor3 = isAutoDodgeEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+end)
+
+arrowBtn.MouseButton1Click:Connect(function()
+    scrollFrame.Visible = not scrollFrame.Visible
+    arrowBtn.Text = scrollFrame.Visible and "^" or "V"
+end)
+
+local hue = 0
+RunService.RenderStepped:Connect(function()
+    hue = (hue + 0.005) % 1
+    local c = Color3.fromHSV(hue, 0.8, 1)
+    uiStroke.Color = c; closestLabel.TextColor3 = c
+    
+    local char = player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local target, dist = nil, math.huge
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local d = (p.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
+                if d < dist then dist = d; target = p end
+            end
+        end
+        closestLabel.Text = target and ("Closest: " .. target.DisplayName) or "Closest: None"
+    end
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Xóa UI cũ
+if PlayerGui:FindFirstChild("SlapDetectorFinal") then
+    PlayerGui.SlapDetectorFinal:Destroy()
+end
+
+-- 1. TẠO SCREEN GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SlapDetectorFinal"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+
+-- 2. NÚT MỞ MENU (Góc trái)
+local OpenBtn = Instance.new("TextButton", ScreenGui)
+OpenBtn.Size = UDim2.new(0, 80, 0, 35)
+OpenBtn.Position = UDim2.new(0, 10, 0.5, -17)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+OpenBtn.Text = "MENU"
+OpenBtn.TextColor3 = Color3.new(1, 1, 1)
+OpenBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", OpenBtn)
+local openStroke = Instance.new("UIStroke", OpenBtn)
+openStroke.Color = Color3.fromRGB(0, 255, 255)
+
+-- 3. MAIN MENU (Cố định giữa màn hình)
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 250, 0, 150)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Visible = false
+Instance.new("UICorner", MainFrame)
+local mStroke = Instance.new("UIStroke", MainFrame)
+mStroke.Color = Color3.new(1, 1, 1)
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Text = "DETECTOR SETTINGS"
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.GothamBold
+Instance.new("UICorner", Title)
+
+local ToggleBtn = Instance.new("TextButton", MainFrame)
+ToggleBtn.Size = UDim2.new(0, 210, 0, 35)
+ToggleBtn.Position = UDim2.new(0.5, 0, 0.45, 0)
+ToggleBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+ToggleBtn.Text = "Notify: OFF"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+ToggleBtn.TextColor3 = Color3.new(1, 1, 1)
+ToggleBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", ToggleBtn)
+
+local TimeInput = Instance.new("TextBox", MainFrame)
+TimeInput.Size = UDim2.new(0, 210, 0, 30)
+TimeInput.Position = UDim2.new(0.5, 0, 0.8, 0)
+TimeInput.AnchorPoint = Vector2.new(0.5, 0.5)
+TimeInput.Text = "3"
+TimeInput.PlaceholderText = "Hide delay (seconds)..."
+TimeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TimeInput.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", TimeInput)
+
+-- 4. NOTIFY FRAME (Hiển thị Headshot)
+local NotifyFrame = Instance.new("Frame", ScreenGui)
+NotifyFrame.Size = UDim2.new(0, 300, 0, 80)
+NotifyFrame.Position = UDim2.new(0.5, 0, 0.25, 0)
+NotifyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+NotifyFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+NotifyFrame.BackgroundTransparency = 0.2
+NotifyFrame.Visible = false
+Instance.new("UICorner", NotifyFrame)
+local nStroke = Instance.new("UIStroke", NotifyFrame)
+nStroke.Color = Color3.fromRGB(255, 0, 0)
+nStroke.Thickness = 2
+
+local AvatarImg = Instance.new("ImageLabel", NotifyFrame)
+AvatarImg.Size = UDim2.new(0, 60, 0, 60)
+AvatarImg.Position = UDim2.new(0, 10, 0.5, -30)
+AvatarImg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", AvatarImg).CornerRadius = UDim.new(1, 0)
+
+local NameLabel = Instance.new("TextLabel", NotifyFrame)
+NameLabel.Size = UDim2.new(0, 210, 0, 60)
+NameLabel.Position = UDim2.new(0, 80, 0.5, -30)
+NameLabel.BackgroundTransparency = 1
+NameLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+NameLabel.Font = Enum.Font.GothamBold
+NameLabel.TextSize = 16
+NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- 5. LOGIC SIÊU TỐC
+local isEnabled = false
+local hideTime = 3
+local IgnoreList = {["rbxassetid://180426354"] = true, ["rbxassetid://106298297854897"] = true, ["WalkAnim"] = true, ["Idle"] = true, ["Jump"] = true}
+
+OpenBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+ToggleBtn.MouseButton1Click:Connect(function()
+    isEnabled = not isEnabled
+    ToggleBtn.Text = isEnabled and "Notify: ON" or "Notify: OFF"
+    ToggleBtn.BackgroundColor3 = isEnabled and Color3.fromRGB(0, 170, 100) or Color3.fromRGB(60, 60, 60)
+end)
+TimeInput.FocusLost:Connect(function() hideTime = tonumber(TimeInput.Text) or 3 end)
+
+local function getSlapper()
+    local char = LocalPlayer.Character
+    if not char then return nil end
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (char.PrimaryPart.Position - p.Character.PrimaryPart.Position).Magnitude
+            if dist < 12 then
+                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                for _, anim in pairs(hum:GetPlayingAnimationTracks()) do
+                    if not IgnoreList[anim.Animation.AnimationId] and not IgnoreList[anim.Name] then
+                        return p
+                    end
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function setup(char)
+    local hum = char:WaitForChild("Humanoid")
+    local lastHealth = hum.Health
+    hum.HealthChanged:Connect(function(hp)
+        if isEnabled and hp < lastHealth then
+            local slapper = getSlapper()
+            if slapper then
+                NameLabel.Text = "⚠️ " .. slapper.DisplayName .. " Slap!"
+                AvatarImg.Image = ""
+                NotifyFrame.Visible = true
+                task.spawn(function()
+                    local img = Players:GetUserThumbnailAsync(slapper.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+                    AvatarImg.Image = img
+                end)
+                task.delay(hideTime, function() NotifyFrame.Visible = false end)
+            end
+        end
+        lastHealth = hp
+    end)
+end
+
+if LocalPlayer.Character then setup(LocalPlayer.Character) end
+LocalPlayer.CharacterAdded:Connect(setup)
