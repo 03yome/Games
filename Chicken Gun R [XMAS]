@@ -292,3 +292,47 @@ for _, v in ipairs(folder:GetChildren()) do
 end
    end,
 })
+
+local Tab = Window:CreateTab("Boots", nil)
+
+local Button = Tab:CreateButton({
+   Name = "ArmorPack",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local hitbox = workspace:FindFirstChild("ItemCache", true)
+    and workspace.ItemCache:FindFirstChild("ArmorPack", true)
+    and workspace.ItemCache.ArmorPack:FindFirstChild("Hitbox", true)
+
+if hitbox then
+    firetouchinterest(hrp, hitbox, 0) -- chạm
+    task.wait(0.1)
+    firetouchinterest(hrp, hitbox, 1) -- rời
+else
+    warn("Không tìm thấy Hitbox")
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "HealthPack",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+
+local hitbox = workspace:FindFirstChild("ItemCache", true)
+    and workspace.ItemCache:FindFirstChild("HealthPack", true)
+    and workspace.ItemCache.ArmorPack:FindFirstChild("Hitbox", true)
+
+if hitbox then
+    firetouchinterest(hrp, hitbox, 0) -- chạm
+    task.wait(0.1)
+    firetouchinterest(hrp, hitbox, 1) -- rời
+else
+    warn("Không tìm thấy Hitbox")
+end
+   end,
+})
