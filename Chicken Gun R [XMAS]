@@ -372,7 +372,7 @@ local function autoLoot()
             end
         end
 
-        wait(1) -- delay chống spam
+        wait(0.5) -- delay chống spam
     end
 end
 
