@@ -325,7 +325,7 @@ local hrp = char:WaitForChild("HumanoidRootPart")
 
 local hitbox = workspace:FindFirstChild("ItemCache", true)
     and workspace.ItemCache:FindFirstChild("HealthPack", true)
-    and workspace.ItemCache.ArmorPack:FindFirstChild("Hitbox", true)
+    and workspace.ItemCache.HealthPack:FindFirstChild("Hitbox", true)
 
 if hitbox then
     firetouchinterest(hrp, hitbox, 0) -- chạm
