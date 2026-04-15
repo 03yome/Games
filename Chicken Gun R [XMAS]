@@ -336,3 +336,25 @@ else
 end
    end,
 })
+
+local Tab = Window:CreateTab("Teams", nil)
+
+local Button = Tab:CreateButton({
+   Name = "Blue",
+   Callback = function()
+   local args = {
+	"Blu"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("JoinTeam_Event"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Red",
+   Callback = function()
+   local args = {
+	"Red"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("JoinTeam_Event"):FireServer(unpack(args))
+   end,
+})
