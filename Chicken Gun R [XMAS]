@@ -411,3 +411,139 @@ local Button = Tab:CreateButton({
 game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("JoinTeam_Event"):FireServer(unpack(args))
    end,
 })
+
+local Button = Tab:CreateButton({
+   Name = "Time",
+   Callback = function()
+   local player = game.Players.LocalPlayer
+local guiParent = player:WaitForChild("PlayerGui")
+
+-- GUI chính
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = guiParent
+screenGui.Name = "RoundTimerGUI"
+
+-- ===== FRAME NGOÀI (TRÒN) =====
+local outer = Instance.new("Frame")
+outer.Parent = screenGui
+outer.Size = UDim2.new(0, 120, 0, 120)
+outer.Position = UDim2.new(0, 20, 0, 100)
+outer.BackgroundColor3 = Color3.fromRGB(20,20,20)
+
+local outerCorner = Instance.new("UICorner")
+outerCorner.CornerRadius = UDim.new(1, 0) -- tròn
+outerCorner.Parent = outer
+
+outer.Active = true
+outer.Draggable = true
+
+-- ===== FRAME TRONG (XÁM) =====
+local inner = Instance.new("Frame")
+inner.Parent = outer
+inner.Size = UDim2.new(0.8, 0, 0.2, 0)
+inner.Position = UDim2.new(0.1, 0, 0.3, 0)
+inner.BackgroundColor3 = Color3.fromRGB(80,80,80)
+
+local innerCorner = Instance.new("UICorner")
+innerCorner.CornerRadius = UDim.new(0.3, 0)
+innerCorner.Parent = inner
+
+-- ===== TEXT TIME =====
+local label = Instance.new("TextLabel")
+label.Parent = inner
+label.Size = UDim2.new(1, 0, 1, 0)
+label.BackgroundTransparency = 1
+label.Text = "00:00"
+label.TextScaled = true
+label.TextColor3 = Color3.new(1,1,1)
+
+-- ===== ICON SETTINGS ⚙️ =====
+local settingsBtn = Instance.new("TextButton")
+settingsBtn.Parent = outer
+settingsBtn.Size = UDim2.new(0, 40, 0, 40)
+settingsBtn.Position = UDim2.new(1, -45, 0, 5)
+settingsBtn.Text = "⚙️"
+settingsBtn.TextScaled = true
+settingsBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+
+local setCorner = Instance.new("UICorner")
+setCorner.CornerRadius = UDim.new(1,0)
+setCorner.Parent = settingsBtn
+
+-- ===== MENU SETTINGS =====
+local menu = Instance.new("Frame")
+menu.Parent = outer
+menu.Size = UDim2.new(0, 120, 0, 250)
+menu.Position = UDim2.new(1, 10, 0, 0)
+menu.BackgroundColor3 = Color3.fromRGB(30,30,30)
+menu.Visible = false
+
+local menuCorner = Instance.new("UICorner")
+menuCorner.Parent = menu
+
+settingsBtn.MouseButton1Click:Connect(function()
+    menu.Visible = not menu.Visible
+end)
+
+-- ===== TIMER LOGIC =====
+local running = false
+
+local function startTimer(minutes)
+    running = false
+    task.wait()
+    running = true
+
+    local total = minutes * 60
+
+    for i = total, 0, -1 do
+        if not running then break end
+
+        local m = math.floor(i/60)
+        local s = i % 60
+
+        label.Text = string.format("%02d:%02d", m, s)
+        task.wait(1)
+    end
+
+    if running then
+        label.Text = "DONE"
+    end
+end
+
+-- ===== TẠO NÚT TRONG SETTINGS =====
+local function createButton(text, posY, minutes)
+    local btn = Instance.new("TextButton")
+    btn.Parent = menu
+    btn.Size = UDim2.new(1, 0, 0, 30)
+    btn.Position = UDim2.new(0, 0, 0, posY)
+    btn.Text = text
+    btn.TextScaled = true
+    btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
+
+    btn.MouseButton1Click:Connect(function()
+        task.spawn(startTimer, minutes)
+    end)
+end
+
+createButton("5 phút", 0, 5)
+createButton("10 phút", 30, 10)
+createButton("15 phút", 60, 15)
+createButton("20 phút", 90, 20)
+createButton("25 phút", 120, 25)
+createButton("30 phút", 150, 30)
+
+-- ===== NÚT END =====
+local endBtn = Instance.new("TextButton")
+endBtn.Parent = menu
+endBtn.Size = UDim2.new(1, 0, 0, 30)
+endBtn.Position = UDim2.new(0, 0, 0, 180)
+endBtn.Text = "END"
+endBtn.BackgroundColor3 = Color3.fromRGB(255,0,0)
+endBtn.TextScaled = true
+
+endBtn.MouseButton1Click:Connect(function()
+    running = false
+    label.Text = "STOP"
+end)
+   end,
+})
