@@ -337,6 +337,59 @@ end
    end,
 })
 
+local player = game.Players.LocalPlayer
+
+local running = false
+
+local function touch(hitbox)
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+
+    if hitbox then
+        firetouchinterest(hrp, hitbox, 0)
+        task.wait(0.1)
+        firetouchinterest(hrp, hitbox, 1)
+    end
+end
+
+local function autoLoot()
+    while running do
+        local itemCache = workspace:FindFirstChild("ItemCache")
+
+        if itemCache then
+            -- ArmorPack
+            local armor = itemCache:FindFirstChild("ArmorPack")
+            if armor then
+                local hitbox = armor:FindFirstChild("Hitbox")
+                touch(hitbox)
+            end
+
+            -- HealthPack
+            local health = itemCache:FindFirstChild("HealthPack")
+            if health then
+                local hitbox = health:FindFirstChild("Hitbox")
+                touch(hitbox)
+            end
+        end
+
+        wait(1) -- delay chống spam
+    end
+end
+
+-- ===== TOGGLE =====
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Loot (Armor + Health)",
+   CurrentValue = false,
+   Flag = "AutoLoot",
+   Callback = function(Value)
+       running = Value
+
+       if running then
+           task.spawn(autoLoot)
+       end
+   end,
+})
+
 local Tab = Window:CreateTab("Teams", nil)
 
 local Button = Tab:CreateButton({
