@@ -386,7 +386,7 @@ local function autoLoot()
             warn("AutoLoot bị lỗi → restart")
 
             running = false
-            task.wait(1)
+            task.wait(2)
             running = true
             task.spawn(autoLoot)
             return
