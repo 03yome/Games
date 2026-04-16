@@ -360,7 +360,7 @@ local function touch(hitbox)
 
     if hitbox then
         firetouchinterest(hrp, hitbox, 0)
-        task.wait(0.1)
+        task.wait()
         firetouchinterest(hrp, hitbox, 1)
     end
 end
@@ -370,28 +370,22 @@ local function autoLoot()
         local itemCache = workspace:FindFirstChild("ItemCache")
 
         if itemCache then
-            -- ArmorPack
-            local armor = itemCache:FindFirstChild("ArmorPack")
-            if armor then
-                local hitbox = armor:FindFirstChild("Hitbox")
-                touch(hitbox)
-            end
-
-            -- HealthPack
-            local health = itemCache:FindFirstChild("HealthPack")
-            if health then
-                local hitbox = health:FindFirstChild("Hitbox")
-                touch(hitbox)
+            for _, v in pairs(itemCache:GetDescendants()) do
+                if v.Name == "Hitbox" and v.Parent then
+                    if v.Parent.Name == "ArmorPack" or v.Parent.Name == "HealthPack" then
+                        touch(v)
+                    end
+                end
             end
         end
 
-        wait(0.5) -- delay chống spam
+        task.wait(0.3)
     end
 end
 
--- ===== TOGGLE =====
+-- TOGGLE
 local Toggle = Tab:CreateToggle({
-   Name = "Auto Loot (Armor + Health)",
+   Name = "Auto Loot (All)",
    CurrentValue = false,
    Flag = "AutoLoot",
    Callback = function(Value)
