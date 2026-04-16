@@ -379,7 +379,7 @@ local function autoLoot()
             end
         end
 
-        task.wait(0.3)
+        task.waiplay5)
     end
 end
 
