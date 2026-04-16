@@ -351,17 +351,18 @@ end
 })
 
 local player = game.Players.LocalPlayer
-
 local running = false
 
 local function touch(hitbox)
     local char = player.Character or player.CharacterAdded:Wait()
     local hrp = char:WaitForChild("HumanoidRootPart")
 
-    if hitbox then
-        firetouchinterest(hrp, hitbox, 0)
-        task.wait()
-        firetouchinterest(hrp, hitbox, 1)
+    if hitbox and hitbox:IsDescendantOf(workspace) then
+        -- force lại touch nhiều lần
+        for i = 1,2 do
+            firetouchinterest(hrp, hitbox, 0)
+            firetouchinterest(hrp, hitbox, 1)
+        end
     end
 end
 
@@ -379,15 +380,23 @@ local function autoLoot()
             end
         end
 
-        wait(0.5)
+        task.wait(0.2)
     end
 end
 
+-- RESET mỗi vài giây để tránh bug lâu dài
+task.spawn(function()
+    while true do
+        task.wait(10)
+        collectgarbage("collect")
+    end
+end)
+
 -- TOGGLE
 local Toggle = Tab:CreateToggle({
-   Name = "Auto Loot (All)",
+   Name = "Auto Loot FIX",
    CurrentValue = false,
-   Flag = "AutoLoot",
+   Flag = "AutoLootFix",
    Callback = function(Value)
        running = Value
 
