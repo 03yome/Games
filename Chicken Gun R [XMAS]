@@ -293,6 +293,19 @@ end
    end,
 })
 
+local Button = Tab:CreateButton({
+   Name = "+99 Level",
+   Callback = function()
+local args = {
+	game:GetService("Players").LocalPlayer:WaitForChild("Hidden_leaderstats"):WaitForChild("ShopPurchases"):WaitForChild("Shoes"):WaitForChild("Shoes"),
+	"Customization",
+	-99,
+	game:GetService("Players").LocalPlayer:WaitForChild("Hidden_leaderstats"):WaitForChild("Level")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("RemoteFunc_Module"):WaitForChild("Bought_EventClient"):FireServer(unpack(args))
+   end,
+})
+
 local Tab = Window:CreateTab("Boots", nil)
 
 local Button = Tab:CreateButton({
