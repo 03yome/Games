@@ -126,6 +126,11 @@ local oneClick31 = makeBtn("Move2Remote")
 local oneClick32 = makeBtn("Move4Remote")
 local oneClick33 = makeBtn("RigTranfo")
 
+local oneClick34 = makeBtn("Move1eto")
+local oneClick35 = makeBtn("Move2eto")
+local oneClick36 = makeBtn("Move3eto")
+local oneClick37 = makeBtn("move4eto")
+
 -------------------------------
 -- Auto loops
 -------------------------------
@@ -303,6 +308,21 @@ oneClick33.MouseButton1Click:Connect(function()
 game:GetService("ReplicatedStorage").AntiSpiralStuff.RigTranfoEvent:FireServer()
 end)
 
+oneClick34.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").EtoOwlStuffRS.Remotes.MOVE1:FireServer()
+end)
+
+oneClick35.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").EtoOwlStuffRS.Remotes.MOVE2:FireServer()
+end)
+
+oneClick36.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").EtoOwlStuffRS.Remotes.MOVE3:FireServer()
+end)
+
+oneClick37.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").EtoOwlStuffRS.Remotes.Move4:FireServer()
+end)
 -------------------------------
 -- Drag UI
 -------------------------------
