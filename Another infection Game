@@ -1,0 +1,96 @@
+--tpwalk 0.3
+--tptool
+
+-- Khai báo các dịch vụ cần thiết
+local CollectionService = game:GetService("CollectionService")
+local Workspace = game:GetService("Workspace")
+
+-- Cấu hình màu sắc
+local TARGET_NAMES = {"Bandage", "Medkit"} -- Tên các vật phẩm cần tìm thêm
+local ESP_COLOR_DEFAULT = Color3.fromRGB(0, 255, 127) -- Màu xanh lá cho Egg/Weapon
+local ESP_COLOR_HEAL = Color3.fromRGB(255, 50, 50)   -- Màu đỏ cho đồ hồi máu (dễ phân biệt)
+
+local FILL_TRANSPARENCY = 0.5
+local OUTLINE_TRANSPARENCY = 0
+
+-- Hàm tạo Highlight
+local function createESP(object, color)
+    if not object:IsA("Model") and not object:IsA("BasePart") then return end
+    if object:FindFirstChild("ESPHighlight") then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESPHighlight"
+    highlight.FillColor = color or ESP_COLOR_DEFAULT
+    highlight.FillTransparency = FILL_TRANSPARENCY
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.OutlineTransparency = OUTLINE_TRANSPARENCY
+    highlight.Adornee = object
+    highlight.Parent = object
+end
+
+-- 1. Xử lý các Folder cố định (EggHunt và Weapons)
+local targetPaths = {
+    Workspace:WaitForChild("Map"):WaitForChild("EggHuntEvent"),
+    Workspace:WaitForChild("Map"):WaitForChild("MapWeapons")
+}
+
+for _, folder in pairs(targetPaths) do
+    for _, item in pairs(folder:GetChildren()) do
+        createESP(item, ESP_COLOR_DEFAULT)
+    end
+    folder.ChildAdded:Connect(function(newItem)
+        createESP(newItem, ESP_COLOR_DEFAULT)
+    end)
+end
+
+-- 2. Xử lý Bandage và Medkit (Quét toàn bộ Workspace)
+local function checkAndApplyHealESP(object)
+    for _, name in pairs(TARGET_NAMES) do
+        if object.Name == name then
+            createESP(object, ESP_COLOR_HEAL)
+            break
+        end
+    end
+end
+
+-- Quét các item hồi máu hiện có
+for _, obj in pairs(Workspace:GetDescendants()) do
+    checkAndApplyHealESP(obj)
+end
+
+-- Theo dõi item hồi máu mới xuất hiện trong Workspace
+Workspace.DescendantAdded:Connect(function(newDescendant)
+    -- Đợi một chút để object load xong tên
+    task.wait(0.1)
+    checkAndApplyHealESP(newDescendant)
+end)
+
+print("ESP đã kích hoạt: EggHunt, Weapons (Xanh) và Bandage/Medkit (Đỏ)!")
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer or Players:FindFirstChildOfClass("Player")
+
+-- Hàm thực hiện reset cooldown
+local function resetToolCooldowns(characterOrBackpack)
+	local items = characterOrBackpack:GetDescendants()
+	
+	for _, item in ipairs(items) do
+		-- Kiểm tra xem có phải là Value tên CooldownTime nằm trong folder Configuration không
+		if item:IsA("NumberValue") or item:IsA("IntValue") then
+			if item.Name == "CooldownTime" and item.Parent.Name == "Configuration" then
+				item.Value = 0
+				print("Đã reset cooldown cho: " .. item.Parent.Parent.Name)
+			end
+		end
+	end
+end
+
+-- Thực hiện quét trong Backpack
+if player and player:FindFirstChild("Backpack") then
+	resetToolCooldowns(player.Backpack)
+end
+
+-- Quét thêm trong Character (vì khi cầm tool, tool sẽ chuyển từ Backpack vào Character)
+if player.Character then
+	resetToolCooldowns(player.Character)
+end
