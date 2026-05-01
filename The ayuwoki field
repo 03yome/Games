@@ -128,6 +128,72 @@ end
 
 _G.FullBrightExecuted = true
 _G.FullBrightEnabled = not _G.FullBrightEnabled
+
+-- Services
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Hàm tạo glow (có check tồn tại)
+local function addGlow(character)
+    if not character then return end
+    
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    -- Nếu đã có thì không tạo lại
+    if character:FindFirstChild("ExecutorGlow") then
+        return
+    end
+
+    -- Tạo part
+    local glow = Instance.new("Part")
+    glow.Name = "ExecutorGlow"
+    glow.Size = Vector3.new(2,2,2)
+    glow.Shape = Enum.PartType.Ball
+    glow.Material = Enum.Material.Neon
+    glow.Color = Color3.fromRGB(0,255,255)
+    glow.Transparency = 0.4
+    glow.CanCollide = false
+    glow.Massless = true
+    glow.Parent = character
+    glow.CFrame = root.CFrame
+
+    -- Weld
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = glow
+    weld.Part1 = root
+    weld.Parent = glow
+
+    -- Light
+    local light = Instance.new("PointLight")
+    light.Brightness = 6
+    light.Range = 12
+    light.Color = glow.Color
+    light.Parent = glow
+
+    -- Nhấp nháy
+    task.spawn(function()
+        while glow and glow.Parent do
+            glow.Transparency = 0.3
+            task.wait(0.5)
+            glow.Transparency = 0.6
+            task.wait(0.5)
+        end
+    end)
+end
+
+-- Khi spawn lần đầu
+if player.Character then
+    addGlow(player.Character)
+end
+
+-- Khi respawn (chết → sống lại)
+player.CharacterAdded:Connect(function(char)
+    char:WaitForChild("HumanoidRootPart")
+    task.wait(0.2) -- tránh lỗi load
+    addGlow(char)
+end)
+
 print("HI")
 end)
 
