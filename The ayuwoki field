@@ -508,3 +508,47 @@ spawn(function()
 end)
 print("HI")
 end)
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local savedCFrame = nil
+
+-- CFrame đích
+local targetCFrame = CFrame.new(
+	228, 39.9999962, -97,
+	0, 0, -1,
+	0, 1, 0,
+	1, 0, 0
+)
+
+-- Hàm lấy HRP
+local function getHRP()
+	local char = player.Character or player.CharacterAdded:Wait()
+	return char:WaitForChild("HumanoidRootPart")
+end
+
+-- Bắt chat
+player.Chatted:Connect(function(msg)
+	msg = msg:lower()
+
+	if msg == "/tp" then
+		local hrp = getHRP()
+
+		-- Lưu vị trí hiện tại
+		savedCFrame = hrp.CFrame
+
+		-- Teleport
+		hrp.CFrame = targetCFrame
+
+	elseif msg == "/bk" then
+		if savedCFrame then
+			local hrp = getHRP()
+
+			-- Quay lại vị trí đã lưu
+			hrp.CFrame = savedCFrame
+		else
+			warn("Chưa có vị trí để quay lại!")
+		end
+	end
+end)
