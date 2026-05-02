@@ -516,10 +516,10 @@ local savedCFrame = nil
 
 -- CFrame đích
 local targetCFrame = CFrame.new(
-	228, 39.9999962, -97,
-	0, 0, -1,
+	232.336884, 79, -96.4145508,
+	1, 0, 0,
 	0, 1, 0,
-	1, 0, 0
+	0, 0, 1
 )
 
 -- Hàm lấy HRP
