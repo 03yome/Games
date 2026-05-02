@@ -514,7 +514,6 @@ local player = Players.LocalPlayer
 
 local savedCFrame = nil
 
--- CFrame đích
 local targetCFrame = CFrame.new(
 	232.336884, 79, -96.4145508,
 	1, 0, 0,
@@ -522,33 +521,66 @@ local targetCFrame = CFrame.new(
 	0, 0, 1
 )
 
--- Hàm lấy HRP
 local function getHRP()
 	local char = player.Character or player.CharacterAdded:Wait()
 	return char:WaitForChild("HumanoidRootPart")
 end
 
--- Bắt chat
+-- Lấy danh sách prompt
+local function getPrompts()
+	local prompts = {}
+
+	for _, obj in pairs(workspace:GetDescendants()) do
+		if obj:IsA("Model") and (
+			obj.Name == "Escoba" or 
+			obj.Name == "Soda" or 
+			obj.Name == "Vendas" or
+        obj.Name == "BarraEnergetica" or
+        obj.Name == "Rastreador" or
+        obj.Name == "Mapa"
+		) then
+			local handle = obj:FindFirstChild("Handle")
+			if handle then
+				local prompt = handle:FindFirstChild("TakePrompt")
+				if prompt and prompt:IsA("ProximityPrompt") then
+					table.insert(prompts, prompt)
+				end
+			end
+		end
+	end
+
+	return prompts
+end
+
+-- Spam trong 2 giây
+local function spamPrompts(duration)
+	local prompts = getPrompts()
+	local startTime = tick()
+
+	while tick() - startTime < duration do
+		for _, prompt in pairs(prompts) do
+			pcall(function()
+				fireproximityprompt(prompt)
+			end)
+		end
+		task.wait(0.1) -- tốc độ spam
+	end
+end
+
 player.Chatted:Connect(function(msg)
 	msg = msg:lower()
 
 	if msg == "/tp" then
 		local hrp = getHRP()
-
-		-- Lưu vị trí hiện tại
 		savedCFrame = hrp.CFrame
-
-		-- Teleport
 		hrp.CFrame = targetCFrame
 
 	elseif msg == "/bk" then
 		if savedCFrame then
-			local hrp = getHRP()
-
-			-- Quay lại vị trí đã lưu
-			hrp.CFrame = savedCFrame
-		else
-			warn("Chưa có vị trí để quay lại!")
+			getHRP().CFrame = savedCFrame
 		end
+
+	elseif msg == "/give" then
+		spamPrompts(2) -- spam 2 giây
 	end
 end)
