@@ -580,7 +580,7 @@ player.Chatted:Connect(function(msg)
 			getHRP().CFrame = savedCFrame
 		end
 
-	elseif msg == "/give" then
+	elseif msg == "/g" then
 		spamPrompts(2) -- spam 2 giây
 	end
 end)
