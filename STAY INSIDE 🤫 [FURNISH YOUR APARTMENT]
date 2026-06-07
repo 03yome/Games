@@ -149,3 +149,30 @@ local Input = Tab:CreateInput({
       end
    end,
 })
+
+local Dropdown = Tab:CreateDropdown({
+   Name = "Select Elevator Floor",
+   Options = {"Tầng 10", "Tầng 8", "Tầng G"}, -- Đã thêm Tầng 8 vào đây
+   CurrentOption = {"Tầng G"}, 
+   MultipleOptions = false,
+   Flag = "DropdownElevator", 
+   Callback = function(Options)
+       local selected = Options[1]
+       
+       -- Kiểm tra nếu chọn "Tầng 10"
+       if selected == "Tầng 10" then
+           local args = { "10" }
+           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
+       
+       -- Kiểm tra nếu chọn "Tầng 8"
+       elseif selected == "Tầng 8" then
+           local args = { "8" }
+           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
+       
+       -- Kiểm tra nếu chọn "Tầng G"
+       elseif selected == "Tầng G" then
+           local args = { "G" }
+           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
+       end
+   end,
+})
