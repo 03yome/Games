@@ -1,0 +1,542 @@
+--[=[
+    INDEPENDENT SCRIPT HUB V4 (DIRECT FIRESERVER VERSION)
+    - Giữ nguyên gốc các lệnh FireServer() bình thường.
+    - Có nút Rút gọn [-] và Xóa hẳn [X] trên thanh tiêu đề.
+--]=]
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local player = Players.LocalPlayer
+
+-- Xóa GUI cũ nếu đang chạy lại script
+if CoreGui:FindFirstChild("FreeScriptHubV4") then
+    CoreGui.FreeScriptHubV4:Destroy()
+end
+
+-- ==========================================
+-- GIAO DIỆN GUI ĐỘC LẬP
+-- ==========================================
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FreeScriptHubV4"
+screenGui.Parent = CoreGui
+
+-- Khung chính của Script Hub
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 250, 0, 330)
+mainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 25, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.Parent = mainFrame
+
+-- Thanh Tiêu Đề (Top Bar)
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 35)
+topBar.BackgroundTransparency = 1
+topBar.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -70, 1, 0)
+titleLabel.Position = UDim2.new(0, 12, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "🚀 CUSTOM HUB"
+titleLabel.TextColor3 = Color3.fromRGB(180, 130, 255)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 15
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
+
+-- Nút Xóa hẳn GUI (Close)
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 22, 0, 22)
+closeButton.Position = UDim2.new(1, -28, 0, 6)
+closeButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 12
+closeButton.Parent = topBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 5)
+closeCorner.Parent = closeButton
+
+-- NÚT RÚT GỌN GUI (MINIMIZE)
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 22, 0, 22)
+minimizeButton.Position = UDim2.new(1, -55, 0, 6)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
+minimizeButton.Text = "-"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.Font = Enum.Font.SourceSansBold
+minimizeButton.TextSize = 14
+minimizeButton.Parent = topBar
+
+local miniCorner = Instance.new("UICorner")
+miniCorner.CornerRadius = UDim.new(0, 5)
+miniCorner.Parent = minimizeButton
+
+-- Khung chứa nội dung (Để ẩn/hiện khi rút gọn)
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- Khung chứa danh sách nút (Có cuộn chuột)
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -20, 1, -15)
+scrollFrame.Position = UDim2.new(0, 10, 0, 5)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 4
+scrollFrame.Parent = contentFrame
+
+local uiLayout = Instance.new("UIListLayout")
+uiLayout.Parent = scrollFrame
+uiLayout.Padding = UDim.new(0, 8)
+
+-- Tự động căn chỉnh kích thước cuộn
+uiLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, uiLayout.AbsoluteContentSize.Y + 10)
+end)
+
+-- ==========================================
+-- LOGIC ĐÓNG / RÚT GỌN GUI
+-- ==========================================
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        contentFrame.Visible = false
+        mainFrame.Size = UDim2.new(0, 250, 0, 35)
+        minimizeButton.Text = "+"
+        minimizeButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
+    else
+        mainFrame.Size = UDim2.new(0, 250, 0, 330)
+        contentFrame.Visible = true
+        minimizeButton.Text = "-"
+        minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
+    end
+end)
+
+
+-- ==========================================
+-- NƠI TỰ DO THÊM NÚT VÀ SCRIPT KÍCH HOẠT
+-- ==========================================
+local function AddScriptButton(buttonName, buttonColor, customFunction)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -5, 0, 35)
+    btn.BackgroundColor3 = buttonColor
+    btn.Text = buttonName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 14
+    btn.Parent = scrollFrame
+
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 5)
+    btnCorner.Parent = btn
+
+    local canClick = true
+    btn.MouseButton1Click:Connect(function()
+        if not canClick then return end
+        canClick = false
+        
+        local oldColor = btn.BackgroundColor3
+        btn.BackgroundColor3 = Color3.fromRGB(oldColor.R * 100, oldColor.G * 100, oldColor.B * 100)
+        
+        task.spawn(customFunction) 
+        
+        task.wait(0.3)
+        btn.BackgroundColor3 = oldColor
+        canClick = true
+    end)
+end
+
+---------------------------------------------------------
+-- CÁC NÚT KỸ NĂNG BÌNH THƯỜNG CỦA BẠN
+---------------------------------------------------------
+
+-- Nút số 1: Hakari Ult
+AddScriptButton(
+    "🎲 Idle Death Gamble", 
+    Color3.fromRGB(46, 139, 87), 
+    function()
+        game:GetService("ReplicatedStorage").Remotes.Hakari.Ult.IdleDeathGamble:FireServer()
+    end
+)
+
+-- Nút số 2: Hakari Gamble
+AddScriptButton(
+    "🎰 Gamble", 
+    Color3.fromRGB(70, 130, 180), 
+    function()
+        game:GetService("ReplicatedStorage").Asset.Hakari.Rotation.RotationRemote:FireServer()
+    end
+)
+
+-- Nút số 3: Mahito Perfection
+AddScriptButton(
+    "💀 Perfection", 
+    Color3.fromRGB(120, 50, 150), 
+    function()
+        game:GetService("ReplicatedStorage").Remotes.Mahito.Perfection:FireServer()
+    end
+)
+
+--[=[
+    ADVANCED TOOL MANAGER HUB V3 (FIXED COOLDOWN BUG)
+    - Sửa lỗi đứng yên/kẹt hồi chiêu khi xóa và lấy lại Tool.
+--]=]
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+
+-- Kiểm tra thư mục nguồn
+local allMoves = ReplicatedStorage:FindFirstChild("AllMoves")
+local closeRange = ReplicatedStorage:FindFirstChild("CloseRange")
+
+if not allMoves or not closeRange then
+    warn("Không tìm thấy thư mục 'AllMoves' hoặc 'CloseRange'!")
+    return
+end
+
+-- Xóa GUI cũ nếu đang chạy lại script
+if CoreGui:FindFirstChild("RobloxToolHubV3") then
+    CoreGui.RobloxToolHubV3:Destroy()
+end
+
+-- ==========================================
+-- GIAO DIỆN GUI CHÍNH
+-- ==========================================
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RobloxToolHubV3"
+screenGui.Parent = CoreGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 500, 0, 320)
+mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 35)
+topBar.BackgroundTransparency = 1
+topBar.Parent = mainFrame
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -70, 1, 0)
+titleLabel.Position = UDim2.new(0, 15, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "⚡ ADVANCED TOOL HUB V3 (FIX BUG) ⚡"
+titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextSize = 16
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 25, 0, 25)
+closeButton.Position = UDim2.new(1, -35, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 14
+closeButton.Parent = topBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton.Position = UDim2.new(1, -65, 0, 5)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+minimizeButton.Text = "-"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.Font = Enum.Font.SourceSansBold
+minimizeButton.TextSize = 16
+minimizeButton.Parent = topBar
+
+local miniCorner = Instance.new("UICorner")
+miniCorner.CornerRadius = UDim.new(0, 6)
+miniCorner.Parent = minimizeButton
+
+local contentFrame = Instance.new("Frame")
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, 0, 0, 25)
+statusLabel.Position = UDim2.new(0, 0, 1, -25)
+statusLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+statusLabel.Text = "Trạng thái: Sẵn sàng"
+statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+statusLabel.Font = Enum.Font.SourceSansItalic
+statusLabel.TextSize = 13
+statusLabel.Parent = contentFrame
+
+local statusCorner = Instance.new("UICorner")
+statusCorner.CornerRadius = UDim.new(0, 8)
+statusCorner.Parent = statusLabel
+
+-- Bên trái: Kho Tool
+local leftLabel = Instance.new("TextLabel")
+leftLabel.Size = UDim2.new(0, 230, 0, 25)
+leftLabel.Position = UDim2.new(0, 15, 0, 5)
+leftLabel.BackgroundTransparency = 1
+leftLabel.Text = "KHO TOOL GAME (BẤM ĐỂ LẤY)"
+leftLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+leftLabel.Font = Enum.Font.SourceSansBold
+leftLabel.TextSize = 14
+leftLabel.Parent = contentFrame
+
+local leftScroll = Instance.new("ScrollingFrame")
+leftScroll.Size = UDim2.new(0, 230, 0, 220)
+leftScroll.Position = UDim2.new(0, 15, 0, 30)
+leftScroll.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+leftScroll.BorderSizePixel = 0
+leftScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+leftScroll.ScrollBarThickness = 6
+leftScroll.Parent = contentFrame
+
+local leftLayout = Instance.new("UIListLayout")
+leftLayout.Parent = leftScroll
+leftLayout.Padding = UDim.new(0, 5)
+
+-- Bên phải: Túi đồ
+local rightLabel = Instance.new("TextLabel")
+rightLabel.Size = UDim2.new(0, 230, 0, 25)
+rightLabel.Position = UDim2.new(0, 255, 0, 5)
+rightLabel.BackgroundTransparency = 1
+rightLabel.Text = "TÚI ĐỒ CỦA BẠN (BẤM ĐỂ XÓA)"
+rightLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+rightLabel.Font = Enum.Font.SourceSansBold
+rightLabel.TextSize = 14
+rightLabel.Parent = contentFrame
+
+local rightScroll = Instance.new("ScrollingFrame")
+rightScroll.Size = UDim2.new(0, 230, 0, 220)
+rightScroll.Position = UDim2.new(0, 255, 0, 30)
+rightScroll.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+rightScroll.BorderSizePixel = 0
+rightScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+rightScroll.ScrollBarThickness = 6
+rightScroll.Parent = contentFrame
+
+local rightLayout = Instance.new("UIListLayout")
+rightLayout.Parent = rightScroll
+rightLayout.Padding = UDim.new(0, 5)
+
+-- ==========================================
+-- ĐIỀU KHIỂN ĐÓNG / THU NHỎ GUI
+-- ==========================================
+
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        contentFrame.Visible = false
+        mainFrame.Size = UDim2.new(0, 500, 0, 35)
+        minimizeButton.Text = "+"
+        minimizeButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
+    else
+        mainFrame.Size = UDim2.new(0, 500, 0, 320)
+        contentFrame.Visible = true
+        minimizeButton.Text = "-"
+        minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+    end
+end)
+
+-- ==========================================
+-- LOGIC SỬA LỖI HỒI CHIÊU & QUẢN LÝ TOOL
+-- ==========================================
+
+local function updateScrollCanvas(scrollFrame, layout)
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+end
+
+-- Hàm thực hiện xóa Tool an toàn (Fix kẹt Cooldown)
+local function SAFELY_DESTROY_TOOL(toolInstance)
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	
+	-- BƯỚC 1: Nếu người chơi đang cầm tool này trên tay, bắt buộc phải bỏ xuống (Unequip)
+	if toolInstance.Parent == character and humanoid then
+		humanoid:UnequipTools()
+		task.wait(0.05) -- Chờ server nhận tín hiệu đã bỏ vũ khí xuống
+	end
+	
+	-- BƯỚC 2: Di chuyển tạm vào thùng rác Local trước khi xóa hẳn để ngắt các kết nối script đang chạy dơ
+	toolInstance.Parent = nil
+	toolInstance:Destroy()
+end
+
+-- Tải danh sách kho tool bên trái
+local function LoadSourceTools()
+    for _, child in ipairs(leftScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+
+    local uniqueTools = {}
+    local function scanFolder(folder)
+        for _, item in ipairs(folder:GetChildren()) do
+            if item:IsA("Tool") and not uniqueTools[item.Name] then
+                uniqueTools[item.Name] = item
+            end
+        end
+    end
+
+    scanFolder(allMoves)
+    scanFolder(closeRange)
+
+    for toolName, originalTool in pairs(uniqueTools) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 30)
+        btn.BackgroundColor3 = Color3.fromRGB(45, 60, 50)
+        btn.Text = "  + " .. toolName
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextXAlignment = Enum.TextXAlignment.Left
+        btn.Font = Enum.Font.SourceSans
+        btn.TextSize = 14
+        btn.Parent = leftScroll
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 4)
+        btnCorner.Parent = btn
+
+        btn.MouseButton1Click:Connect(function()
+            local backpack = player:FindFirstChildOfClass("Backpack")
+            if backpack then
+                if backpack:FindFirstChild(toolName) or (player.Character and player.Character:FindFirstChild(toolName)) then
+                    statusLabel.Text = "Trạng thái: Đã sở hữu vũ khí này!"
+                    statusLabel.TextColor3 = Color3.fromRGB(255, 165, 0)
+                    return
+                end
+
+                local clone = originalTool:Clone()
+                clone.Parent = backpack
+                statusLabel.Text = "Trạng thái: Đã lấy " .. toolName
+                statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            end
+        end)
+    end
+    updateScrollCanvas(leftScroll, leftLayout)
+end
+
+-- Đồng bộ danh sách túi đồ bên phải (Quét cả Backpack lẫn trên tay Nhân vật)
+local function UpdateBackpackUI()
+    for _, child in ipairs(rightScroll:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+
+    local backpack = player:FindFirstChildOfClass("Backpack")
+    local character = player.Character
+    local listTools = {}
+
+    -- Lấy tool trong túi đồ
+    if backpack then
+        for _, item in ipairs(backpack:GetChildren()) do
+            if item:IsA("Tool") then table.insert(listTools, {instance = item, location = "Túi"}) end
+        end
+    end
+    
+    -- Lấy tool đang cầm trên tay
+    if character then
+        for _, item in ipairs(character:GetChildren()) do
+            if item:IsA("Tool") then table.insert(listTools, {instance = item, location = "Tay"}) end
+        end
+    end
+
+    -- Hiển thị lên UI
+    for _, toolData in ipairs(listTools) do
+        local tool = toolData.instance
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 30)
+        btn.BackgroundColor3 = toolData.location == "Tay" and Color3.fromRGB(90, 50, 30) or Color3.fromRGB(70, 40, 40)
+        btn.Text = "  ❌ [" .. toolData.location .. "] " .. tool.Name
+        btn.TextColor3 = Color3.fromRGB(255, 200, 200)
+        btn.TextXAlignment = Enum.TextXAlignment.Left
+        btn.Font = Enum.Font.SourceSans
+        btn.TextSize = 14
+        btn.Parent = rightScroll
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 4)
+        btnCorner.Parent = btn
+
+        btn.MouseButton1Click:Connect(function()
+            statusLabel.Text = "Trạng thái: Đang giải phóng hồi chiêu & xóa " .. tool.Name .."..."
+            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            SAFELY_DESTROY_TOOL(tool)
+        end)
+    end
+    updateScrollCanvas(rightScroll, rightLayout)
+end
+
+-- Lắp đặt bộ lắng nghe cập nhật UI liên tục
+local function SetupListeners()
+    local backpack = player:WaitForChild("Backpack", 5)
+    
+    -- Lắng nghe thay đổi trong Backpack
+    if backpack then
+        backpack.ChildAdded:Connect(UpdateBackpackUI)
+        backpack.ChildRemoved:Connect(UpdateBackpackUI)
+    end
+    
+    -- Lắng nghe khi nhân vật đổi trạng thái cầm tool trên tay
+    if player.Character then
+        player.Character.ChildAdded:Connect(UpdateBackpackUI)
+        player.Character.ChildRemoved:Connect(UpdateBackpackUI)
+    end
+    
+    UpdateBackpackUI()
+end
+
+player.CharacterAdded:Connect(function(char)
+    task.wait(0.5)
+    char.ChildAdded:Connect(UpdateBackpackUI)
+    char.ChildRemoved:Connect(UpdateBackpackUI)
+    SetupListeners()
+    statusLabel.Text = "Trạng thái: Làm mới hệ thống!"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+end)
+
+-- Khởi chạy lần đầu
+LoadSourceTools()
+SetupListeners()
