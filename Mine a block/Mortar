@@ -1,0 +1,106 @@
+-- Khai báo các dịch vụ
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+local activateEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Activate")
+
+-- Trạng thái bật/tắt chế độ nhắm bắn
+local IsAimingMode = false
+local TIME_TO_DESTROY = 5
+
+----------------------------------------------------------------
+-- 1. TẠO GIAO DIỆN (GUI)
+----------------------------------------------------------------
+-- Xóa GUI cũ nếu có để tránh bị trùng lặp khi chạy lại script
+if CoreGui:FindFirstChild("MortarGui") then
+    CoreGui.MortarGui:Destroy()
+end
+
+-- Tạo ScreenGui (Đặt vào CoreGui để không bị mất khi nhân vật reset)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MortarGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- Tạo Nút Bấm chính (Toggle Button)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Size = UDim2.new(0, 150, 0, 50)
+toggleButton.Position = UDim2.new(0.05, 0, 0.4, 0) -- Vị trí bên trái màn hình
+toggleButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- Màu đỏ mặc định (TẮT)
+toggleButton.Text = "Mortar: TẮT"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 18
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.Parent = screenGui
+
+-- Bo góc cho nút bấm nhìn đẹp hơn
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = toggleButton
+
+----------------------------------------------------------------
+-- 2. XỬ LÝ LOGIC BẬT / TẮT
+----------------------------------------------------------------
+toggleButton.MouseButton1Click:Connect(function()
+    IsAimingMode = not IsAimingMode -- Đảo trạng thái
+    
+    if IsAimingMode then
+        toggleButton.Text = "Mortar: ĐANG BẬT"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(40, 180, 40) -- Đổi sang màu xanh lá
+    else
+        toggleButton.Text = "Mortar: TẮT"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- Đổi về màu đỏ
+    end
+end)
+
+----------------------------------------------------------------
+-- 3. XỬ LÝ CLICK CHUỘT TRÊN MÀN HÌNH
+----------------------------------------------------------------
+mouse.Button1Down:Connect(function()
+    -- Chỉ hoạt động khi chế độ nhắm bắn đang BẬT
+    if not IsAimingMode then return end
+    
+    -- Kiểm tra nếu chuột đang click vào một UI nào đó thì bỏ qua (tránh tự kích hoạt khi bấm nút tắt)
+    if game:GetService("UserInputService"):GetFocusedTextBox() then return end
+    
+    if mouse.Hit then
+        local targetPosition = mouse.Hit.Position
+        
+        -- Tạo Part tạm thời để đánh dấu vị trí bắn
+        local targetPart = Instance.new("Part")
+        targetPart.Name = "Mortar_Target_Marker"
+        targetPart.Size = Vector3.new(3, 3, 3)
+        targetPart.Position = targetPosition
+        targetPart.Anchored = true
+        targetPart.CanCollide = false
+        targetPart.BrickColor = BrickColor.new("Bright red")
+        targetPart.Material = Enum.Material.Neon
+        targetPart.Transparency = 0.5
+        targetPart.Parent = Workspace
+        
+        -- Đóng gói dữ liệu tọa độ
+        local args = {
+            "Mortar",
+            {
+                vector.create(targetPart.Position.X, targetPart.Position.Y, targetPart.Position.Z)
+            }
+        }
+        
+        -- Gửi lệnh bắn lên Server
+        activateEvent:FireServer(unpack(args))
+        
+        -- Tự động xóa khối sau 5 giây
+        task.delay(TIME_TO_DESTROY, function()
+            if targetPart then
+                targetPart:Destroy()
+            end
+        end)
+    end
+end)
+
+print("GUI đã được tải thành công!")
