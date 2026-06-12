@@ -1998,7 +1998,6 @@ end
 })
 
 do
-    local tgl
     local rStor = game:GetService("ReplicatedStorage")
     local lplr = game.Players.LocalPlayer
     local char = lplr.Character or lplr.CharacterAdded:Wait()
@@ -2006,22 +2005,28 @@ do
     local event = rStor.Remotes.ZombieRelated.PlayerAttack
     local eventC = 0
     local Attack = rStor.Attack:Clone()
+    
+    local isLooping = false -- Biến kiểm soát vòng lặp chuẩn cho Rayfield
 
-    tgl = Tab:CreateToggle({
+    local Toggle = Tab:CreateToggle({
         Name = "Annoy all",
         CurrentValue = false,
         Flag = "AnnoyAll",
-        Callback = function(c)
-            -- đảm bảo có tool Attack
+        Callback = function(Value)
+            isLooping = Value
+            
+            -- Đảm bảo có tool Attack
             if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then
                 Attack.Parent = lplr:WaitForChild("Backpack")
             end
 
-            if c then
+            if isLooping then
                 task.spawn(function()
-                    while tgl.CurrentValue do
+                    while isLooping and task.wait() do
                         if find.Weapon(true) then
-                            for _, v in living:GetChildren() do
+                            for _, v in ipairs(living:GetChildren()) do
+                                if not isLooping then break end -- Dừng khẩn cấp nếu tắt toggle khi đang quét loop
+                                
                                 if v ~= lplr.Character then
                                     local hum = v:FindFirstChildWhichIsA("Humanoid")
                                     local root = v:FindFirstChild("HumanoidRootPart")
@@ -2038,7 +2043,6 @@ do
                                 end
                             end
                         end
-                        task.wait()
                     end
                 end)
             end
