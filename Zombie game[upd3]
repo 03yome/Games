@@ -2001,7 +2001,6 @@ local event = rStor.Remotes.ZombieRelated.PlayerAttack
 local eventC = 0
 local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
 
--- Thay "Tab" bằng biến chứa Tab Rayfield của bạn (ví dụ: Window:CreateTab(...))
 local Toggle = Tab:CreateToggle({
     Name = "Annoy all (Hit edition)",
     CurrentValue = false,
@@ -2040,6 +2039,7 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
+
 local event = game:GetService("ReplicatedStorage")
     :WaitForChild("NetworkEvents")
     :WaitForChild("RemoteEvent")
