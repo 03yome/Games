@@ -2050,41 +2050,44 @@ do
     })
 end
 
-local rStor = game:GetService("ReplicatedStorage")
-local Teams = game:GetService("Teams")
-local lplr = game.Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local event = ReplicatedStorage:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
 
-local event = rStor:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
-local isLooping = false 
+local KillZombies = false
 
--- 1. CẤU TRÚC BUTTON (Bấm một lần để quét zombie hiện tại)
-Tab:CreateButton({
-    Name = "Kill Zombies (Once)",
-    Callback = function()
-        if lplr.Team ~= Teams.Human then return end
+Tabs.Server:AddToggle("Kill Zombies", {
+    Title = "Kill Zombies",
+    Default = false,
+    Callback = function(Value)
+        KillZombies = Value
 
-        task.spawn(function()
-            if not find.Sniper(true) then
-                rStor.Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
-                find.Sniper(true)
-            end
+        if KillZombies then
+            task.spawn(function()
+                while KillZombies do
+                    if lplr.Team == Teams.Human then
+                        if find.Sniper(true) then
+                            getzombies()
 
-            getzombies()
+                            for i, v in pairs(zombieTbl) do
+                                if v and v:FindFirstChild("Humanoid") then
+                                    event:FireServer("GUN_DAMAGE", v)
+                                    table.remove(zombieTbl, i)
+                                end
+                            end
+                        else
+                            ReplicatedStorage.Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+                            find.Sniper(true)
+                        end
+                    end
 
-            for i = #zombieTbl, 1, -1 do
-                local v = zombieTbl[i]
-                if v and v:FindFirstChild("Humanoid") then
-                    event:FireServer("GUN_DAMAGE", v)
-                    table.remove(zombieTbl, i)
-                    task.wait(0.05)
+                    task.wait(0.1)
                 end
-            end
 
-            table.clear(zombieTbl)
-        end)
+                table.clear(zombieTbl)
+            end)
+        end
     end
-  })
-end
+})
 
 local Section = Tab:CreateSection("Client")
 
