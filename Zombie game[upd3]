@@ -2050,8 +2050,6 @@ do
     })
 end
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local KillZombies = false
 
 Tabs.Server:AddToggle("Kill Zombies", {
