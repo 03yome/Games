@@ -2085,6 +2085,68 @@ end
 local Section = Tab:CreateSection("Client")
 
 local Button = Tab:CreateButton({
+   Name = "Remove Melee & Spitter cooldown",
+   Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lplr = Players.LocalPlayer
+
+local rStor = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage
+
+local MeleeFunctions = require(rStor.Modules.MeleeFunctions)
+local ShovelModule = require(rStor.Modules.Items.Shovel)
+local SpitModule = require(rStor.Modules.Items.Spit)
+
+local originalShovelNew = ShovelModule.new
+local originalFireGun = SpitModule.FireGun
+
+MeleeFunctions.AddCooldown = function() end
+MeleeFunctions.CheckForCooldown = function() return false end
+
+ShovelModule.new = function(...)
+    local shovelObject = originalShovelNew(...)
+    
+    if shovelObject and shovelObject.AnimationTracks and shovelObject.AnimationTracks.Attack then
+        shovelObject.AnimationTracks.Attack.Speed = 1.30
+    end
+    
+    return shovelObject
+end
+
+SpitModule.FireGun = function(spitObject, mouseX, mouseY)
+    if not spitObject.Character or not spitObject.Character:FindFirstChild("Head") then return end
+    local headPosition = spitObject.Character.Head.Position
+    
+    local cameraRay = workspace.CurrentCamera:ScreenPointToRay(mouseX, mouseY)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    raycastParams.FilterDescendantsInstances = { lplr.Character }
+    
+    local raycastResult = workspace:Raycast(cameraRay.Origin, cameraRay.Direction * 1000, raycastParams)
+    local aimPosition = raycastResult and raycastResult.Position or (cameraRay.Origin + cameraRay.Direction * 1000)
+
+    local directionVector = aimPosition - headPosition
+    
+    rStor.Remotes.ZombieRelated.AcidSpit:FireServer(headPosition, aimPosition)
+
+    local projectileMagnitude = directionVector.Magnitude
+    if projectileMagnitude > 41 then
+        directionVector = directionVector.Unit * 40
+        projectileMagnitude = 40
+    end
+
+    local timeToTarget = math.log(1.001 + projectileMagnitude * 0.01)
+    local projectileVelocity = directionVector / timeToTarget + Vector3.new(0, workspace.Gravity * 0.5 * timeToTarget, 0)
+    
+    local visualModule = rStor:FindFirstChild("VisualFunctions") and rStor.VisualFunctions:FindFirstChild("AcidProjectile")
+    if visualModule then
+        require(visualModule)(headPosition, projectileVelocity)
+    end
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
    Name = "Unload Entities(P)",
    Callback = function()
 -- services
