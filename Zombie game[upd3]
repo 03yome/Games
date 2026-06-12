@@ -1741,6 +1741,53 @@ end
    end,
 })
 
+local Button = Tab:CreateButton({
+   Name = "Spitter",
+   Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lplr = Players.LocalPlayer
+
+local function GetHumRootPart(character)
+    if not character then return nil end
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+local character = lplr.Character
+if character then
+    local rootPart = GetHumRootPart(character)
+    if rootPart then
+        local oldCFrame = rootPart.CFrame
+
+        if character:FindFirstChild("ForceField") then
+            local shopkeeper = workspace:FindFirstChild("OutsideOfGame") 
+                and workspace.OutsideOfGame:FindFirstChild("Shopkeeper")
+                and workspace.OutsideOfGame.Shopkeeper:FindFirstChild("Head")
+
+            if shopkeeper then
+                rootPart.CFrame = CFrame.new(shopkeeper.Position)
+                task.wait(1)
+                for i = 1, 15 do
+                    ReplicatedStorage.Remotes.ZombieRelated.TouchedAcid:FireServer("")
+                end
+                task.wait(0.1)
+                
+                character = lplr.Character
+                local currentRoot = GetHumRootPart(character)
+                if currentRoot then
+                    currentRoot.CFrame = oldCFrame
+                end
+            end
+        else
+            for i = 1, 15 do
+                ReplicatedStorage.Remotes.ZombieRelated.TouchedAcid:FireServer("")
+            end
+        end
+    end
+end
+   end,
+})
+
 local Tab = Window:CreateTab("Server/client", nil)
 local Section = Tab:CreateSection("Server")
 
