@@ -2083,43 +2083,8 @@ Tab:CreateButton({
             table.clear(zombieTbl)
         end)
     end
-})
-
--- 2. CẤU TRÚC TOGGLE (Bật để tự động lặp lại liên tục)
-local Toggle = Tab:CreateToggle({
-   Name = "Kill Zombies (Loop)",
-   CurrentValue = false,
-   Flag = "KillZombiesToggle",
-   Callback = function(Value)
-       isLooping = Value
-       
-       if isLooping then
-           task.spawn(function()
-               while isLooping and task.wait(0.1) do
-                   if lplr.Team == Teams.Human then
-                       if find.Sniper(true) then
-                           getzombies()
-
-                           for i = #zombieTbl, 1, -1 do
-                               if not isLooping then break end
-                               
-                               local v = zombieTbl[i]
-                               if v and v:FindFirstChild("Humanoid") then
-                                   event:FireServer("GUN_DAMAGE", v)
-                                   table.remove(zombieTbl, i)
-                                   task.wait(0.02)
-                               end
-                           end
-                       else
-                           rStor.Remotes.Shop.EquipWeapon:InvokeServer("Sniper") 
-                           find.Sniper(true)
-                       end
-                   end
-               end
-               table.clear(zombieTbl)
-           end)
-       end
-   end
+  })
+end
 
 local Section = Tab:CreateSection("Client")
 
