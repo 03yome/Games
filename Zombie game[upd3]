@@ -2051,7 +2051,6 @@ do
 end
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local event = ReplicatedStorage:WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent")
 
 local KillZombies = false
 
