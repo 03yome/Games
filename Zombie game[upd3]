@@ -1997,59 +1997,49 @@ end
    end,
 })
 
-do
-    local rStor = game:GetService("ReplicatedStorage")
-    local lplr = game.Players.LocalPlayer
-    local char = lplr.Character or lplr.CharacterAdded:Wait()
+local event = rStor.Remotes.ZombieRelated.PlayerAttack
+local eventC = 0
+local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
 
-    local event = rStor.Remotes.ZombieRelated.PlayerAttack
-    local eventC = 0
-    local Attack = rStor.Attack:Clone()
-    
-    local isLooping = false -- Biến kiểm soát vòng lặp chuẩn cho Rayfield
+-- Thay "Tab" bằng biến chứa Tab Rayfield của bạn (ví dụ: Window:CreateTab(...))
+local Toggle = Tab:CreateToggle({
+    Name = "Annoy all (Hit edition)",
+    CurrentValue = false,
+    Flag = "AnnoyAllToggle", -- Callback sẽ dùng cái này làm ID lưu cấu hình nếu cần
+    Callback = function(Value)
+        -- Kiểm tra và trang bị vật phẩm Attack nếu chưa có
+        if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then 
+            Attack.Parent = lplr:WaitForChild("Backpack") 
+        end
 
-    local Toggle = Tab:CreateToggle({
-        Name = "Annoy all",
-        CurrentValue = false,
-        Flag = "AnnoyAll",
-        Callback = function(Value)
-            isLooping = Value
-            
-            -- Đảm bảo có tool Attack
-            if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then
-                Attack.Parent = lplr:WaitForChild("Backpack")
-            end
-
-            if isLooping then
-                task.spawn(function()
-                    while isLooping and task.wait() do
-                        if find.Weapon(true) then
-                            for _, v in ipairs(living:GetChildren()) do
-                                if not isLooping then break end -- Dừng khẩn cấp nếu tắt toggle khi đang quét loop
-                                
-                                if v ~= lplr.Character then
-                                    local hum = v:FindFirstChildWhichIsA("Humanoid")
-                                    local root = v:FindFirstChild("HumanoidRootPart")
-
-                                    if hum and root and hum.Health > 0 then
-                                        if eventC < 100 then
-                                            task.spawn(function()
-                                                eventC += 1
-                                                event:InvokeServer(root)
-                                                eventC -= 1
-                                            end)
-                                        end
+        -- Nếu Toggle được BẬT (Value == true)
+        if Value then
+            -- Sử dụng task.spawn để vòng lặp repeat không làm treo luồng chính của giao diện
+            task.spawn(function()
+                repeat
+                    if find.Weapons(true) then
+                        for _, v in pairs(living:GetChildren()) do
+                            if lplr.Character ~= v then
+                                local hum = v:FindFirstChildWhichIsA("Humanoid")
+                                if hum and hum.Health > 0 and hum.RootPart then
+                                    if eventC < 100 then
+                                        coroutine.wrap(function()
+                                            eventC += 1
+                                            event:InvokeServer(hum.RootPart)
+                                            eventC -= 1
+                                        end)()
                                     end
                                 end
                             end
                         end
                     end
-                end)
-            end
+                    task.wait() -- Tránh crash game
+                -- Vòng lặp sẽ chạy liên tục cho đến khi trạng thái Toggle.CurrentValue trở thành false
+                until not Toggle.CurrentValue
+            end)
         end
-    })
-end
-
+    end,
+})
 local event = game:GetService("ReplicatedStorage")
     :WaitForChild("NetworkEvents")
     :WaitForChild("RemoteEvent")
