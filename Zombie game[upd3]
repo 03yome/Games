@@ -2050,6 +2050,50 @@ do
     })
 end
 
+local event = game:GetService("ReplicatedStorage")
+    :WaitForChild("NetworkEvents")
+    :WaitForChild("RemoteEvent")
+
+local KillZombieLoop = false
+
+local Toggle = Tab:CreateToggle({
+    Name = "Kill Zombies",
+    CurrentValue = false,
+    Flag = "KillZombies",
+
+    Callback = function(Value)
+        KillZombieLoop = Value
+
+        if Value then
+            task.spawn(function()
+                while KillZombieLoop do
+                    if lplr.Team == Teams.Human then
+                        if find.Sniper(true) then
+                            getzombies()
+
+                            for i, v in pairs(zombieTbl) do
+                                if v and v:FindFirstChild("Humanoid") then
+                                    event:FireServer("GUN_DAMAGE", v)
+                                    table.remove(zombieTbl, i)
+                                end
+                            end
+                        else
+                            game:GetService("ReplicatedStorage")
+                                .Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+
+                            find.Sniper(true)
+                        end
+                    end
+
+                    task.wait(0.1)
+                end
+
+                table.clear(zombieTbl)
+            end)
+        end
+    end,
+})
+
 local Section = Tab:CreateSection("Client")
 
 local Button = Tab:CreateButton({
