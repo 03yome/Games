@@ -176,3 +176,15 @@ local Dropdown = Tab:CreateDropdown({
        end
    end,
 })
+
+local Button = Tab:CreateButton({
+   Name = "AntiFallDmg",
+   Callback = function()
+local fallDmgScript = workspace:FindFirstChild("x5_oz6") and workspace.x5_oz6:FindFirstChild("FallDmg") and workspace.x5_oz6.FallDmg:FindFirstChild("Core")
+
+if fallDmgScript then
+    fallDmgScript.Disabled = true
+    print("Đã vô hiệu hóa FallDmg thành công!")
+end
+   end,
+})
