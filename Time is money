@@ -1,0 +1,118 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+if game.CoreGui:FindFirstChild("Rayfield") then
+   game.CoreGui.Rayfield:Destroy()
+end
+
+local Window = Rayfield:CreateWindow({
+   Name = "Time is Money",
+   Icon = 0, 
+   LoadingTitle = "lol",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", 
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "Vietnamvodich", 
+      FileName = "ควย" 
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, 
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", 
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Main", nil)
+
+local Input = Tab:CreateInput({
+   Name = "Nhập số tiền muốn nhận",
+   CurrentValue = "",
+   PlaceholderText = "Ví dụ: 1000",
+   RemoveTextAfterFocusLost = false,
+   Flag = "Input1",
+   Callback = function(Text)
+       -- Chuyển đổi văn bản nhập vào thành dạng số
+       local amount = tonumber(Text)
+       
+       -- Kiểm tra xem người dùng có nhập đúng định dạng số hay không
+       if amount then
+           local args = {
+               "playtime",
+               amount
+           }
+           
+           -- Gửi dữ liệu lên Server
+           game:GetService("ReplicatedStorage"):WaitForChild("LikeReward"):FireServer(unpack(args))
+       else
+           warn("Vui lòng nhập một số hợp lệ!")
+       end
+   end,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local Button = Tab:CreateButton({
+   Name = "Gửi toàn bộ tiền vào Ngân hàng",
+   Callback = function()
+       -- Kiểm tra xem người chơi và thư mục leaderstats/Cash có tồn tại không
+       if LocalPlayer and LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Cash") then
+           -- Lấy toàn bộ số tiền hiện tại
+           local allCash = LocalPlayer.leaderstats.Cash.Value
+           
+           -- Đưa số tiền vừa lấy (allCash) vào trong args
+           local args = {
+               "deposit",
+               allCash
+           }
+           
+           -- Gửi dữ liệu lên Server
+           game:GetService("ReplicatedStorage"):WaitForChild("BankTransaction"):FireServer(unpack(args))
+       else
+           warn("Không tìm thấy dữ liệu Cash của bạn!")
+       end
+   end,
+})
+
+local AutoRebirth = false -- Biến dùng để kiểm tra trạng thái bật/tắt
+
+local Toggle = Tab:CreateToggle({
+   Name = "Tự động Rebirth (Auto Rebirth)",
+   CurrentValue = false,
+   Flag = "AutoRebirthFlag", 
+   Callback = function(Value)
+       AutoRebirth = Value -- Cập nhật trạng thái (true hoặc false) theo Toggle
+       
+       -- Nếu Toggle được bật, kích hoạt vòng lặp chạy ngầm
+       if AutoRebirth then
+           task.spawn(function()
+               while AutoRebirth do
+                   local args = {
+                       true
+                   }
+                   -- Gửi lệnh Rebirth lên Server
+                   game:GetService("ReplicatedStorage"):WaitForChild("Rebirth"):FireServer(unpack(args))
+                   
+                   -- Thời gian chờ giữa mỗi lần Rebirth (tránh bị kích do gửi lệnh quá nhanh)
+                   task.wait(0.1) 
+               end
+           end)
+       end
+   end,
+})
