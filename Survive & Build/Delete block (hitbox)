@@ -1,0 +1,70 @@
+-- ================= CONFIGURATION =================
+local TARGET_PLOT = "8689243344_Plot"     -- <-- Điền tên Plot của bạn
+local TARGET_BLOCK = "Model"    -- <-- Điền tên Model hoặc tên Part muốn xóa
+local HITBOX_SIZE = Vector3.new(6, 6, 6) -- <-- Kích thước hitbox
+-- =================================================
+
+local player = game:GetService("Players").LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local plotsFolder = workspace:WaitForChild("WORLD"):WaitForChild("PLOTS")
+local plot = plotsFolder:FindFirstChild(TARGET_PLOT)
+
+if not plot then
+    warn("Không tìm thấy Plot: " .. tostring(TARGET_PLOT))
+    return
+end
+
+-- 1. Tạo Hitbox trước mặt
+local hitbox = Instance.new("Part")
+hitbox.Size = HITBOX_SIZE
+hitbox.Transparency = 0.6
+hitbox.Color = Color3.fromRGB(0, 255, 0) -- Đổi sang màu xanh lá cho đổi gió nhé
+hitbox.CanCollide = false
+hitbox.Anchored = true
+hitbox.CFrame = rootPart.CFrame * CFrame.new(0, 0, - (HITBOX_SIZE.Z / 2 + 1))
+hitbox.Parent = workspace
+
+-- 2. Quét các Part bên trong Hitbox
+local partsInHitbox = workspace:GetPartsInPart(hitbox)
+local deleteList = {} -- Bảng lưu các thứ cần xóa để không bị trùng lặp
+local deletedCount = 0
+
+for _, part in ipairs(partsInHitbox) do
+    -- Kiểm tra xem Part này có nằm trong Plot chỉ định không
+    if part:IsDescendantOf(plot) then
+        
+        local objectToDestroy = nil
+        
+        -- TH1: Nếu bản thân Part đó trùng tên muốn xóa
+        if part.Name == TARGET_BLOCK then
+            objectToDestroy = part
+        else
+            -- TH2: Nếu Part không trùng tên, tìm ngược lên xem nó có thuộc Model nào trùng tên không
+            local parentModel = part:FindFirstAncestorOfClass("Model")
+            if parentModel and parentModel.Name == TARGET_BLOCK and parentModel:IsDescendantOf(plot) then
+                objectToDestroy = parentModel
+            end
+        end
+        
+        -- Nếu tìm thấy thứ cần xóa và chưa được thêm vào danh sách chờ xóa
+        if objectToDestroy and not deleteList[objectToDestroy] then
+            deleteList[objectToDestroy] = true -- Đánh dấu đã xử lý
+            
+            local args = {
+                "Destroy",
+                objectToDestroy
+            }
+            -- Gửi lệnh xóa (Model hoặc Part) lên Server
+            game:GetService("ReplicatedStorage"):WaitForChild("World_Function"):InvokeServer(unpack(args))
+            deletedCount = deletedCount + 1
+        end
+    end
+end
+
+-- 3. Dọn dẹp Hitbox
+task.wait(0.5)
+hitbox:Destroy()
+
+print("Đã quét xong! Đã xóa " .. deletedCount .. " đối tượng (Model/Part) tên '" .. TARGET_BLOCK .. "' trong Hitbox.")
