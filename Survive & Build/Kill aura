@@ -1,0 +1,326 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local DamageFunction = ReplicatedStorage:WaitForChild("DamageFunction")
+
+-- Cấu hình trạng thái mặc định
+local _G = {
+    MobAuraEnabled = true, -- Mặc định bật đánh quái
+    AttackDelay = 0.1,     -- Tốc độ spam chiêu (giây)
+    MaxDistance = 60       -- Khoảng cách quét quái bình thường (studs)
+}
+
+local targetPlayer = nil
+local isLoopingPlayer = false
+
+-- Quản lý trạng thái Tàn Sát nâng cao
+local isRageActive = false   -- Đang trong thời gian tàn sát (dưới 50% máu)
+local isSuperRage = false    -- Đang trong trạng thái tàn sát x2 (dưới 35% máu)
+local rageTimeLeft = 0       -- Thời gian tàn sát còn lại (giây)
+
+----------------------------------------------------------------
+-- TẠO GIAO DIỆN CHÍNH (GUI GỐC - KHÔNG ĐỔI MÀU)
+----------------------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
+
+local MobToggleBtn = Instance.new("TextButton")
+local RageStatusLabel = Instance.new("TextLabel")
+local NameInput = Instance.new("TextBox")
+local AttackOnceBtn = Instance.new("TextButton")
+local AttackLoopBtn = Instance.new("TextButton")
+local CancelAttackBtn = Instance.new("TextButton")
+
+ScreenGui.Name = "AdvancedAuraGUI"
+ScreenGui.Parent = game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Position = UDim2.new(0.05, 0, 0.35, 0)
+MainFrame.Size = UDim2.new(0, 160, 0, 245)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+UIListLayout.Parent = MainFrame
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 6)
+
+local function addCorner(parent)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 6)
+    c.Parent = parent
+end
+
+MobToggleBtn.Name = "MobToggleBtn"
+MobToggleBtn.Parent = MainFrame
+MobToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+MobToggleBtn.Size = UDim2.new(0, 140, 0, 35)
+MobToggleBtn.Font = Enum.Font.SourceSansBold
+MobToggleBtn.Text = "ĐÁNH QUÁI: BẬT"
+MobToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MobToggleBtn.TextSize = 14
+MobToggleBtn.LayoutOrder = 1
+addCorner(MobToggleBtn)
+
+RageStatusLabel.Name = "RageStatusLabel"
+RageStatusLabel.Parent = MainFrame
+RageStatusLabel.BackgroundTransparency = 1
+RageStatusLabel.Size = UDim2.new(0, 140, 0, 20)
+RageStatusLabel.Font = Enum.Font.SourceSansBold
+RageStatusLabel.Text = "TRẠNG THÁI: BÌNH THƯỜNG"
+RageStatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+RageStatusLabel.TextSize = 12
+RageStatusLabel.LayoutOrder = 2
+
+NameInput.Name = "NameInput"
+NameInput.Parent = MainFrame
+NameInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+NameInput.Size = UDim2.new(0, 140, 0, 30)
+NameInput.Font = Enum.Font.SourceSans
+NameInput.PlaceholderText = "Nhập tên Player..."
+NameInput.Text = ""
+NameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+NameInput.TextSize = 14
+NameInput.LayoutOrder = 3
+addCorner(NameInput)
+
+AttackOnceBtn.Name = "AttackOnceBtn"
+AttackOnceBtn.Parent = MainFrame
+AttackOnceBtn.BackgroundColor3 = Color3.fromRGB(200, 150, 50)
+AttackOnceBtn.Size = UDim2.new(0, 140, 0, 30)
+AttackOnceBtn.Font = Enum.Font.SourceSansBold
+AttackOnceBtn.Text = "Đánh 1 Lần"
+AttackOnceBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AttackOnceBtn.TextSize = 14
+AttackOnceBtn.LayoutOrder = 4
+addCorner(AttackOnceBtn)
+
+AttackLoopBtn.Name = "AttackLoopBtn"
+AttackLoopBtn.Parent = MainFrame
+AttackLoopBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+AttackLoopBtn.Size = UDim2.new(0, 140, 0, 30)
+AttackLoopBtn.Font = Enum.Font.SourceSansBold
+AttackLoopBtn.Text = "Loop Đến Chết"
+AttackLoopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AttackLoopBtn.TextSize = 14
+AttackLoopBtn.LayoutOrder = 5
+addCorner(AttackLoopBtn)
+
+CancelAttackBtn.Name = "CancelAttackBtn"
+CancelAttackBtn.Parent = MainFrame
+CancelAttackBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+CancelAttackBtn.Size = UDim2.new(0, 140, 0, 30)
+CancelAttackBtn.Font = Enum.Font.SourceSansBold
+CancelAttackBtn.Text = "Hủy Đánh Người"
+CancelAttackBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CancelAttackBtn.TextSize = 14
+CancelAttackBtn.LayoutOrder = 6
+addCorner(CancelAttackBtn)
+
+local UIPadding = Instance.new("UIPadding")
+UIPadding.Parent = MainFrame
+UIPadding.PaddingTop = UDim.new(0, 8)
+
+----------------------------------------------------------------
+-- LOGIC TÌM KIẾM THEO TÊN GẦN ĐÚNG NHẤT
+----------------------------------------------------------------
+local function findClosestPlayer(text)
+    if text == "" then return nil end
+    local search = string.lower(text)
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if string.sub(string.lower(player.Name), 1, string.len(search)) == search then
+                return player
+            end
+        end
+    end
+    return nil
+end
+
+-- Tương tác GUI Gốc
+MobToggleBtn.MouseButton1Click:Connect(function()
+    _G.MobAuraEnabled = not _G.MobAuraEnabled
+    if _G.MobAuraEnabled then
+        MobToggleBtn.Text = "ĐÁNH QUÁI: BẬT"
+        MobToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    else
+        MobToggleBtn.Text = "ĐÁNH QUÁI: TẮT"
+        MobToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    end
+end)
+
+AttackOnceBtn.MouseButton1Click:Connect(function()
+    local found = findClosestPlayer(NameInput.Text)
+    if found then targetPlayer = found; isLoopingPlayer = false end
+end)
+
+AttackLoopBtn.MouseButton1Click:Connect(function()
+    local found = findClosestPlayer(NameInput.Text)
+    if found then targetPlayer = found; isLoopingPlayer = true end
+end)
+
+CancelAttackBtn.MouseButton1Click:Connect(function()
+    targetPlayer = nil; isLoopingPlayer = false
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.K then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+end)
+
+----------------------------------------------------------------
+-- CORE LOGIC: GỬI LỆNH ĐÁNH
+----------------------------------------------------------------
+local function sendDamage(weapon, targetRoot, targetHumanoid)
+    if weapon and targetRoot and targetHumanoid and targetHumanoid.Health > 0 then
+        local args = {
+            [1] = weapon,
+            [2] = "Attack",
+            [3] = targetRoot,
+            [4] = targetHumanoid,
+            n = 4,
+        }
+        pcall(function()
+            DamageFunction:InvokeServer(unpack(args, 1, args.n or #args))
+        end)
+    end
+end
+
+----------------------------------------------------------------
+-- VÒNG LẶP ĐẾM NGƯỢC THỜI GIAN TÀN SÁT NÂNG CAO
+----------------------------------------------------------------
+task.spawn(function()
+    while true do
+        if isRageActive then
+            rageTimeLeft = rageTimeLeft - 1
+            if isSuperRage then
+                RageStatusLabel.Text = "TÀN SÁT X2: " .. rageTimeLeft .. "s"
+                RageStatusLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+            else
+                RageStatusLabel.Text = "TÀN SÁT: " .. rageTimeLeft .. "s"
+                RageStatusLabel.TextColor3 = Color3.fromRGB(255, 150, 0)
+            end
+            
+            if rageTimeLeft <= 0 then
+                isRageActive = false
+                isSuperRage = false
+                RageStatusLabel.Text = "TRẠNG THÁI: BÌNH THƯỜNG"
+                RageStatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+----------------------------------------------------------------
+-- LUỒNG QUẢN LÝ THEO DÕI MÁU (XỬ LÝ MỐC 50% VÀ MỐC 35%)
+----------------------------------------------------------------
+task.spawn(function()
+    while true do
+        local charactersFolder = workspace:FindFirstChild("CHARACTERS")
+        local myChar = LocalPlayer.Character or (charactersFolder and charactersFolder:FindFirstChild(LocalPlayer.Name))
+        local myHum = myChar and myChar:FindFirstChild("Humanoid")
+        
+        if myHum and myHum.Health > 0 then
+            local currentHealthPercent = myHum.Health / myHum.MaxHealth
+            
+            -- BƯỚC 1: Kiểm tra mốc dưới 50% để bật Tàn sát thường
+            if currentHealthPercent <= 0.70 and not isRageActive then
+                isRageActive = true
+                isSuperRage = false
+                rageTimeLeft = 50 -- Thiết lập thời gian ban đầu là 30 giây
+            end
+            
+            -- BƯỚC 2: Nếu đang trong 30 giây tàn sát mà máu tiếp tục tụt xuống dưới 35%
+            if isRageActive and not isSuperRage and currentHealthPercent <= 0.50 then
+                isSuperRage = true
+                rageTimeLeft = rageTimeLeft + 60 -- Cộng thêm 15 giây tàn sát
+            end
+        end
+        task.wait(0.2) -- Tăng tần suất quét máu để bắt mốc kịp thời
+    end
+end)
+
+----------------------------------------------------------------
+-- 2 LUỒNG CHẠY SONG SONG ĐỘC LẬP
+----------------------------------------------------------------
+
+-- LUỒNG 1: ĐÁNH QUÁI (TỰ ĐỘNG PHÂN CHIA SÁT THƯƠNG THEO MỐC)
+task.spawn(function()
+    while true do
+        local charactersFolder = workspace:FindFirstChild("CHARACTERS")
+        local myChar = LocalPlayer.Character or (charactersFolder and charactersFolder:FindFirstChild(LocalPlayer.Name))
+        local myWeapon = myChar and myChar:FindFirstChild("Weapon")
+        local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+        
+        if myWeapon and myRoot then
+            local mobsFolder = workspace:FindFirstChild("MOBS")
+            if mobsFolder then
+                for _, mob in pairs(mobsFolder:GetChildren()) do
+                    local mTorso = mob:FindFirstChild("Torso") or mob:FindFirstChild("UpperTorso") or mob:FindFirstChild("HumanoidRootPart")
+                    local mHum = mob:FindFirstChild("Humanoid")
+                    
+                    if mTorso and mHum and mHum.Health > 0 then
+                        -- [ĐÒN ĐÁNH 1 - TÀN SÁT THƯỜNG]: Không giới hạn khoảng cách khi dưới 50% máu
+                        if isRageActive then
+                            sendDamage(myWeapon, mTorso, mHum)
+                        end
+                        
+                        -- [ĐÒN ĐÁNH 2 - TÀN SÁT X2]: Đánh thêm một phát nữa toàn map khi dưới 35% máu (Kích hoạt x2)
+                        if isSuperRage then
+                            sendDamage(myWeapon, mTorso, mHum)
+                        end
+                        
+                        -- [ĐÒN ĐÁNH TỪ GUI THƯỜNG]: Chỉ đánh khi nút bật và quái trong tầm 60 studs
+                        if _G.MobAuraEnabled then
+                            local distance = (myRoot.Position - mTorso.Position).Magnitude
+                            if distance <= _G.MaxDistance then
+                                sendDamage(myWeapon, mTorso, mHum)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        -- Tăng tốc độ spam khi ở trạng thái tàn sát
+        task.wait(isRageActive and 0.02 or _G.AttackDelay)
+    end
+end)
+
+-- LUỒNG 2: ĐÁNH PLAYER ĐÃ CHỌN (workspace.CHARACTERS)
+task.spawn(function()
+    while true do
+        if targetPlayer then
+            local charactersFolder = workspace:FindFirstChild("CHARACTERS")
+            local myChar = LocalPlayer.Character or (charactersFolder and charactersFolder:FindFirstChild(LocalPlayer.Name))
+            local myWeapon = myChar and myChar:FindFirstChild("Weapon")
+            
+            local tChar = charactersFolder and charactersFolder:FindFirstChild(targetPlayer.Name)
+            local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+            local tHum = tChar and tChar:FindFirstChild("Humanoid")
+            
+            if myWeapon and tRoot and tHum and tHum.Health > 0 then
+                sendDamage(myWeapon, tRoot, tHum)
+                
+                if not isLoopingPlayer then
+                    targetPlayer = nil
+                end
+            else
+                targetPlayer = nil
+                isLoopingPlayer = false
+            end
+        end
+        task.wait(_G.AttackDelay)
+    end
+end)
