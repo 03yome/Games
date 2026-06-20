@@ -1,0 +1,30 @@
+-- ================= CONFIGURATION =================
+local TARGET_PLOT = "8689243344_Plot"   -- <-- Điền chính xác tên Plot của bạn vào đây
+local TARGET_BLOCK = "Part"   -- <-- Điền chính xác tên của Block muốn xóa vào đây
+-- =================================================
+
+-- Đường dẫn hệ thống
+local plotsFolder = workspace:WaitForChild("WORLD"):WaitForChild("PLOTS")
+local plot = plotsFolder:FindFirstChild(TARGET_PLOT)
+
+if not plot then
+    warn("Không tìm thấy Plot: " .. tostring(TARGET_PLOT))
+    return
+end
+
+-- Tìm đúng block trong plot đó
+local block = plot:FindFirstChild(TARGET_BLOCK)
+
+if not block then
+    warn("Không tìm thấy Block '" .. tostring(TARGET_BLOCK) .. "' trong " .. tostring(TARGET_PLOT))
+    return
+end
+
+-- Thực hiện gửi lệnh xóa lên Server (Chạy đúng 1 lần)
+local args = {
+    "Destroy",
+    block
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("World_Function"):InvokeServer(unpack(args))
+print("Đã gửi yêu cầu xóa block: " .. tostring(TARGET_BLOCK))
