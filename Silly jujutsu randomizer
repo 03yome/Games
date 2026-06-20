@@ -200,8 +200,9 @@ AddScriptButton(
 )
 
 --[=[
-    ADVANCED TOOL MANAGER HUB V3 (FIXED COOLDOWN BUG)
-    - Sửa lỗi đứng yên/kẹt hồi chiêu khi xóa và lấy lại Tool.
+    ADVANCED TOOL MANAGER HUB V5 (AUTO-SCAN SYSTEM)
+    - Tự động quét toàn bộ ReplicatedStorage để tìm Tool (Sửa lỗi không hiển thị đồ).
+    - Giữ nguyên cơ chế bypass server, sửa lỗi kẹt cooldown.
 --]=]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -212,39 +213,28 @@ local CoreGui = game:GetService("CoreGui")
 
 local player = Players.LocalPlayer
 
--- Kiểm tra thư mục nguồn
-local allMoves = ReplicatedStorage:FindFirstChild("AllMoves")
-local closeRange = ReplicatedStorage:FindFirstChild("CloseRange")
-
-if not allMoves or not closeRange then
-    warn("Không tìm thấy thư mục 'AllMoves' hoặc 'CloseRange'!")
-    return
-end
-
--- Xóa GUI cũ nếu đang chạy lại script
-if CoreGui:FindFirstChild("RobloxToolHubV3") then
-    CoreGui.RobloxToolHubV3:Destroy()
+-- Xóa GUI cũ để tránh trùng lặp
+if CoreGui:FindFirstChild("RobloxToolHubV5") then
+    CoreGui.RobloxToolHubV5:Destroy()
 end
 
 -- ==========================================
 -- GIAO DIỆN GUI CHÍNH
 -- ==========================================
-
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RobloxToolHubV3"
+screenGui.Name = "RobloxToolHubV5"
 screenGui.Parent = CoreGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 500, 0, 320)
-mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-mainFrame.BorderSizePixel = 0
+mainFrame.Size = UDim2.new(0, 500, 0, 410)
+mainFrame.Position = UDim2.new(0, 30, 0, 30) -- Đặt lệch góc trên bên trái để không che màn hình chính
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 mainFrame.Active = true
 mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
 local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.CornerRadius = UDim.new(0, 10)
 mainCorner.Parent = mainFrame
 
 local topBar = Instance.new("Frame")
@@ -256,10 +246,10 @@ local titleLabel = Instance.new("TextLabel")
 titleLabel.Size = UDim2.new(1, -70, 1, 0)
 titleLabel.Position = UDim2.new(0, 15, 0, 0)
 titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "⚡ ADVANCED TOOL HUB V3 (FIX BUG) ⚡"
+titleLabel.Text = "⚡ TOOL MANAGER HUB V5 (AUTO-SCAN) ⚡"
 titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
 titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 16
+titleLabel.TextSize = 15
 titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 titleLabel.Parent = topBar
 
@@ -270,12 +260,7 @@ closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 closeButton.Text = "X"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 14
 closeButton.Parent = topBar
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 6)
-closeCorner.Parent = closeButton
 
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0, 25, 0, 25)
@@ -284,12 +269,7 @@ minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
 minimizeButton.Text = "-"
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeButton.Font = Enum.Font.SourceSansBold
-minimizeButton.TextSize = 16
 minimizeButton.Parent = topBar
-
-local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(0, 6)
-miniCorner.Parent = minimizeButton
 
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 1, -35)
@@ -300,243 +280,217 @@ contentFrame.Parent = mainFrame
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 25)
 statusLabel.Position = UDim2.new(0, 0, 1, -25)
-statusLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-statusLabel.Text = "Trạng thái: Sẵn sàng"
+statusLabel.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+statusLabel.Text = "Hệ thống: Đang khởi tạo quét..."
 statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 statusLabel.Font = Enum.Font.SourceSansItalic
 statusLabel.TextSize = 13
 statusLabel.Parent = contentFrame
 
-local statusCorner = Instance.new("UICorner")
-statusCorner.CornerRadius = UDim.new(0, 8)
-statusCorner.Parent = statusLabel
-
--- Bên trái: Kho Tool
-local leftLabel = Instance.new("TextLabel")
-leftLabel.Size = UDim2.new(0, 230, 0, 25)
-leftLabel.Position = UDim2.new(0, 15, 0, 5)
-leftLabel.BackgroundTransparency = 1
-leftLabel.Text = "KHO TOOL GAME (BẤM ĐỂ LẤY)"
-leftLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
-leftLabel.Font = Enum.Font.SourceSansBold
-leftLabel.TextSize = 14
-leftLabel.Parent = contentFrame
-
+-- Các bảng cuộn (Scroll)
 local leftScroll = Instance.new("ScrollingFrame")
 leftScroll.Size = UDim2.new(0, 230, 0, 220)
 leftScroll.Position = UDim2.new(0, 15, 0, 30)
-leftScroll.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
-leftScroll.BorderSizePixel = 0
-leftScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-leftScroll.ScrollBarThickness = 6
+leftScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+leftScroll.ScrollBarThickness = 4
 leftScroll.Parent = contentFrame
 
 local leftLayout = Instance.new("UIListLayout")
 leftLayout.Parent = leftScroll
 leftLayout.Padding = UDim.new(0, 5)
 
--- Bên phải: Túi đồ
-local rightLabel = Instance.new("TextLabel")
-rightLabel.Size = UDim2.new(0, 230, 0, 25)
-rightLabel.Position = UDim2.new(0, 255, 0, 5)
-rightLabel.BackgroundTransparency = 1
-rightLabel.Text = "TÚI ĐỒ CỦA BẠN (BẤM ĐỂ XÓA)"
-rightLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-rightLabel.Font = Enum.Font.SourceSansBold
-rightLabel.TextSize = 14
-rightLabel.Parent = contentFrame
-
 local rightScroll = Instance.new("ScrollingFrame")
 rightScroll.Size = UDim2.new(0, 230, 0, 220)
 rightScroll.Position = UDim2.new(0, 255, 0, 30)
-rightScroll.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
-rightScroll.BorderSizePixel = 0
-rightScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-rightScroll.ScrollBarThickness = 6
+rightScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+rightScroll.ScrollBarThickness = 4
 rightScroll.Parent = contentFrame
 
 local rightLayout = Instance.new("UIListLayout")
 rightLayout.Parent = rightScroll
 rightLayout.Padding = UDim.new(0, 5)
 
+-- Khung dán Combo
+local comboFrame = Instance.new("Frame")
+comboFrame.Size = UDim2.new(1, -30, 0, 65)
+comboFrame.Position = UDim2.new(0, 15, 0, 260)
+comboFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+comboFrame.Parent = contentFrame
+
+local comboTextBox = Instance.new("TextBox")
+comboTextBox.Size = UDim2.new(1, -110, 0, 35)
+comboTextBox.Position = UDim2.new(0, 5, 0, 20)
+comboTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+comboTextBox.Text = "tight hold,momentum,inertia,every last drop,dial up,critical point"
+comboTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+comboTextBox.ClearTextOnFocus = false
+comboTextBox.Parent = comboFrame
+
+local comboButton = Instance.new("TextButton")
+comboButton.Size = UDim2.new(0, 95, 0, 35)
+comboButton.Position = UDim2.new(1, -100, 0, 20)
+comboButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
+comboButton.Text = "NHẬN COMBO"
+comboButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+comboButton.Font = Enum.Font.SourceSansBold
+comboButton.Parent = comboFrame
+
 -- ==========================================
--- ĐIỀU KHIỂN ĐÓNG / THU NHỎ GUI
+-- LOGIC QUÉT VÀ XỬ LÝ AN TOÀN
 -- ==========================================
 
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
-end)
-
-local isMinimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    if isMinimized then
-        contentFrame.Visible = false
-        mainFrame.Size = UDim2.new(0, 500, 0, 35)
-        minimizeButton.Text = "+"
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
-    else
-        mainFrame.Size = UDim2.new(0, 500, 0, 320)
-        contentFrame.Visible = true
-        minimizeButton.Text = "-"
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-    end
-end)
-
--- ==========================================
--- LOGIC SỬA LỖI HỒI CHIÊU & QUẢN LÝ TOOL
--- ==========================================
+local cachedSourceTools = {}
 
 local function updateScrollCanvas(scrollFrame, layout)
     scrollFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
 end
 
--- Hàm thực hiện xóa Tool an toàn (Fix kẹt Cooldown)
 local function SAFELY_DESTROY_TOOL(toolInstance)
-	local character = player.Character
-	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	
-	-- BƯỚC 1: Nếu người chơi đang cầm tool này trên tay, bắt buộc phải bỏ xuống (Unequip)
-	if toolInstance.Parent == character and humanoid then
-		humanoid:UnequipTools()
-		task.wait(0.05) -- Chờ server nhận tín hiệu đã bỏ vũ khí xuống
-	end
-	
-	-- BƯỚC 2: Di chuyển tạm vào thùng rác Local trước khi xóa hẳn để ngắt các kết nối script đang chạy dơ
-	toolInstance.Parent = nil
-	toolInstance:Destroy()
+    local character = player.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    
+    if toolInstance.Parent == character and humanoid then
+        humanoid:UnequipTools()
+        task.wait(0.1)
+    end
+    
+    toolInstance.Name = "DELETED_TOOL" 
+    toolInstance.Parent = nil
+    task.wait(0.05)
+    toolInstance:Destroy()
 end
 
--- Tải danh sách kho tool bên trái
-local function LoadSourceTools()
-    for _, child in ipairs(leftScroll:GetChildren()) do
-        if child:IsA("TextButton") then child:Destroy() end
+local function GIVE_TOOL_SAFE(originalTool)
+    local backpack = player:FindFirstChildOfClass("Backpack")
+    if not backpack then return false end
+    
+    local toolName = originalTool.Name
+    local alreadyHas = backpack:FindFirstChild(toolName) or (player.Character and player.Character:FindFirstChild(toolName))
+    
+    if not alreadyHas then
+        local clone = originalTool:Clone()
+        clone.Parent = backpack
+        
+        task.spawn(function()
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum:EquipTool(clone)
+                task.wait(0.05)
+                hum:UnequipTools()
+            end
+        end)
+        return true
     end
+    return false
+end
 
-    local uniqueTools = {}
-    local function scanFolder(folder)
-        for _, item in ipairs(folder:GetChildren()) do
-            if item:IsA("Tool") and not uniqueTools[item.Name] then
-                uniqueTools[item.Name] = item
+-- TỰ ĐỘNG QUÉT TOÀN BỘ GAME ĐỂ TÌM TOOL (KHÔNG PHỤ THUỘC TÊN THƯ MỤC CŨ)
+local function AutoScanGameTools()
+    for _, child in ipairs(leftScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
+    cachedSourceTools = {}
+    
+    -- Dùng GetDescendants() để lục tung toàn bộ thư mục con trong ReplicatedStorage
+    local allItems = ReplicatedStorage:GetDescendants()
+    local foundCount = 0
+
+    for _, item in ipairs(allItems) do
+        if item:IsA("Tool") then
+            local lowerName = string.lower(item.Name)
+            -- Tránh lấy trùng các tool có tên giống nhau ở nhiều chỗ
+            if not cachedSourceTools[lowerName] then
+                cachedSourceTools[lowerName] = item
+                foundCount = foundCount + 1
             end
         end
     end
 
-    scanFolder(allMoves)
-    scanFolder(closeRange)
-
-    for toolName, originalTool in pairs(uniqueTools) do
+    -- Đưa danh sách đã quét được lên UI
+    for _, originalTool in pairs(cachedSourceTools) do
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, -10, 0, 30)
-        btn.BackgroundColor3 = Color3.fromRGB(45, 60, 50)
-        btn.Text = "  + " .. toolName
+        btn.BackgroundColor3 = Color3.fromRGB(45, 55, 45)
+        btn.Text = "  + " .. originalTool.Name
         btn.TextColor3 = Color3.fromRGB(255, 255, 255)
         btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.Font = Enum.Font.SourceSans
-        btn.TextSize = 14
         btn.Parent = leftScroll
 
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 4)
-        btnCorner.Parent = btn
-
         btn.MouseButton1Click:Connect(function()
-            local backpack = player:FindFirstChildOfClass("Backpack")
-            if backpack then
-                if backpack:FindFirstChild(toolName) or (player.Character and player.Character:FindFirstChild(toolName)) then
-                    statusLabel.Text = "Trạng thái: Đã sở hữu vũ khí này!"
-                    statusLabel.TextColor3 = Color3.fromRGB(255, 165, 0)
-                    return
-                end
-
-                local clone = originalTool:Clone()
-                clone.Parent = backpack
-                statusLabel.Text = "Trạng thái: Đã lấy " .. toolName
+            if GIVE_TOOL_SAFE(originalTool) then
+                statusLabel.Text = "Hệ thống: Đã lấy thành công " .. originalTool.Name
                 statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            else
+                statusLabel.Text = "Hệ thống: Bạn đã có vũ khí này rồi!"
+                statusLabel.TextColor3 = Color3.fromRGB(255, 150, 0)
             end
         end)
     end
+    
     updateScrollCanvas(leftScroll, leftLayout)
+    statusLabel.Text = "Hệ thống: Đã quét thấy tổng cộng " .. foundCount .. " Tools trong game!"
+    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 255)
 end
 
--- Đồng bộ danh sách túi đồ bên phải (Quét cả Backpack lẫn trên tay Nhân vật)
+-- ĐỒNG BỘ TÚI ĐỒ (BÊN PHẢI)
 local function UpdateBackpackUI()
-    for _, child in ipairs(rightScroll:GetChildren()) do
-        if child:IsA("TextButton") then child:Destroy() end
-    end
-
+    for _, child in ipairs(rightScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
     local backpack = player:FindFirstChildOfClass("Backpack")
     local character = player.Character
     local listTools = {}
 
-    -- Lấy tool trong túi đồ
-    if backpack then
-        for _, item in ipairs(backpack:GetChildren()) do
-            if item:IsA("Tool") then table.insert(listTools, {instance = item, location = "Túi"}) end
-        end
-    end
-    
-    -- Lấy tool đang cầm trên tay
-    if character then
-        for _, item in ipairs(character:GetChildren()) do
-            if item:IsA("Tool") then table.insert(listTools, {instance = item, location = "Tay"}) end
-        end
-    end
+    if backpack then for _, item in ipairs(backpack:GetChildren()) do if item:IsA("Tool") then table.insert(listTools, {instance = item, loc = "Túi"}) end end end
+    if character then for _, item in ipairs(character:GetChildren()) do if item:IsA("Tool") then table.insert(listTools, {instance = item, loc = "Tay"}) end end end
 
-    -- Hiển thị lên UI
     for _, toolData in ipairs(listTools) do
-        local tool = toolData.instance
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, -10, 0, 30)
-        btn.BackgroundColor3 = toolData.location == "Tay" and Color3.fromRGB(90, 50, 30) or Color3.fromRGB(70, 40, 40)
-        btn.Text = "  ❌ [" .. toolData.location .. "] " .. tool.Name
+        btn.BackgroundColor3 = toolData.loc == "Tay" and Color3.fromRGB(90, 50, 30) or Color3.fromRGB(70, 40, 40)
+        btn.Text = "  ❌ [" .. toolData.loc .. "] " .. toolData.instance.Name
         btn.TextColor3 = Color3.fromRGB(255, 200, 200)
         btn.TextXAlignment = Enum.TextXAlignment.Left
-        btn.Font = Enum.Font.SourceSans
-        btn.TextSize = 14
         btn.Parent = rightScroll
 
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 4)
-        btnCorner.Parent = btn
-
         btn.MouseButton1Click:Connect(function()
-            statusLabel.Text = "Trạng thái: Đang giải phóng hồi chiêu & xóa " .. tool.Name .."..."
+            statusLabel.Text = "Hệ thống: Đang giải phóng bộ nhớ & xóa " .. toolData.instance.Name
             statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            SAFELY_DESTROY_TOOL(tool)
+            SAFELY_DESTROY_TOOL(toolData.instance)
         end)
     end
     updateScrollCanvas(rightScroll, rightLayout)
 end
 
--- Lắp đặt bộ lắng nghe cập nhật UI liên tục
-local function SetupListeners()
-    local backpack = player:WaitForChild("Backpack", 5)
-    
-    -- Lắng nghe thay đổi trong Backpack
-    if backpack then
-        backpack.ChildAdded:Connect(UpdateBackpackUI)
-        backpack.ChildRemoved:Connect(UpdateBackpackUI)
+-- SỰ KIỆN COMBO TOOL
+comboButton.MouseButton1Click:Connect(function()
+    local text = comboTextBox.Text
+    if text == "" then return end
+    local count = 0
+    for part in string.gmatch(text, "[^,]+") do
+        local name = string.match(part, "^%s*(.-)%s*$")
+        local target = cachedSourceTools[string.lower(name)]
+        if target and GIVE_TOOL_SAFE(target) then count = count + 1 end
     end
-    
-    -- Lắng nghe khi nhân vật đổi trạng thái cầm tool trên tay
-    if player.Character then
-        player.Character.ChildAdded:Connect(UpdateBackpackUI)
-        player.Character.ChildRemoved:Connect(UpdateBackpackUI)
-    end
-    
-    UpdateBackpackUI()
-end
-
-player.CharacterAdded:Connect(function(char)
-    task.wait(0.5)
-    char.ChildAdded:Connect(UpdateBackpackUI)
-    char.ChildRemoved:Connect(UpdateBackpackUI)
-    SetupListeners()
-    statusLabel.Text = "Trạng thái: Làm mới hệ thống!"
-    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.Text = "Hệ thống: Đã nạp thành công combo (" .. count .. " món mới)!"
+    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
 end)
 
--- Khởi chạy lần đầu
-LoadSourceTools()
+-- NÚT THU NHỎ / ĐÓNG
+closeButton.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then contentFrame.Visible = false mainFrame.Size = UDim2.new(0, 500, 0, 35) minimizeButton.Text = "+"
+    else mainFrame.Size = UDim2.new(0, 500, 0, 410) contentFrame.Visible = true minimizeButton.Text = "-" end
+end)
+
+-- BỘ LẮNG NGHE ĐỒNG BỘ
+local function SetupListeners()
+    local bk = player:WaitForChild("Backpack", 5)
+    if bk then bk.ChildAdded:Connect(UpdateBackpackUI) bk.ChildRemoved:Connect(UpdateBackpackUI) end
+    if player.Character then player.Character.ChildAdded:Connect(UpdateBackpackUI) player.Character.ChildRemoved:Connect(UpdateBackpackUI) end
+    UpdateBackpackUI()
+end
+player.CharacterAdded:Connect(function(char) task.wait(0.5) SetupListeners() end)
+
+-- CHẠY HỆ THỐNG
+AutoScanGameTools()
 SetupListeners()
