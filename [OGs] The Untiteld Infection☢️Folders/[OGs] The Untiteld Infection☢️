@@ -130,6 +130,7 @@ local oneClick34 = makeBtn("Move1eto")
 local oneClick35 = makeBtn("Move2eto")
 local oneClick36 = makeBtn("Move3eto")
 local oneClick37 = makeBtn("move4eto")
+local oneClick38 = makeBtn("horror")
 
 -------------------------------
 -- Auto loops
@@ -322,6 +323,10 @@ end)
 
 oneClick37.MouseButton1Click:Connect(function() 
 game:GetService("ReplicatedStorage").EtoOwlStuffRS.Remotes.Move4:FireServer()
+end)
+
+oneClick38.MouseButton1Click:Connect(function() 
+game:GetService("ReplicatedStorage").DogEvent:FireServer()
 end)
 -------------------------------
 -- Drag UI
