@@ -199,6 +199,15 @@ AddScriptButton(
     end
 )
 
+-- Nút số 4: Gojo ult
+AddScriptButton(
+    "gojo", 
+    Color3.fromRGB(120, 50, 150), 
+    function()
+        game:GetService("ReplicatedStorage").Remotes.Gojo:FindFirstChild("gojo ult"):FireServer()
+   end
+)
+
 --[=[
     ADVANCED TOOL MANAGER HUB V5 (AUTO-SCAN SYSTEM)
     - Tự động quét toàn bộ ReplicatedStorage để tìm Tool (Sửa lỗi không hiển thị đồ).
