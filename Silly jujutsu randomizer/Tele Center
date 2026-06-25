@@ -1,0 +1,118 @@
+-- Tạo ScreenGui để chứa các nút bấm (Sử dụng CoreGui để không bị mất khi hồi sinh)
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Xóa UI cũ nếu có chạy lại script
+if CoreGui:FindFirstChild("TeleportMenu") then
+    CoreGui.TeleportMenu:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TeleportMenu"
+ScreenGui.Parent = CoreGui
+
+-- Khung chứa các nút
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 200, 0, 110)
+Frame.Position = UDim2.new(0.1, 0, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Frame.Active = true
+Frame.Draggable = true -- Có thể kéo di chuyển trên màn hình
+Frame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = Frame
+
+-- Nút 1: Dịch chuyển đến Center (Border3)
+local BtnCenter = Instance.new("TextButton")
+BtnCenter.Size = UDim2.new(0, 180, 0, 40)
+BtnCenter.Position = UDim2.new(0, 10, 0, 10)
+BtnCenter.Text = "TP to Random Center"
+BtnCenter.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+BtnCenter.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnCenter.Font = Enum.Font.SourceSansBold
+BtnCenter.TextSize = 16
+BtnCenter.Parent = Frame
+
+local UICorner1 = Instance.new("UICorner")
+UICorner1.CornerRadius = UDim.new(0, 6)
+UICorner1.Parent = BtnCenter
+
+-- Nút 2: Dịch chuyển đến CFrame cố định
+local BtnCFrame = Instance.new("TextButton")
+BtnCFrame.Size = UDim2.new(0, 180, 0, 40)
+BtnCFrame.Position = UDim2.new(0, 10, 0, 60)
+BtnCFrame.Text = "TP to Custom CFrame"
+BtnCFrame.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+BtnCFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+BtnCFrame.Font = Enum.Font.SourceSansBold
+BtnCFrame.TextSize = 16
+BtnCFrame.Parent = Frame
+
+local UICorner2 = Instance.new("UICorner")
+UICorner2.CornerRadius = UDim.new(0, 6)
+UICorner2.Parent = BtnCFrame
+
+-- Hàm dịch chuyển an toàn
+local function teleport(cframe)
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = cframe
+    end
+end
+
+-- Xử lý Logic Nút 1: Tìm Center và dịch chuyển
+BtnCenter.MouseButton1Click:Connect(function()
+    local map = workspace:FindFirstChild("Map")
+    if not map then
+        print("Không tìm thấy thư mục 'Map' trong Workspace!")
+        return
+    end
+
+    -- Tìm tất cả các object tên là "Center" nằm trong Map
+    local centers = {}
+    for _, child in ipairs(map:GetChildren()) do
+        if child.Name == "Center" then
+            table.insert(centers, child)
+        end
+    end
+
+    -- Kiểm tra nếu không tìm thấy Center nào
+    if #centers == 0 then
+        print("Không thấy center nào")
+        return
+    end
+
+    -- Chọn Center để dịch chuyển
+    local targetCenter
+    if #centers == 1 then
+        targetCenter = centers[1]
+        print("Tìm thấy 1 Center duy nhất. Đang dịch chuyển...")
+    else
+        -- Nếu có nhiều Center, lấy ngẫu nhiên 1 cái
+        local randomIndex = math.random(1, #centers)
+        targetCenter = centers[randomIndex]
+        print("Tìm thấy " .. #centers .. " Centers. Đang dịch chuyển đến Center ngẫu nhiên số: " .. randomIndex)
+    end
+
+    -- Dịch chuyển đến vị trí của Center (Nếu là BasePart hoặc Model đều lấy được CFrame)
+    if targetCenter:IsA("BasePart") then
+        teleport(targetCenter.CFrame)
+    elseif targetCenter:IsA("Model") then
+        local primaryPart = targetCenter.PrimaryPart or targetCenter:FindFirstChildWhichIsA("BasePart")
+        if primaryPart then
+            teleport(primaryPart.CFrame)
+        else
+            teleport(targetCenter:GetPivot())
+        end
+    end
+end)
+
+-- Xử lý Logic Nút 2: CFrame cố định
+BtnCFrame.MouseButton1Click:Connect(function()
+    local targetCFrame = CFrame.new(-284.185394, 242.496246, -377.219574, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+    print("Đang dịch chuyển đến CFrame cố định...")
+    teleport(targetCFrame)
+end)
