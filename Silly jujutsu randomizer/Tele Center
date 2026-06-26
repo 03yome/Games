@@ -117,7 +117,7 @@ BtnCFrame.MouseButton1Click:Connect(function()
     teleport(targetCFrame)
 end)
 
-llocal ScreenGui = Instance.new("ScreenGui")
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 
 -- Nút mở menu chính (Nằm ở trên)
