@@ -116,3 +116,112 @@ BtnCFrame.MouseButton1Click:Connect(function()
     print("Đang dịch chuyển đến CFrame cố định...")
     teleport(targetCFrame)
 end)
+
+llocal ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+-- Nút mở menu chính (Nằm ở trên)
+local Button = Instance.new("TextButton")
+Button.Text = "Show Inventory"
+Button.Size = UDim2.new(0, 150, 0, 50)
+Button.Position = UDim2.new(0.5, -75, 0.001, 0) -- Giữ nguyên vị trí bản gốc
+Button.Active = true
+Button.Draggable = true
+Button.Parent = ScreenGui
+
+-- Ô tìm kiếm (Được đẩy xuống dưới nút Show Inventory)
+local searchBox = Instance.new("TextBox")
+searchBox.Parent = ScreenGui
+searchBox.Size = UDim2.new(0, 600, 0, 40) 
+searchBox.Position = UDim2.new(0.5, -300, 0.25, 60) -- Nằm ngay dưới nút Show Inventory (cách 10px)
+searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+searchBox.PlaceholderText = "Search for an item..."
+searchBox.TextSize = 18
+searchBox.Visible = false
+
+-- Bảng chứa danh sách vật phẩm (Được đẩy xuống dưới ô tìm kiếm)
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Parent = ScreenGui
+scrollingFrame.Size = UDim2.new(0, 600, 0, 450) 
+scrollingFrame.Position = UDim2.new(0.5, -300, 0.25, 110) -- Nằm ngay dưới ô tìm kiếm (cách 10px)
+scrollingFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+scrollingFrame.ScrollBarThickness = 12
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.Visible = false
+
+-- Hàm hiển thị và cập nhật danh sách
+local function showInventory()
+    if scrollingFrame.Visible then
+        scrollingFrame.Visible = false
+        searchBox.Visible = false
+    else
+        local player = game.Players.LocalPlayer
+        local backpack = player:WaitForChild("Backpack")
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+
+        -- Xóa danh sách cũ trước khi tải danh sách mới
+        for _, child in pairs(scrollingFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+
+        local yPosition = 10
+        -- Quét qua tất cả các Tool trong Backpack
+        for _, item in pairs(backpack:GetChildren()) do
+            if item:IsA("Tool") then
+                -- Tạo Nút bấm thay vì TextLabel thông thường
+                local itemButton = Instance.new("TextButton")
+                itemButton.Parent = scrollingFrame
+                itemButton.Size = UDim2.new(0, 560, 0, 40) 
+                itemButton.Position = UDim2.new(0, 10, 0, yPosition)
+                itemButton.Text = item.Name
+                itemButton.TextSize = 18
+                itemButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                itemButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+                itemButton.Name = item.Name
+                
+                -- Hiệu ứng bo góc nhẹ cho nút bấm
+                local uiCorner = Instance.new("UICorner")
+                uiCorner.CornerRadius = UDim.new(0, 6)
+                uiCorner.Parent = itemButton
+
+                -- Sự kiện khi bấm vào vật phẩm -> Trang bị lên tay
+                itemButton.MouseButton1Click:Connect(function()
+                    if item and item.Parent == backpack then
+                        humanoid:EquipTool(item) 
+                    end
+                end)
+
+                yPosition = yPosition + 45
+            end
+        end
+
+        -- Cập nhật lại thanh cuộn dựa trên số lượng item thực tế
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yPosition)
+
+        scrollingFrame.Visible = true
+        searchBox.Visible = true
+    end
+end
+
+-- Bộ lọc tìm kiếm
+searchBox.Changed:Connect(function(property)
+    if property == "Text" then
+        local searchText = searchBox.Text:lower()
+
+        for _, itemButton in pairs(scrollingFrame:GetChildren()) do
+            if itemButton:IsA("TextButton") then
+                if searchText == "" or itemButton.Name:lower():find(searchText) then
+                    itemButton.Visible = true
+                else
+                    itemButton.Visible = false
+                end
+            end
+        end
+    end
+end)
+
+Button.MouseButton1Click:Connect(showInventory)
