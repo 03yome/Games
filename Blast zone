@@ -5,7 +5,7 @@ if game.CoreGui:FindFirstChild("Rayfield") then
 end
 
 local Window = Rayfield:CreateWindow({
-   Name = "Time is Money",
+   Name = "Blast zone",
    Icon = 0, 
    LoadingTitle = "lol",
    LoadingSubtitle = "Script By romd3976",
