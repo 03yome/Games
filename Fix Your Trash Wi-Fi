@@ -110,12 +110,10 @@ local function tpAndPrompt(partName, freeze)
     local target = workspace:FindFirstChild(partName, true)
 
     if target then
-        -- Teleport
         hrp.CFrame = target.CFrame + Vector3.new(0, 3, 0)
 
         task.wait(0.3)
 
-        -- Tìm prompt
         local prompt = target:FindFirstChildWhichIsA("ProximityPrompt", true)
 
         if prompt then
@@ -124,7 +122,7 @@ local function tpAndPrompt(partName, freeze)
 
             fireproximityprompt(prompt)
         else
-            warn("Không có ProximityPrompt:", partName)
+            warn("LOL ProximityPrompt:", partName)
         end
 
         if freeze then
