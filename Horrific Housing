@@ -645,7 +645,7 @@ PlayerTab:CreateInput({
 
 local Godmode = false
 
-Tab:CreateToggle({
+PlayerTab:CreateToggle({
     Name = "Semi-GodMode",
     CurrentValue = false,
     Flag = "SemiGodMode",
