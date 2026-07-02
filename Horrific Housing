@@ -643,120 +643,30 @@ PlayerTab:CreateInput({
     end
 })
 
-local player = game:GetService("Players").LocalPlayer
-local runService = game:GetService("RunService")
+local Godmode = false
 
-local ghostModeEnabled = false
-local heartbeatConnection = nil
-local fakeTorso = nil
+Tab:CreateToggle({
+    Name = "Semi-GodMode",
+    CurrentValue = false,
+    Flag = "SemiGodMode",
+    Callback = function(Value)
+        Godmode = Value
 
-local function disableGhostMode(char)
-    if not char then return end
-    
-    local existingFake = char:FindFirstChild("FakeTorso")
-    if existingFake then existingFake:Destroy() end
-    
-    for _, part in pairs(char:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanTouch = true
-            if part.Name == "HumanoidRootPart" or part.Name == "UpperTorso" or part.Name == "LowerTorso" or part.Name == "LeftFoot" or part.Name == "RightFoot" then
-                part.CanCollide = true
-            else
-                part.CanCollide = true
+        task.spawn(function()
+            while Godmode do
+                pcall(function()
+                    game:GetService("ReplicatedStorage").damageMe:FireServer(
+                        -math.huge,
+                        {
+                            shooter = game.Players.LocalPlayer,
+                            origin = Vector3.new(0, 0, 0),
+                            dir = Vector3.new(0, 0, 0)
+                        }
+                    )
+                end)
+
+                task.wait(0.2)
             end
-            if part.Name ~= "HumanoidRootPart" then
-                part.Transparency = 0
-            end
-        end
-    end
-    
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.WalkSpeed = 16
-        hum:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
-    end
-end
-
-local function setupGhostMode(char)
-    if not ghostModeEnabled or not char then return end
-    
-    local realTorso = char:WaitForChild("Torso", 5) or char:WaitForChild("UpperTorso", 5)
-    if not realTorso then return end
-    
-    if not char:FindFirstChild("FakeTorso") then
-        fakeTorso = realTorso:Clone()
-        fakeTorso.Name = "FakeTorso"
-        fakeTorso.Parent = char
-        fakeTorso.Transparency = 0.5
-        fakeTorso.CanCollide = false
-        fakeTorso.CanTouch = false
-        
-        local weld = Instance.new("WeldConstraint")
-        weld.Part0 = fakeTorso
-        weld.Part1 = realTorso
-        weld.Parent = fakeTorso
-    end
-
-    if heartbeatConnection then heartbeatConnection:Disconnect() end
-
-    heartbeatConnection = runService.Heartbeat:Connect(function()
-        if not ghostModeEnabled or not char:IsDescendantOf(workspace) then
-            if heartbeatConnection then heartbeatConnection:Disconnect() end
-            return
-        end
-        
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") and part.Name ~= "FakeTorso" then
-                part.CanTouch = false 
-                part.Transparency = 1 
-                
-                if part.Name == "HumanoidRootPart" then
-                    part.CanCollide = true 
-                else
-                    part.CanCollide = false 
-                end
-            end
-        end
-        
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.WalkSpeed = 50 
-            hum.Health = hum.MaxHealth
-            hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-            if hum:GetState() == Enum.HumanoidStateType.Dead then
-                hum:ChangeState(Enum.HumanoidStateType.Running)
-            end
-        end
-    end)
-end
-
-player.CharacterAdded:Connect(function(newChar)
-    if ghostModeEnabled then
-        task.wait(0.5)
-        setupGhostMode(newChar)
-    end
-end)
-
-local Toggle = Tab:CreateToggle({
-   Name = "Semi god mode",
-   CurrentValue = false,
-   Flag = "ToggleGhostMode", 
-   Callback = function(Value)
-        ghostModeEnabled = Value
-        
-        if ghostModeEnabled then
-            
-            if player.Character then 
-                setupGhostMode(player.Character) 
-            end
-            print("Ghost Mode: ACTIVATED")
-        else
-            
-            if heartbeatConnection then heartbeatConnection:Disconnect() end
-            if player.Character then 
-                disableGhostMode(player.Character) 
-            end
-            print("Ghost Mode: DEACTIVATED")
-        end
-   end,
+        end)
+    end,
 })
