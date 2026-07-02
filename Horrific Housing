@@ -1,11 +1,5 @@
---// Horrific Housing | Refactored
---// Original by @611v - corex
---// Refactor by ChatGPT
-
--- Rayfield
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Window
 local Window = Rayfield:CreateWindow({
     Name = "Crytpon 有   | Horrific Housing",
     LoadingTitle = "Loading...",
@@ -18,7 +12,6 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
--- Utils
 local function getHRP()
     return (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait())
         :WaitForChild("HumanoidRootPart")
@@ -592,4 +585,60 @@ TeleportTab:CreateButton({
                 TargetPlayer.Character.HumanoidRootPart.CFrame
         end
     end,
+})
+
+TeleportTab:CreateButton({
+    Name = "Teleport to End of Obby",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local root = character:WaitForChild("HumanoidRootPart")
+
+        local victoryPart
+
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and obj.Name == "Victory2" then
+                victoryPart = obj
+                break
+            end
+        end
+
+        if victoryPart then
+            root.CFrame = victoryPart.CFrame
+        end
+    end
+})
+
+local PlayerTab = Window:CreateTab("Player", 7992557358)
+
+PlayerTab:CreateSection("Player Settings")
+
+PlayerTab:CreateInput({
+    Name = "Speed",
+    CurrentValue = "",
+    PlaceholderText = "Enter the speed",
+    RemoveTextAfterFocusLost = false,
+    Flag = "SpeedInput",
+
+    Callback = function(text)
+        local player = game.Players.LocalPlayer
+        local humanoid = (player.Character or player.CharacterAdded:Wait()):WaitForChild("Humanoid")
+
+        humanoid.WalkSpeed = tonumber(text) or 16
+    end
+})
+
+PlayerTab:CreateInput({
+    Name = "JumpPower",
+    CurrentValue = "",
+    PlaceholderText = "Enter the JumpPower",
+    RemoveTextAfterFocusLost = false,
+    Flag = "JumpInput",
+
+    Callback = function(text)
+        local player = game.Players.LocalPlayer
+        local humanoid = (player.Character or player.CharacterAdded:Wait()):WaitForChild("Humanoid")
+
+        humanoid.JumpPower = tonumber(text) or 50
+    end
 })
