@@ -670,3 +670,31 @@ PlayerTab:CreateToggle({
         end)
     end,
 })
+
+_G.InfJumpEnabled = false
+
+local UserInputService = game:GetService("UserInputService")
+UserInputService.JumpRequest:Connect(function()
+    if _G.InfJumpEnabled then
+        local Player = game:GetService("Players").LocalPlayer
+        if Player and Player.Character and Player.Character:FindFirstChildOfClass("Humanoid") then
+            Player.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end
+    end
+end)
+
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Inf Jump",
+   CurrentValue = false,
+   Flag = "InfJumpToggle", 
+   Callback = function(Value)
+      _G.InfJumpEnabled = Value
+      
+      Rayfield:Notify({
+         Title = "Infinite Jump",
+         Content = Value and "Đã BẬT trạng thái nhảy vô hạn!" or "Đã TẮT trạng thái nhảy vô hạn!",
+         Duration = 2,
+         Image = 4483362458,
+      })
+   end,
+})
