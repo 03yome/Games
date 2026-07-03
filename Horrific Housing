@@ -339,6 +339,82 @@ AntiTab:CreateToggle({
     end,
 })
 
+AntiTab:CreateButton({
+    Name = "Anti-Lag",
+    Callback = function()
+        local game = game
+        local Workspace = game.Workspace
+        local Lighting = game.Lighting
+        local Terrain = Workspace.Terrain
+
+        -- Terrain
+        Terrain.WaterWaveSize = 0
+        Terrain.WaterWaveSpeed = 0
+        Terrain.WaterReflectance = 0
+        Terrain.WaterTransparency = 0
+
+        -- Lighting
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 0
+        Lighting.EnvironmentDiffuseScale = 0.5
+        Lighting.EnvironmentSpecularScale = 0.5
+
+        pcall(function()
+            settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        end)
+
+        -- Giảm hiệu ứng toàn game
+        for _, obj in ipairs(game:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
+                obj.CastShadow = false
+
+                if obj:IsA("MeshPart") then
+                    obj.CollisionFidelity = Enum.CollisionFidelity.Box
+                    pcall(function()
+                        obj.TextureID = ""
+                        obj.MeshId = ""
+                    end)
+                end
+
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj.Transparency = 1
+
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                obj.Lifetime = NumberRange.new(0)
+
+            elseif obj:IsA("Explosion") then
+                obj.BlastPressure = 1
+                obj.BlastRadius = 1
+
+            elseif obj:IsA("Fire")
+                or obj:IsA("Smoke")
+                or obj:IsA("SpotLight")
+                or obj:IsA("SurfaceLight")
+                or obj:IsA("PointLight") then
+                obj.Enabled = false
+            end
+        end
+
+        for _, effect in ipairs(Lighting:GetChildren()) do
+            if effect:IsA("BlurEffect")
+            or effect:IsA("BloomEffect")
+            or effect:IsA("SunRaysEffect")
+            or effect:IsA("ColorCorrectionEffect")
+            or effect:IsA("DepthOfFieldEffect") then
+                effect.Enabled = false
+            end
+        end
+
+        local Debris = game:GetService("Debris")
+        if Debris.MaxItems > 40000 then
+            Debris.MaxItems = math.floor(Debris.MaxItems * 0.75)
+        end
+    end,
+})
+
 --━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -- TROLL
 --━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
