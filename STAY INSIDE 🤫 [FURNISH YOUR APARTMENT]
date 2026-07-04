@@ -1,3 +1,5 @@
+-----workspace:WaitForChild("Items"):WaitForChild("Banana"):WaitForChild("Store"):FireServer()------
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
