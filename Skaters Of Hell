@@ -372,3 +372,60 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("AddBoost"):FireServer(unpack(args))
    end,
 })
+
+local Tab = Window:CreateTab("Boosts", 4483362458)
+
+local Button = Tab:CreateButton({
+   Name = "Shield",
+   Callback = function()
+local args = {
+	"Shield",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyPP"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Jump",
+   Callback = function()
+local args = {
+	"Jump",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyPP"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Fog",
+   Callback = function()
+local args = {
+	"Fog",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyPP"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Time",
+   Callback = function()
+local args = {
+	"Time",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyPP"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Coins",
+   Callback = function()
+local args = {
+	"Coins",
+	0
+}
+game:GetService("ReplicatedStorage"):WaitForChild("BuyPP"):FireServer(unpack(args))
+   end,
+})
