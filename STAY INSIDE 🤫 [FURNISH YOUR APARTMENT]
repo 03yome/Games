@@ -116,7 +116,7 @@ local Toggle = Tab:CreateToggle({
                   :WaitForChild("Health")
                   :FireServer(unpack(args))
 
-               task.wait(0.1) -- chỉnh tốc độ spam tại đây
+               task.wait(0.1)
             end
          end)
       end
@@ -152,24 +152,21 @@ local Input = Tab:CreateInput({
 
 local Dropdown = Tab:CreateDropdown({
    Name = "Select Elevator Floor",
-   Options = {"Tầng 10", "Tầng 8", "Tầng G"}, -- Đã thêm Tầng 8 vào đây
+   Options = {"Tầng 10", "Tầng 8", "Tầng G"},
    CurrentOption = {"Tầng G"}, 
    MultipleOptions = false,
    Flag = "DropdownElevator", 
    Callback = function(Options)
        local selected = Options[1]
        
-       -- Kiểm tra nếu chọn "Tầng 10"
        if selected == "Tầng 10" then
            local args = { "10" }
            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
        
-       -- Kiểm tra nếu chọn "Tầng 8"
        elseif selected == "Tầng 8" then
            local args = { "8" }
            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
        
-       -- Kiểm tra nếu chọn "Tầng G"
        elseif selected == "Tầng G" then
            local args = { "G" }
            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
@@ -186,5 +183,47 @@ if fallDmgScript then
     fallDmgScript.Disabled = true
     print("Đã vô hiệu hóa FallDmg thành công!")
 end
+   end,
+})
+
+local autoReviveConnection = nil
+
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Respawn",
+   CurrentValue = false,
+   Flag = "AutoDeathRevive1", 
+   Callback = function(Value)
+        _G.AutoRevive = Value
+
+        if Value then
+            local function checkAndRevive(character)
+                local humanoid = character:WaitForChild("Humanoid", 5)
+                if humanoid then
+                    autoReviveConnection = humanoid.HealthChanged:Connect(function(health)
+                        if health <= 0 and _G.AutoRevive then
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("DeathRevive"):FireServer()
+                        end
+                    end)
+                end
+            end
+
+            local localPlayer = game.Players.LocalPlayer
+            if localPlayer.Character then
+                checkAndRevive(localPlayer.Character)
+            end
+
+            localPlayer.CharacterAdded:Connect(function(newCharacter)
+                if _G.AutoRevive then
+                    if autoReviveConnection then autoReviveConnection:Disconnect() end
+                    checkAndRevive(newCharacter)
+                end
+            end)
+
+        else
+            if autoReviveConnection then
+                autoReviveConnection:Disconnect()
+                autoReviveConnection = nil
+            end
+        end
    end,
 })
