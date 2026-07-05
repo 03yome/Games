@@ -1,143 +1,129 @@
 --[=[
-    INDEPENDENT SCRIPT HUB V4 (DIRECT FIRESERVER VERSION)
-    - Giữ nguyên gốc các lệnh FireServer() bình thường.
-    - Có nút Rút gọn [-] và Xóa hẳn [X] trên thanh tiêu đề.
+    INDEPENDENT SCRIPT HUB V4 + TOOL MANAGER HUB V5 COMBINED
+    - Tự động quét ReplicatedStorage tìm Tools.
+    - Nhập sẵn danh sách Combo trong mã nguồn (Bỏ TextBox, kéo dài nút Nhận Combo).
+    - Có đầy đủ các nút kỹ năng gọi từ FireServer().
 --]=]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local player = Players.LocalPlayer
 
--- Xóa GUI cũ nếu đang chạy lại script
+-- =========================================================================
+-- 1. KÍCH HOẠT SCRIPT HUB V4 (CÁC NÚT CHIÊU THỨC / FIRESERVER)
+-- =========================================================================
+
 if CoreGui:FindFirstChild("FreeScriptHubV4") then
     CoreGui.FreeScriptHubV4:Destroy()
 end
 
--- ==========================================
--- GIAO DIỆN GUI ĐỘC LẬP
--- ==========================================
+local screenGui1 = Instance.new("ScreenGui")
+screenGui1.Name = "FreeScriptHubV4"
+screenGui1.Parent = CoreGui
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "FreeScriptHubV4"
-screenGui.Parent = CoreGui
+local mainFrame1 = Instance.new("Frame")
+mainFrame1.Size = UDim2.new(0, 250, 0, 330)
+mainFrame1.Position = UDim2.new(0.05, 0, 0.25, 0)
+mainFrame1.BackgroundColor3 = Color3.fromRGB(30, 25, 40)
+mainFrame1.BorderSizePixel = 0
+mainFrame1.Active = true
+mainFrame1.Draggable = true
+mainFrame1.Parent = screenGui1
 
--- Khung chính của Script Hub
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 250, 0, 330)
-mainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 25, 40)
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
+local mainCorner1 = Instance.new("UICorner")
+mainCorner1.CornerRadius = UDim.new(0, 10)
+mainCorner1.Parent = mainFrame1
 
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
-mainCorner.Parent = mainFrame
+local topBar1 = Instance.new("Frame")
+topBar1.Size = UDim2.new(1, 0, 0, 35)
+topBar1.BackgroundTransparency = 1
+topBar1.Parent = mainFrame1
 
--- Thanh Tiêu Đề (Top Bar)
-local topBar = Instance.new("Frame")
-topBar.Size = UDim2.new(1, 0, 0, 35)
-topBar.BackgroundTransparency = 1
-topBar.Parent = mainFrame
+local titleLabel1 = Instance.new("TextLabel")
+titleLabel1.Size = UDim2.new(1, -70, 1, 0)
+titleLabel1.Position = UDim2.new(0, 12, 0, 0)
+titleLabel1.BackgroundTransparency = 1
+titleLabel1.Text = "🚀 CUSTOM HUB"
+titleLabel1.TextColor3 = Color3.fromRGB(180, 130, 255)
+titleLabel1.Font = Enum.Font.SourceSansBold
+titleLabel1.TextSize = 15
+titleLabel1.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel1.Parent = topBar1
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -70, 1, 0)
-titleLabel.Position = UDim2.new(0, 12, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "🚀 CUSTOM HUB"
-titleLabel.TextColor3 = Color3.fromRGB(180, 130, 255)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 15
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.Parent = topBar
+local closeButton1 = Instance.new("TextButton")
+closeButton1.Size = UDim2.new(0, 22, 0, 22)
+closeButton1.Position = UDim2.new(1, -28, 0, 6)
+closeButton1.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+closeButton1.Text = "X"
+closeButton1.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton1.Font = Enum.Font.SourceSansBold
+closeButton1.TextSize = 12
+closeButton1.Parent = topBar1
 
--- Nút Xóa hẳn GUI (Close)
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 22, 0, 22)
-closeButton.Position = UDim2.new(1, -28, 0, 6)
-closeButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.TextSize = 12
-closeButton.Parent = topBar
+local closeCorner1 = Instance.new("UICorner")
+closeCorner1.CornerRadius = UDim.new(0, 5)
+closeCorner1.Parent = closeButton1
 
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 5)
-closeCorner.Parent = closeButton
+local minimizeButton1 = Instance.new("TextButton")
+minimizeButton1.Size = UDim2.new(0, 22, 0, 22)
+minimizeButton1.Position = UDim2.new(1, -55, 0, 6)
+minimizeButton1.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
+minimizeButton1.Text = "-"
+minimizeButton1.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton1.Font = Enum.Font.SourceSansBold
+minimizeButton1.TextSize = 14
+minimizeButton1.Parent = topBar1
 
--- NÚT RÚT GỌN GUI (MINIMIZE)
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0, 22, 0, 22)
-minimizeButton.Position = UDim2.new(1, -55, 0, 6)
-minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
-minimizeButton.Text = "-"
-minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.Font = Enum.Font.SourceSansBold
-minimizeButton.TextSize = 14
-minimizeButton.Parent = topBar
+local miniCorner1 = Instance.new("UICorner")
+miniCorner1.CornerRadius = UDim.new(0, 5)
+miniCorner1.Parent = minimizeButton1
 
-local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(0, 5)
-miniCorner.Parent = minimizeButton
+local contentFrame1 = Instance.new("Frame")
+contentFrame1.Size = UDim2.new(1, 0, 1, -35)
+contentFrame1.Position = UDim2.new(0, 0, 0, 35)
+contentFrame1.BackgroundTransparency = 1
+contentFrame1.Parent = mainFrame1
 
--- Khung chứa nội dung (Để ẩn/hiện khi rút gọn)
-local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, 0, 1, -35)
-contentFrame.Position = UDim2.new(0, 0, 0, 35)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = mainFrame
+local scrollFrame1 = Instance.new("ScrollingFrame")
+scrollFrame1.Size = UDim2.new(1, -20, 1, -15)
+scrollFrame1.Position = UDim2.new(0, 10, 0, 5)
+scrollFrame1.BackgroundTransparency = 1
+scrollFrame1.BorderSizePixel = 0
+scrollFrame1.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame1.ScrollBarThickness = 4
+scrollFrame1.Parent = contentFrame1
 
--- Khung chứa danh sách nút (Có cuộn chuột)
-local scrollFrame = Instance.new("ScrollingFrame")
-scrollFrame.Size = UDim2.new(1, -20, 1, -15)
-scrollFrame.Position = UDim2.new(0, 10, 0, 5)
-scrollFrame.BackgroundTransparency = 1
-scrollFrame.BorderSizePixel = 0
-scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollFrame.ScrollBarThickness = 4
-scrollFrame.Parent = contentFrame
+local uiLayout1 = Instance.new("UIListLayout")
+uiLayout1.Parent = scrollFrame1
+uiLayout1.Padding = UDim.new(0, 8)
 
-local uiLayout = Instance.new("UIListLayout")
-uiLayout.Parent = scrollFrame
-uiLayout.Padding = UDim.new(0, 8)
-
--- Tự động căn chỉnh kích thước cuộn
-uiLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, uiLayout.AbsoluteContentSize.Y + 10)
+uiLayout1:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrollFrame1.CanvasSize = UDim2.new(0, 0, 0, uiLayout1.AbsoluteContentSize.Y + 10)
 end)
 
--- ==========================================
--- LOGIC ĐÓNG / RÚT GỌN GUI
--- ==========================================
-
-closeButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
+closeButton1.MouseButton1Click:Connect(function()
+    screenGui1:Destroy()
 end)
 
-local isMinimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    if isMinimized then
-        contentFrame.Visible = false
-        mainFrame.Size = UDim2.new(0, 250, 0, 35)
-        minimizeButton.Text = "+"
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
+local isMinimized1 = false
+minimizeButton1.MouseButton1Click:Connect(function()
+    isMinimized1 = not isMinimized1
+    if isMinimized1 then
+        contentFrame1.Visible = false
+        mainFrame1.Size = UDim2.new(0, 250, 0, 35)
+        minimizeButton1.Text = "+"
+        minimizeButton1.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
     else
-        mainFrame.Size = UDim2.new(0, 250, 0, 330)
-        contentFrame.Visible = true
-        minimizeButton.Text = "-"
-        minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
+        mainFrame1.Size = UDim2.new(0, 250, 0, 330)
+        contentFrame1.Visible = true
+        minimizeButton1.Text = "-"
+        minimizeButton1.BackgroundColor3 = Color3.fromRGB(60, 55, 70)
     end
 end)
 
-
--- ==========================================
--- NƠI TỰ DO THÊM NÚT VÀ SCRIPT KÍCH HOẠT
--- ==========================================
 local function AddScriptButton(buttonName, buttonColor, customFunction)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, -5, 0, 35)
@@ -146,7 +132,7 @@ local function AddScriptButton(buttonName, buttonColor, customFunction)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.SourceSansBold
     btn.TextSize = 14
-    btn.Parent = scrollFrame
+    btn.Parent = scrollFrame1
 
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 5)
@@ -156,151 +142,104 @@ local function AddScriptButton(buttonName, buttonColor, customFunction)
     btn.MouseButton1Click:Connect(function()
         if not canClick then return end
         canClick = false
-        
         local oldColor = btn.BackgroundColor3
         btn.BackgroundColor3 = Color3.fromRGB(oldColor.R * 100, oldColor.G * 100, oldColor.B * 100)
-        
         task.spawn(customFunction) 
-        
         task.wait(0.3)
         btn.BackgroundColor3 = oldColor
         canClick = true
     end)
 end
 
----------------------------------------------------------
--- CÁC NÚT KỸ NĂNG BÌNH THƯỜNG CỦA BẠN
----------------------------------------------------------
+-- Thêm các nút chức năng gọi Server Remotes
+AddScriptButton("🎲 Idle Death Gamble", Color3.fromRGB(46, 139, 87), function()
+    game:GetService("ReplicatedStorage").Remotes.Hakari.Ult.IdleDeathGamble:FireServer()
+end)
 
--- Nút số 1: Hakari Ult
-AddScriptButton(
-    "🎲 Idle Death Gamble", 
-    Color3.fromRGB(46, 139, 87), 
-    function()
-        game:GetService("ReplicatedStorage").Remotes.Hakari.Ult.IdleDeathGamble:FireServer()
-    end
-)
+AddScriptButton("🎰 Gamble", Color3.fromRGB(70, 130, 180), function()
+    game:GetService("ReplicatedStorage").Asset.Hakari.Rotation.RotationRemote:FireServer()
+end)
 
--- Nút số 2: Hakari Gamble
-AddScriptButton(
-    "🎰 Gamble", 
-    Color3.fromRGB(70, 130, 180), 
-    function()
-        game:GetService("ReplicatedStorage").Asset.Hakari.Rotation.RotationRemote:FireServer()
-    end
-)
+AddScriptButton("💀 Perfection", Color3.fromRGB(120, 50, 150), function()
+    game:GetService("ReplicatedStorage").Remotes.Mahito.Perfection:FireServer()
+end)
 
--- Nút số 3: Mahito Perfection
-AddScriptButton(
-    "💀 Perfection", 
-    Color3.fromRGB(120, 50, 150), 
-    function()
-        game:GetService("ReplicatedStorage").Remotes.Mahito.Perfection:FireServer()
-    end
-)
+AddScriptButton("gojo", Color3.fromRGB(120, 50, 150), function()
+    game:GetService("ReplicatedStorage").Remotes.Gojo:FindFirstChild("gojo ult"):FireServer()
+end)
 
--- Nút số 4: Gojo ult
-AddScriptButton(
-    "gojo", 
-    Color3.fromRGB(120, 50, 150), 
-    function()
-        game:GetService("ReplicatedStorage").Remotes.Gojo:FindFirstChild("gojo ult"):FireServer()
-   end
-)
+AddScriptButton("TimeCellMoonPalace", Color3.fromRGB(130, 50, 150), function()
+    game:GetService("ReplicatedStorage").Remotes.Naoya.NaoyaUlt.TimeCellMoonPalace:FireServer()
+end)
 
-AddScriptButton(
-   "TimeCellMoonPalace", 
-    Color3.fromRGB(130, 50, 150), 
-    function()
-game:GetService("ReplicatedStorage").Remotes.Naoya.NaoyaUlt.TimeCellMoonPalace:FireServer()
-   end
-)
+AddScriptButton("BodyRepel", Color3.fromRGB(110, 50, 150), function()
+    game:GetService("ReplicatedStorage").Remotes.Mahito.Base.BodyRepel:FireServer()
+end)
 
-AddScriptButton(
-   "BodyRepel", 
-    Color3.fromRGB(110, 50, 150), 
-    function()
-game:GetService("ReplicatedStorage").Remotes.Mahito.Base.BodyRepel:FireServer()
-   end
-)
 
---[=[
-    ADVANCED TOOL MANAGER HUB V5 (AUTO-SCAN SYSTEM)
-    - Tự động quét toàn bộ ReplicatedStorage để tìm Tool (Sửa lỗi không hiển thị đồ).
-    - Giữ nguyên cơ chế bypass server, sửa lỗi kẹt cooldown.
---]=]
+-- =========================================================================
+-- 2. KÍCH HOẠT TOOL MANAGER HUB V5 (TỰ ĐỘNG QUÉT + COMBO KHÔNG TEXTBOX)
+-- =========================================================================
 
-if not game:IsLoaded() then game.Loaded:Wait() end
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-
-local player = Players.LocalPlayer
-
--- Xóa GUI cũ để tránh trùng lặp
 if CoreGui:FindFirstChild("RobloxToolHubV5") then
     CoreGui.RobloxToolHubV5:Destroy()
 end
 
--- ==========================================
--- GIAO DIỆN GUI CHÍNH
--- ==========================================
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RobloxToolHubV5"
-screenGui.Parent = CoreGui
+local screenGui2 = Instance.new("ScreenGui")
+screenGui2.Name = "RobloxToolHubV5"
+screenGui2.Parent = CoreGui
 
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 500, 0, 410)
-mainFrame.Position = UDim2.new(0, 30, 0, 30) -- Đặt lệch góc trên bên trái để không che màn hình chính
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
+local mainFrame2 = Instance.new("Frame")
+mainFrame2.Size = UDim2.new(0, 500, 0, 410)
+mainFrame2.Position = UDim2.new(0, 30, 0, 30) -- Tránh che khung số 1
+mainFrame2.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+mainFrame2.Active = true
+mainFrame2.Draggable = true
+mainFrame2.Parent = screenGui2
 
-local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
-mainCorner.Parent = mainFrame
+local mainCorner2 = Instance.new("UICorner")
+mainCorner2.CornerRadius = UDim.new(0, 10)
+mainCorner2.Parent = mainFrame2
 
-local topBar = Instance.new("Frame")
-topBar.Size = UDim2.new(1, 0, 0, 35)
-topBar.BackgroundTransparency = 1
-topBar.Parent = mainFrame
+local topBar2 = Instance.new("Frame")
+topBar2.Size = UDim2.new(1, 0, 0, 35)
+topBar2.BackgroundTransparency = 1
+topBar2.Parent = mainFrame2
 
-local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(1, -70, 1, 0)
-titleLabel.Position = UDim2.new(0, 15, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.Text = "⚡ TOOL MANAGER HUB V5 (AUTO-SCAN) ⚡"
-titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextSize = 15
-titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-titleLabel.Parent = topBar
+local titleLabel2 = Instance.new("TextLabel")
+titleLabel2.Size = UDim2.new(1, -70, 1, 0)
+titleLabel2.Position = UDim2.new(0, 15, 0, 0)
+titleLabel2.BackgroundTransparency = 1
+titleLabel2.Text = "⚡ TOOL MANAGER HUB V5 (AUTO-SCAN) ⚡"
+titleLabel2.TextColor3 = Color3.fromRGB(255, 215, 0)
+titleLabel2.Font = Enum.Font.SourceSansBold
+titleLabel2.TextSize = 15
+titleLabel2.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel2.Parent = topBar2
 
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 25, 0, 25)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.SourceSansBold
-closeButton.Parent = topBar
+local closeButton2 = Instance.new("TextButton")
+closeButton2.Size = UDim2.new(0, 25, 0, 25)
+closeButton2.Position = UDim2.new(1, -35, 0, 5)
+closeButton2.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+closeButton2.Text = "X"
+closeButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton2.Font = Enum.Font.SourceSansBold
+closeButton2.Parent = topBar2
 
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0, 25, 0, 25)
-minimizeButton.Position = UDim2.new(1, -65, 0, 5)
-minimizeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
-minimizeButton.Text = "-"
-minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.Font = Enum.Font.SourceSansBold
-minimizeButton.Parent = topBar
+local minimizeButton2 = Instance.new("TextButton")
+minimizeButton2.Size = UDim2.new(0, 25, 0, 25)
+minimizeButton2.Position = UDim2.new(1, -65, 0, 5)
+minimizeButton2.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+minimizeButton2.Text = "-"
+minimizeButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton2.Font = Enum.Font.SourceSansBold
+minimizeButton2.Parent = topBar2
 
-local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(1, 0, 1, -35)
-contentFrame.Position = UDim2.new(0, 0, 0, 35)
-contentFrame.BackgroundTransparency = 1
-contentFrame.Parent = mainFrame
+local contentFrame2 = Instance.new("Frame")
+contentFrame2.Size = UDim2.new(1, 0, 1, -35)
+contentFrame2.Position = UDim2.new(0, 0, 0, 35)
+contentFrame2.BackgroundTransparency = 1
+contentFrame2.Parent = mainFrame2
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 25)
@@ -310,15 +249,14 @@ statusLabel.Text = "Hệ thống: Đang khởi tạo quét..."
 statusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 statusLabel.Font = Enum.Font.SourceSansItalic
 statusLabel.TextSize = 13
-statusLabel.Parent = contentFrame
+statusLabel.Parent = contentFrame2
 
--- Các bảng cuộn (Scroll)
 local leftScroll = Instance.new("ScrollingFrame")
 leftScroll.Size = UDim2.new(0, 230, 0, 220)
 leftScroll.Position = UDim2.new(0, 15, 0, 30)
 leftScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 leftScroll.ScrollBarThickness = 4
-leftScroll.Parent = contentFrame
+leftScroll.Parent = contentFrame2
 
 local leftLayout = Instance.new("UIListLayout")
 leftLayout.Parent = leftScroll
@@ -329,40 +267,43 @@ rightScroll.Size = UDim2.new(0, 230, 0, 220)
 rightScroll.Position = UDim2.new(0, 255, 0, 30)
 rightScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 rightScroll.ScrollBarThickness = 4
-rightScroll.Parent = contentFrame
+rightScroll.Parent = contentFrame2
 
 local rightLayout = Instance.new("UIListLayout")
 rightLayout.Parent = rightScroll
 rightLayout.Padding = UDim.new(0, 5)
 
--- Khung dán Combo
+-- KHUNG CHỨA NÚT COMBO (ĐÃ ĐƯỢC THAY ĐỔI)
 local comboFrame = Instance.new("Frame")
 comboFrame.Size = UDim2.new(1, -30, 0, 65)
 comboFrame.Position = UDim2.new(0, 15, 0, 260)
 comboFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 comboFrame.Parent = contentFrame
 
-local comboTextBox = Instance.new("TextBox")
-comboTextBox.Size = UDim2.new(1, -110, 0, 35)
-comboTextBox.Position = UDim2.new(0, 5, 0, 20)
-comboTextBox.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-comboTextBox.Text = "tight hold,full throttle,inertia,every last drop,dial up,critical point,hard grip,twister,carpet bomb,spinning cyclone,suplex,lapse pull,slicing exorcism,bland passion,Boogie Woogie"
-comboTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-comboTextBox.ClearTextOnFocus = false
-comboTextBox.Parent = comboFrame
-
 local comboButton = Instance.new("TextButton")
-comboButton.Size = UDim2.new(0, 95, 0, 35)
-comboButton.Position = UDim2.new(1, -100, 0, 20)
+comboButton.Size = UDim2.new(1, -10, 0, 45) -- Kéo dài ra toàn bộ chiều rộng Khung
+comboButton.Position = UDim2.new(0, 5, 0, 10)
 comboButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
-comboButton.Text = "NHẬN COMBO"
+comboButton.Text = "🔥 NHẬN COMBO (AUTO GET) 🔥"
 comboButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 comboButton.Font = Enum.Font.SourceSansBold
+comboButton.TextSize = 16
 comboButton.Parent = comboFrame
 
--- ==========================================
--- LOGIC QUÉT VÀ XỬ LÝ AN TOÀN
--- ==========================================
+local comboCorner = Instance.new("UICorner")
+comboCorner.CornerRadius = UDim.new(0, 6)
+comboCorner.Parent = comboButton
+
+-- =========================================================================
+-- 3. XỬ LÝ LOGIC QUÉT VÀ THAM CHIẾU COMBO TỪ TRONG CODE
+-- =========================================================================
+
+-- NƠI NHẬP TÊN COMBO TRỰC TIẾP TRONG SCRIPT
+local DanhSachCombo = {
+    "tight hold", "full throttle", "inertia", "every last drop", "dial up",
+    "critical point", "hard grip", "twister", "carpet bomb", "spinning cyclone",
+    "suplex", "lapse pull", "slicing exorcism", "bland passion", "Boogie Woogie"
+}
 
 local cachedSourceTools = {}
 
@@ -373,12 +314,10 @@ end
 local function SAFELY_DESTROY_TOOL(toolInstance)
     local character = player.Character
     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    
     if toolInstance.Parent == character and humanoid then
         humanoid:UnequipTools()
         task.wait(0.1)
     end
-    
     toolInstance.Name = "DELETED_TOOL" 
     toolInstance.Parent = nil
     task.wait(0.05)
@@ -395,7 +334,6 @@ local function GIVE_TOOL_SAFE(originalTool)
     if not alreadyHas then
         local clone = originalTool:Clone()
         clone.Parent = backpack
-        
         task.spawn(function()
             local char = player.Character
             local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -410,19 +348,16 @@ local function GIVE_TOOL_SAFE(originalTool)
     return false
 end
 
--- TỰ ĐỘNG QUÉT TOÀN BỘ GAME ĐỂ TÌM TOOL (KHÔNG PHỤ THUỘC TÊN THƯ MỤC CŨ)
 local function AutoScanGameTools()
     for _, child in ipairs(leftScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
     cachedSourceTools = {}
     
-    -- Dùng GetDescendants() để lục tung toàn bộ thư mục con trong ReplicatedStorage
     local allItems = ReplicatedStorage:GetDescendants()
     local foundCount = 0
 
     for _, item in ipairs(allItems) do
         if item:IsA("Tool") then
             local lowerName = string.lower(item.Name)
-            -- Tránh lấy trùng các tool có tên giống nhau ở nhiều chỗ
             if not cachedSourceTools[lowerName] then
                 cachedSourceTools[lowerName] = item
                 foundCount = foundCount + 1
@@ -430,7 +365,6 @@ local function AutoScanGameTools()
         end
     end
 
-    -- Đưa danh sách đã quét được lên UI
     for _, originalTool in pairs(cachedSourceTools) do
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1, -10, 0, 30)
@@ -456,7 +390,6 @@ local function AutoScanGameTools()
     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 255)
 end
 
--- ĐỒNG BỘ TÚI ĐỒ (BÊN PHẢI)
 local function UpdateBackpackUI()
     for _, child in ipairs(rightScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
     local backpack = player:FindFirstChildOfClass("Backpack")
@@ -484,38 +417,44 @@ local function UpdateBackpackUI()
     updateScrollCanvas(rightScroll, rightLayout)
 end
 
--- SỰ KIỆN COMBO TOOL
+-- LOGIC KHI ẤN NÚT "NHẬN COMBO" (QUÉT MẢNG DANH SÁCH TRONG CODE)
 comboButton.MouseButton1Click:Connect(function()
-    local text = comboTextBox.Text
-    if text == "" then return end
     local count = 0
-    for part in string.gmatch(text, "[^,]+") do
-        local name = string.match(part, "^%s*(.-)%s*$")
-        local target = cachedSourceTools[string.lower(name)]
-        if target and GIVE_TOOL_SAFE(target) then count = count + 1 end
+    for _, name in ipairs(DanhSachCombo) do
+        local cleanName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
+        local target = cachedSourceTools[cleanName]
+        if target and GIVE_TOOL_SAFE(target) then 
+            count = count + 1 
+        end
     end
-    statusLabel.Text = "Hệ thống: Đã nạp thành công combo (" .. count .. " món mới)!"
+    statusLabel.Text = "Hệ thống: Đã nhận combo trong code (" .. count .. " món mới)!"
     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
 end)
 
--- NÚT THU NHỎ / ĐÓNG
-closeButton.MouseButton1Click:Connect(function() screenGui:Destroy() end)
-local isMinimized = false
-minimizeButton.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    if isMinimized then contentFrame.Visible = false mainFrame.Size = UDim2.new(0, 500, 0, 35) minimizeButton.Text = "+"
-    else mainFrame.Size = UDim2.new(0, 500, 0, 410) contentFrame.Visible = true minimizeButton.Text = "-" end
+closeButton2.MouseButton1Click:Connect(function() screenGui2:Destroy() end)
+local isMinimized2 = false
+minimizeButton2.MouseButton1Click:Connect(function()
+    isMinimized2 = not isMinimized2
+    if isMinimized2 then 
+        contentFrame2.Visible = false 
+        mainFrame2.Size = UDim2.new(0, 500, 0, 35) 
+        minimizeButton2.Text = "+"
+    else 
+        mainFrame2.Size = UDim2.new(0, 500, 0, 410) 
+        contentFrame2.Visible = true 
+        minimizeButton2.Text = "-" 
+    end
 end)
 
--- BỘ LẮNG NGHE ĐỒNG BỘ
 local function SetupListeners()
     local bk = player:WaitForChild("Backpack", 5)
     if bk then bk.ChildAdded:Connect(UpdateBackpackUI) bk.ChildRemoved:Connect(UpdateBackpackUI) end
     if player.Character then player.Character.ChildAdded:Connect(UpdateBackpackUI) player.Character.ChildRemoved:Connect(UpdateBackpackUI) end
     UpdateBackpackUI()
 end
+
 player.CharacterAdded:Connect(function(char) task.wait(0.5) SetupListeners() end)
 
--- CHẠY HỆ THỐNG
+-- KHỞI CHẠY HỆ THỐNG
 AutoScanGameTools()
 SetupListeners()
