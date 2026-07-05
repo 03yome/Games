@@ -1,8 +1,9 @@
 --[=[
-    INDEPENDENT SCRIPT HUB V4 + TOOL MANAGER HUB V5 COMBINED
+    INDEPENDENT SCRIPT HUB V4 + TOOL MANAGER HUB V5 COMBINED (CUSTOM BOOGIE WOOGIE)
     - Tự động quét ReplicatedStorage tìm Tools.
-    - Nhập sẵn danh sách Combo trong mã nguồn (Bỏ TextBox, kéo dài nút Nhận Combo).
+    - Nhập sẵn danh sách Combo trong mã nguồn (Bỏ TextBox, nút Combo dài).
     - Có đầy đủ các nút kỹ năng gọi từ FireServer().
+    - ĐẶC BIỆT: Khi nạp combo có "Boogie Woogie", tự tạo Tool ảo kích hoạt Remote của Todo khi click chuột!
 --]=]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -273,7 +274,7 @@ local rightLayout = Instance.new("UIListLayout")
 rightLayout.Parent = rightScroll
 rightLayout.Padding = UDim.new(0, 5)
 
--- KHUNG CHỨA NÚT COMBO (ĐÃ ĐƯỢC THAY ĐỔI)
+-- KHUNG CHỨA NÚT COMBO
 local comboFrame = Instance.new("Frame")
 comboFrame.Size = UDim2.new(1, -30, 0, 65)
 comboFrame.Position = UDim2.new(0, 15, 0, 260)
@@ -281,7 +282,7 @@ comboFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 comboFrame.Parent = contentFrame
 
 local comboButton = Instance.new("TextButton")
-comboButton.Size = UDim2.new(1, -10, 0, 45) -- Kéo dài ra toàn bộ chiều rộng Khung
+comboButton.Size = UDim2.new(1, -10, 0, 45)
 comboButton.Position = UDim2.new(0, 5, 0, 10)
 comboButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
 comboButton.Text = "🔥 NHẬN COMBO (AUTO GET) 🔥"
@@ -298,7 +299,6 @@ comboCorner.Parent = comboButton
 -- 3. XỬ LÝ LOGIC QUÉT VÀ THAM CHIẾU COMBO TỪ TRONG CODE
 -- =========================================================================
 
--- NƠI NHẬP TÊN COMBO TRỰC TIẾP TRONG SCRIPT
 local DanhSachCombo = {
     "tight hold", "full throttle", "inertia", "every last drop", "dial up",
     "critical point", "hard grip", "twister", "carpet bomb", "spinning cyclone",
@@ -348,6 +348,32 @@ local function GIVE_TOOL_SAFE(originalTool)
     return false
 end
 
+-- HÀM TẠO TOOL ẢO BOOGIE WOOGIE KHI CÓ TRONG COMBO
+local function CreateCustomBoogieWoogieTool()
+    local backpack = player:FindFirstChildOfClass("Backpack")
+    if not backpack then return false end
+    
+    -- Kiểm tra xem người chơi đã có tool ảo này chưa
+    if backpack:FindFirstChild("Boogie Woogie") or (player.Character and player.Character:FindFirstChild("Boogie Woogie")) then
+        return false
+    end
+    
+    local customTool = Instance.new("Tool")
+    customTool.Name = "Boogie Woogie"
+    customTool.RequiresHandle = false -- Không cần bộ phận cầm nắm (Handle) vật lý
+    customTool.ToolTip = "Sử dụng để kích hoạt Boogie Woogie Remote"
+    
+    -- Lắng nghe sự kiện kích hoạt khi người chơi cầm tool và click chuột trái
+    customTool.Activated:Connect(function()
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.todo.gimmick:FireServer()
+        end)
+    end)
+    
+    customTool.Parent = backpack
+    return true
+end
+
 local function AutoScanGameTools()
     for _, child in ipairs(leftScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
     cachedSourceTools = {}
@@ -375,12 +401,22 @@ local function AutoScanGameTools()
         btn.Parent = leftScroll
 
         btn.MouseButton1Click:Connect(function()
-            if GIVE_TOOL_SAFE(originalTool) then
-                statusLabel.Text = "Hệ thống: Đã lấy thành công " .. originalTool.Name
-                statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+            if originalTool.Name == "Boogie Woogie" then
+                if CreateCustomBoogieWoogieTool() then
+                    statusLabel.Text = "Hệ thống: Đã kích hoạt Tool ảo Boogie Woogie!"
+                    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+                else
+                    statusLabel.Text = "Hệ thống: Bạn đã có vũ khí này rồi!"
+                    statusLabel.TextColor3 = Color3.fromRGB(255, 150, 0)
+                end
             else
-                statusLabel.Text = "Hệ thống: Bạn đã có vũ khí này rồi!"
-                statusLabel.TextColor3 = Color3.fromRGB(255, 150, 0)
+                if GIVE_TOOL_SAFE(originalTool) then
+                    statusLabel.Text = "Hệ thống: Đã lấy thành công " .. originalTool.Name
+                    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+                else
+                    statusLabel.Text = "Hệ thống: Bạn đã có vũ khí này rồi!"
+                    statusLabel.TextColor3 = Color3.fromRGB(255, 150, 0)
+                end
             end
         end)
     end
@@ -417,17 +453,26 @@ local function UpdateBackpackUI()
     updateScrollCanvas(rightScroll, rightLayout)
 end
 
--- LOGIC KHI ẤN NÚT "NHẬN COMBO" (QUÉT MẢNG DANH SÁCH TRONG CODE)
+-- LOGIC KHI ẤN NÚT "NHẬN COMBO" (CÓ TÍCH HỢP CRAFT BOOGIE WOOGIE)
 comboButton.MouseButton1Click:Connect(function()
     local count = 0
     for _, name in ipairs(DanhSachCombo) do
         local cleanName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
-        local target = cachedSourceTools[cleanName]
-        if target and GIVE_TOOL_SAFE(target) then 
-            count = count + 1 
+        
+        if cleanName == "boogie woogie" then
+            -- Nếu trong danh sách là Boogie Woogie, kích hoạt tạo tool ảo tùy biến
+            if CreateCustomBoogieWoogieTool() then
+                count = count + 1
+            end
+        else
+            -- Các vũ khí thông thường lấy từ ReplicatedStorage
+            local target = cachedSourceTools[cleanName]
+            if target and GIVE_TOOL_SAFE(target) then 
+                count = count + 1 
+            end
         end
     end
-    statusLabel.Text = "Hệ thống: Đã nhận combo trong code (" .. count .. " món mới)!"
+    statusLabel.Text = "Hệ thống: Đã nhận combo (" .. count .. " món mới bao gồm Boogie Woogie)!"
     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
 end)
 
