@@ -501,3 +501,65 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("RewardClaimed"):FireServer(unpack(args))
    end,
 })
+
+local Section = Tab:CreateSection("Gifts")
+
+local Button = Tab:CreateButton({
+   Name = "Gift1",
+   Callback = function()
+local args = {
+	"Gift1"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gift2",
+   Callback = function()
+local args = {
+	"Gift2"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gift3",
+   Callback = function()
+local args = {
+	"Gift3"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gift4",
+   Callback = function()
+local args = {
+	"Gift4"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gift5",
+   Callback = function()
+local args = {
+	"Gift5"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Gift6",
+   Callback = function()
+local args = {
+	"Gift6"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClaimHourly"):FireServer(unpack(args))
+   end,
+})
