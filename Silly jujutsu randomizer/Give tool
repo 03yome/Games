@@ -1,7 +1,7 @@
 --[=[
-    INDEPENDENT SCRIPT HUB V4 + TOOL MANAGER HUB V5 COMBINED (CUSTOM BOOGIE WOOGIE)
+    INDEPENDENT SCRIPT HUB V4 + TOOL MANAGER HUB V5 COMBINED (FIXED COMBO BUTTON)
     - Tự động quét ReplicatedStorage tìm Tools.
-    - Nhập sẵn danh sách Combo trong mã nguồn (Bỏ TextBox, nút Combo dài).
+    - Nhập sẵn danh sách Combo trong mã nguồn (Bỏ TextBox, nút Combo to rõ ràng).
     - Có đầy đủ các nút kỹ năng gọi từ FireServer().
     - ĐẶC BIỆT: Khi nạp combo có "Boogie Woogie", tự tạo Tool ảo kích hoạt Remote của Todo khi click chuột!
 --]=]
@@ -179,7 +179,7 @@ end)
 
 
 -- =========================================================================
--- 2. KÍCH HOẠT TOOL MANAGER HUB V5 (TỰ ĐỘNG QUÉT + COMBO KHÔNG TEXTBOX)
+-- 2. KÍCH HOẠT TOOL MANAGER HUB V5 (TỰ ĐỘNG QUÉT + FIX NÚT COMBO)
 -- =========================================================================
 
 if CoreGui:FindFirstChild("RobloxToolHubV5") then
@@ -192,7 +192,7 @@ screenGui2.Parent = CoreGui
 
 local mainFrame2 = Instance.new("Frame")
 mainFrame2.Size = UDim2.new(0, 500, 0, 410)
-mainFrame2.Position = UDim2.new(0, 30, 0, 30) -- Tránh che khung số 1
+mainFrame2.Position = UDim2.new(0, 30, 0, 30)
 mainFrame2.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 mainFrame2.Active = true
 mainFrame2.Draggable = true
@@ -252,9 +252,10 @@ statusLabel.Font = Enum.Font.SourceSansItalic
 statusLabel.TextSize = 13
 statusLabel.Parent = contentFrame2
 
+-- Giảm chiều cao danh sách cuộn từ 220 xuống 210 để nhường khoảng trống cho nút Combo
 local leftScroll = Instance.new("ScrollingFrame")
-leftScroll.Size = UDim2.new(0, 230, 0, 220)
-leftScroll.Position = UDim2.new(0, 15, 0, 30)
+leftScroll.Size = UDim2.new(0, 230, 0, 210)
+leftScroll.Position = UDim2.new(0, 15, 0, 20)
 leftScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 leftScroll.ScrollBarThickness = 4
 leftScroll.Parent = contentFrame2
@@ -264,8 +265,8 @@ leftLayout.Parent = leftScroll
 leftLayout.Padding = UDim.new(0, 5)
 
 local rightScroll = Instance.new("ScrollingFrame")
-rightScroll.Size = UDim2.new(0, 230, 0, 220)
-rightScroll.Position = UDim2.new(0, 255, 0, 30)
+rightScroll.Size = UDim2.new(0, 230, 0, 210)
+rightScroll.Position = UDim2.new(0, 255, 0, 20)
 rightScroll.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 rightScroll.ScrollBarThickness = 4
 rightScroll.Parent = contentFrame2
@@ -274,25 +275,26 @@ local rightLayout = Instance.new("UIListLayout")
 rightLayout.Parent = rightScroll
 rightLayout.Padding = UDim.new(0, 5)
 
--- KHUNG CHỨA NÚT COMBO
+-- ĐỊNH VỊ LẠI KHUNG COMBO LÊN TRÊN ĐỂ TRÁNH BỊ CHE MẤT KHUẤT TẦM NHÌN
 local comboFrame = Instance.new("Frame")
-comboFrame.Size = UDim2.new(1, -30, 0, 65)
-comboFrame.Position = UDim2.new(0, 15, 0, 260)
+comboFrame.Size = UDim2.new(1, -30, 0, 55)
+comboFrame.Position = UDim2.new(0, 15, 0, 245) -- Dịch vị trí lên Y = 245 cho vừa vặn góc
 comboFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+comboFrame.BorderSizePixel = 0
 comboFrame.Parent = contentFrame
 
 local comboButton = Instance.new("TextButton")
-comboButton.Size = UDim2.new(1, -10, 0, 45)
-comboButton.Position = UDim2.new(0, 5, 0, 10)
+comboButton.Size = UDim2.new(1, 0, 1, 0) -- Chiếm trọn 100% diện tích Khung Combo
+comboButton.Position = UDim2.new(0, 0, 0, 0)
 comboButton.BackgroundColor3 = Color3.fromRGB(46, 139, 87)
-comboButton.Text = "🔥 NHẬN COMBO (AUTO GET) 🔥"
+comboButton.Text = "🔥 NHẬN COMBO (CÓ BOOGIE WOOGIE) 🔥"
 comboButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 comboButton.Font = Enum.Font.SourceSansBold
 comboButton.TextSize = 16
 comboButton.Parent = comboFrame
 
 local comboCorner = Instance.new("UICorner")
-comboCorner.CornerRadius = UDim.new(0, 6)
+comboCorner.CornerRadius = UDim.new(0, 8)
 comboCorner.Parent = comboButton
 
 -- =========================================================================
@@ -353,17 +355,15 @@ local function CreateCustomBoogieWoogieTool()
     local backpack = player:FindFirstChildOfClass("Backpack")
     if not backpack then return false end
     
-    -- Kiểm tra xem người chơi đã có tool ảo này chưa
     if backpack:FindFirstChild("Boogie Woogie") or (player.Character and player.Character:FindFirstChild("Boogie Woogie")) then
         return false
     end
     
     local customTool = Instance.new("Tool")
     customTool.Name = "Boogie Woogie"
-    customTool.RequiresHandle = false -- Không cần bộ phận cầm nắm (Handle) vật lý
+    customTool.RequiresHandle = false
     customTool.ToolTip = "Sử dụng để kích hoạt Boogie Woogie Remote"
     
-    -- Lắng nghe sự kiện kích hoạt khi người chơi cầm tool và click chuột trái
     customTool.Activated:Connect(function()
         pcall(function()
             game:GetService("ReplicatedStorage").Remotes.todo.gimmick:FireServer()
@@ -401,7 +401,7 @@ local function AutoScanGameTools()
         btn.Parent = leftScroll
 
         btn.MouseButton1Click:Connect(function()
-            if originalTool.Name == "Boogie Woogie" then
+            if string.lower(originalTool.Name) == "boogie woogie" then
                 if CreateCustomBoogieWoogieTool() then
                     statusLabel.Text = "Hệ thống: Đã kích hoạt Tool ảo Boogie Woogie!"
                     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
@@ -453,26 +453,24 @@ local function UpdateBackpackUI()
     updateScrollCanvas(rightScroll, rightLayout)
 end
 
--- LOGIC KHI ẤN NÚT "NHẬN COMBO" (CÓ TÍCH HỢP CRAFT BOOGIE WOOGIE)
+-- LOGIC NHẤN NÚT "NHẬN COMBO"
 comboButton.MouseButton1Click:Connect(function()
     local count = 0
     for _, name in ipairs(DanhSachCombo) do
         local cleanName = string.lower(string.gsub(name, "^%s*(.-)%s*$", "%1"))
         
         if cleanName == "boogie woogie" then
-            -- Nếu trong danh sách là Boogie Woogie, kích hoạt tạo tool ảo tùy biến
             if CreateCustomBoogieWoogieTool() then
                 count = count + 1
             end
         else
-            -- Các vũ khí thông thường lấy từ ReplicatedStorage
             local target = cachedSourceTools[cleanName]
             if target and GIVE_TOOL_SAFE(target) then 
                 count = count + 1 
             end
         end
     end
-    statusLabel.Text = "Hệ thống: Đã nhận combo (" .. count .. " món mới bao gồm Boogie Woogie)!"
+    statusLabel.Text = "Hệ thống: Đã nạp xong combo (" .. count .. " món mới)!"
     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
 end)
 
