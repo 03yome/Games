@@ -834,3 +834,36 @@ button.MouseButton1Click:Connect(function()
 	print("Đang kích hoạt Gimmick Remote...")
 	remote:FireServer()
 end)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Gui"
+screenGui.ResetOnSpawn = false -- Giữ giao diện không bị mất khi nhân vật hồi sinh
+screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+-- Tạo TextButton (Nút bấm)
+local button = Instance.new("TextButton")
+button.Name = "ActivatoRButton"
+
+-- Cấu hình vị trí và kích thước theo đúng yêu cầu của bạn
+button.Position = UDim2.new(0.900000036, 0, 0.200000012, 0)
+button.Size = UDim2.new(0, 50, 0, 50)
+
+-- Trang trí một chút cho nút (Bạn có thể sửa lại theo ý muốn)
+button.BackgroundColor3 = Color3.fromRGB(85, 170, 255) -- Màu đỏ
+button.Text = "Lapse" -- Chữ hiển thị trên nút
+button.TextColor3 = Color3.fromRGB(255, 255, 255) -- Chữ màu trắng
+button.TextSize = 14
+button.Font = Enum.Font.SourceSansBold
+button.BorderSizePixel = 2
+button.Archivable = true
+
+button.Parent = screenGui
+
+-- Đường dẫn tới RemoteEvent của bạn
+local remote = game:GetService("ReplicatedStorage").Remotes.Gojo.Lapsepull:FireServer()
+
+-- Sự kiện khi nhấn vào nút
+button.MouseButton1Click:Connect(function()
+	print("Đang kích hoạt Gimmick Remote...")
+	remote:FireServer()
+end)
