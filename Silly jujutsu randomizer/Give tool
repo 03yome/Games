@@ -468,7 +468,7 @@ local player = Players.LocalPlayer
 local ComboList = {
     "tight hold", "full throttle", "inertia", "every last drop", "dial up", 
     "critical point", "hard grip", "twister", "carpet bomb", "spinning cyclone", 
-    "suplex", "lapse pull", "slicing exorcism", "bland passion"
+    "suplex", "slicing exorcism", "bland passion", "piercing blood"
 }
 
 -- Xóa GUI cũ để tránh trùng lặp khi chạy lại script
