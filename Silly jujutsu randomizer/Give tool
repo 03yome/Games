@@ -864,6 +864,6 @@ local remote = game:GetService("ReplicatedStorage").Remotes.Gojo.Lapsepull:FireS
 
 -- Sự kiện khi nhấn vào nút
 button.MouseButton1Click:Connect(function()
-	print("Đang kích hoạt Gimmick Remote...")
+	print("Đang kích hoạt Lapse Remote...")
 	remote:FireServer()
 end)
