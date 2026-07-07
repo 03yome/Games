@@ -229,3 +229,44 @@ local Toggle = Tab:CreateToggle({
         end
    end,
 })
+
+local Button = Tab:CreateButton({
+   Name = "Anti Lag(Beta)",
+   Callback = function()
+local Buildings = workspace:FindFirstChild("Buildings")
+
+if Buildings then
+    print("[Anti-Lag] Đang quét cấu trúc Model và Part trong Buildings...")
+    
+    local descendants = Buildings:GetDescendants()
+    local count = 0
+
+    for _, object in ipairs(descendants) do
+        if object:IsA("Model") and object.Name == "Model" then
+            for _, subObject in ipairs(object:GetDescendants()) do
+                if subObject:IsA("Decal") or subObject:IsA("SurfaceLight") then
+                    subObject:Destroy()
+                    count = count + 1
+                end
+            end
+            
+        elseif object:IsA("BasePart") then
+            for _, child in ipairs(object:GetChildren()) do
+                if child:IsA("Decal") or child:IsA("SurfaceLight") then
+                    child:Destroy()
+                    count = count + 1
+                end
+            end
+        end
+        
+        if count % 400 == 0 then
+            task.wait()
+        end
+    end
+
+    print("[Anti-Lag] Hoàn thành! Đã dọn dẹp sạch Decal & SurfaceLight. Tổng số đã xóa: " .. tostring(count))
+else
+    warn("[Anti-Lag] Không tìm thấy thư mục 'Buildings'!")
+end
+   end,
+})
