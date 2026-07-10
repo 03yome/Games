@@ -510,12 +510,21 @@ local function createESP(npc, color)
         highlight.OutlineOpacity = 1
         highlight.Adornee = npc
         highlight.Parent = npc
-        table.insert(espObjects, highlight)
+        
+        espObjects[npc] = highlight
+        
+        local connection
+        connection = npc.AncestryChanged:Connect(function(_, parent)
+            if not parent then
+                espObjects[npc] = nil
+                if connection then connection:Disconnect() end
+            end
+        end)
     end
 end
 
 local function clearESP()
-    for _, obj in pairs(espObjects) do
+    for npc, obj in pairs(espObjects) do
         if obj and obj.Parent then
             obj:Destroy()
         end
@@ -540,9 +549,8 @@ local Toggle = Tab:AddToggle("MyToggle", {
                     local entities = workspace:FindFirstChild("Entities")
                     if entities then
                         for _, npc in pairs(entities:GetChildren()) do
-                            if npc.Name ~= "NightGuard" then
-                                local color = npcColors["Default"]
-                                createESP(npc, color)
+                            if npc:IsA("Model") and npc.Name ~= "NightGuard" then
+                                createESP(npc, npcColors["Default"])
                             end
                         end
                     end
