@@ -1,0 +1,558 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/StyearX/Fluent-Modded/releases/download/Fluent/FluentPro"))()
+
+local Window = Fluent:CreateWindow({
+    Title       = "[SAVE] Decorate the Backrooms",
+    SubTitle    = "by romd3976",
+    TabWidth    = 160,
+    Size        = UDim2.fromOffset(500, 480),
+    Acrylic     = false,
+    Theme       = "Midnight Blue",
+    MinimizeKey = Enum.KeyCode.LeftControl,
+    Search      = true,
+})
+
+local ToggleScreen = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
+local UIStroke = Instance.new("UIStroke")
+
+if game:GetService("CoreGui"):FindFirstChild("LOL") then
+    game:GetService("CoreGui").LOL:Destroy()
+end
+
+ToggleScreen.Name = "LOL"
+ToggleScreen.Parent = game:GetService("CoreGui")
+ToggleScreen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ToggleScreen
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+ToggleButton.Position = UDim2.new(0.02, 0, 0.4, 0)
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Image = "rbxassetid://1179108573" 
+
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleButton
+
+UIStroke.Color = Color3.fromRGB(96, 205, 255)
+UIStroke.Thickness = 1.5
+UIStroke.Parent = ToggleButton
+
+ToggleButton.MouseButton1Click:Connect(function()
+    Window:Minimize()
+end)
+
+local UserInputService = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPosition
+
+local function update(input)
+    local delta = input.Position - dragStart
+    ToggleButton.Position = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
+end
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPosition = ToggleButton.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+local Tab = Window:AddTab({ Title = "Main", Icon = "solar/home-bold" })
+
+Tab:AddButton({
+    Title = "Fullbright & ST",
+    Icon = "solar/map-point-bold",
+    Callback = function()
+        if not _G.FullBrightExecuted then
+
+	_G.FullBrightEnabled = false
+
+	_G.NormalLightingSettings = {
+		Brightness = game:GetService("Lighting").Brightness,
+		ClockTime = game:GetService("Lighting").ClockTime,
+		FogEnd = game:GetService("Lighting").FogEnd,
+		GlobalShadows = game:GetService("Lighting").GlobalShadows,
+		Ambient = game:GetService("Lighting").Ambient
+	}
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("Brightness"):Connect(function()
+		if game:GetService("Lighting").Brightness ~= 1 and game:GetService("Lighting").Brightness ~= _G.NormalLightingSettings.Brightness then
+			_G.NormalLightingSettings.Brightness = game:GetService("Lighting").Brightness
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").Brightness = 1
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("ClockTime"):Connect(function()
+		if game:GetService("Lighting").ClockTime ~= 12 and game:GetService("Lighting").ClockTime ~= _G.NormalLightingSettings.ClockTime then
+			_G.NormalLightingSettings.ClockTime = game:GetService("Lighting").ClockTime
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").ClockTime = 12
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(function()
+		if game:GetService("Lighting").FogEnd ~= 786543 and game:GetService("Lighting").FogEnd ~= _G.NormalLightingSettings.FogEnd then
+			_G.NormalLightingSettings.FogEnd = game:GetService("Lighting").FogEnd
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").FogEnd = 786543
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("GlobalShadows"):Connect(function()
+		if game:GetService("Lighting").GlobalShadows ~= false and game:GetService("Lighting").GlobalShadows ~= _G.NormalLightingSettings.GlobalShadows then
+			_G.NormalLightingSettings.GlobalShadows = game:GetService("Lighting").GlobalShadows
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").GlobalShadows = false
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("Ambient"):Connect(function()
+		if game:GetService("Lighting").Ambient ~= Color3.fromRGB(178, 178, 178) and game:GetService("Lighting").Ambient ~= _G.NormalLightingSettings.Ambient then
+			_G.NormalLightingSettings.Ambient = game:GetService("Lighting").Ambient
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+		end
+	end)
+
+	game:GetService("Lighting").Brightness = 1
+	game:GetService("Lighting").ClockTime = 12
+	game:GetService("Lighting").FogEnd = 786543
+	game:GetService("Lighting").GlobalShadows = false
+	game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+
+	local LatestValue = true
+	spawn(function()
+		repeat
+			wait()
+		until _G.FullBrightEnabled
+		while wait() do
+			if _G.FullBrightEnabled ~= LatestValue then
+				if not _G.FullBrightEnabled then
+					game:GetService("Lighting").Brightness = _G.NormalLightingSettings.Brightness
+					game:GetService("Lighting").ClockTime = _G.NormalLightingSettings.ClockTime
+					game:GetService("Lighting").FogEnd = _G.NormalLightingSettings.FogEnd
+					game:GetService("Lighting").GlobalShadows = _G.NormalLightingSettings.GlobalShadows
+					game:GetService("Lighting").Ambient = _G.NormalLightingSettings.Ambient
+				else
+					game:GetService("Lighting").Brightness = 1
+					game:GetService("Lighting").ClockTime = 12
+					game:GetService("Lighting").FogEnd = 786543
+					game:GetService("Lighting").GlobalShadows = false
+					game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+				end
+				LatestValue = not LatestValue
+			end
+		end
+	end)
+end
+------ST-----
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local success, SprintController = pcall(function()
+    return require(LocalPlayer.PlayerScripts.Client.Controllers.SprintController)
+end)
+
+if success and type(SprintController) == "table" then
+    if SprintController.HasInfiniteSprint ~= nil then
+        SprintController.HasInfiniteSprint = true
+    end
+
+    RunService.Heartbeat:Connect(function()
+        SprintController.Stamina = 100
+        SprintController.HasInfiniteSprint = true
+    end)
+end
+    end
+})
+
+Tab:AddButton({
+    Title = "Delete Guard",
+    Icon = "solar/map-point-bold",
+    Callback = function()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+LocalPlayer.CharacterAdded:Connect(function(newChar)
+	Character = newChar
+end)
+
+local function getRoot(char)
+	if not char then return nil end
+	return char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+end
+
+local function getGamePhase()
+	local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+	if not playerGui then return "Day" end
+	
+	local phaseLabel = playerGui:FindFirstChild("Top")
+		and playerGui.Top:FindFirstChild("Holder")
+		and playerGui.Top.Holder:FindFirstChild("Top")
+		and playerGui.Top.Holder.Top:FindFirstChild("Phase")
+		
+	if phaseLabel and phaseLabel:IsA("TextLabel") then
+		local text = phaseLabel.Text
+		if string.find(text, "Night") then
+			return "Night"
+		elseif string.find(text, "Day") then
+			return "Day"
+		end
+	end
+	
+	return "Day"
+end
+
+local function deleteAllMapParts()
+	for _, item in pairs(Workspace:GetDescendants()) do
+		if item:IsA("BasePart") or item:IsA("Terrain") then
+			local isProtected = false
+			
+			if Character and item:IsDescendantOf(Character) then
+				isProtected = true
+			end
+			
+			if not isProtected then
+				local parentModel = item:FindFirstAncestorOfClass("Model")
+				if parentModel and string.find(parentModel.Name, "NightGuard") then
+					isProtected = true
+				end
+			end
+			
+			if not isProtected then
+				pcall(function()
+					item:Destroy()
+				end)
+			end
+		end
+	end
+end
+
+local function isNPCKilled(npc)
+	if not npc or not npc.Parent then return true end
+	
+	local hasParts = false
+	for _, child in pairs(npc:GetDescendants()) do
+		if child:IsA("BasePart") then
+			hasParts = true
+			break
+		end
+	end
+	if not hasParts then return true end
+
+	local hrp = getRoot(npc)
+	if not hrp or hrp.Position.Y < -100 then
+		return true
+	end
+
+	return false
+end
+
+local function getValidTargets()
+	local targets = {}
+	for _, obj in pairs(Workspace:GetDescendants()) do
+		if obj:IsA("Model") and string.find(obj.Name, "NightGuard") then
+			if not isNPCKilled(obj) then
+				table.insert(targets, obj)
+			end
+		end
+	end
+	return targets
+end
+
+local function mainLogic()
+	local rootPart = getRoot(Character)
+	if not Character or not rootPart then return end
+
+	local noclipConnection = RunService.Stepped:Connect(function()
+		if Character then
+			for _, part in pairs(Character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end
+	end)
+
+	deleteAllMapParts()
+
+	local currentPhase = getGamePhase()
+
+	if currentPhase == "Day" then
+		local bodyPos = Instance.new("BodyPosition")
+		bodyPos.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+		bodyPos.Position = rootPart.Position
+		bodyPos.Parent = rootPart
+
+		local bambam = Instance.new("BodyAngularVelocity")
+		bambam.Name = "FlingVelocity"
+		bambam.Parent = rootPart
+		bambam.AngularVelocity = Vector3.new(0, 99999, 0)
+		bambam.MaxTorque = Vector3.new(0, math.huge, 0)
+		bambam.P = math.huge
+
+		for _, child in pairs(Character:GetDescendants()) do
+			if child:IsA("BasePart") then
+				child.CustomPhysicalProperties = PhysicalProperties.new(100, 0.3, 0.5)
+				child.Massless = true
+				child.Velocity = Vector3.new(0, 0, 0)
+			end
+		end
+
+		local isSpinning = true
+		task.spawn(function()
+			while isSpinning and bambam and bambam.Parent do
+				bambam.AngularVelocity = Vector3.new(0, 99999, 0)
+				task.wait(0.2)
+				if bambam and bambam.Parent then
+					bambam.AngularVelocity = Vector3.new(0, 0, 0)
+				end
+				task.wait(0.1)
+			end
+		end)
+
+		local targets = getValidTargets()
+		for _, targetNPC in ipairs(targets) do
+			if not isNPCKilled(targetNPC) then
+				local npcHRP = getRoot(targetNPC)
+				local startTime = tick()
+				
+				while npcHRP and npcHRP.Parent and not isNPCKilled(targetNPC) and (tick() - startTime < 5) do
+					local closePosition = npcHRP.CFrame * CFrame.new(0, 0, -1)
+					
+					bodyPos.Position = closePosition.Position
+					rootPart.CFrame = closePosition
+					npcHRP.AssemblyLinearVelocity = Vector3.new(0, -1000, 0)
+					
+					RunService.Heartbeat:Wait()
+				end
+			end
+		end
+
+		isSpinning = false
+		if bodyPos then bodyPos:Destroy() end
+		if bambam then bambam:Destroy() end
+
+	elseif currentPhase == "Night" then
+		-- Đảm bảo vật lý bình thường (không fling)
+		for _, child in pairs(Character:GetDescendants()) do
+			if child:IsA("BasePart") then
+				child.CustomPhysicalProperties = nil
+				child.Massless = false
+			end
+		end
+
+		while getGamePhase() == "Night" do
+			local targets = getValidTargets()
+			if #targets == 0 then
+				break
+			end
+
+			for _, targetNPC in ipairs(targets) do
+				if not isNPCKilled(targetNPC) then
+					local npcHRP = getRoot(targetNPC)
+					local startTime = tick()
+					
+					while npcHRP and npcHRP.Parent and not isNPCKilled(targetNPC) and getGamePhase() == "Night" and (tick() - startTime < 10) do
+						local frontCFrame = npcHRP.CFrame * CFrame.new(0, 2, -14) * CFrame.Angles(0, math.pi, 0)
+						rootPart.CFrame = frontCFrame
+						
+						RunService.Heartbeat:Wait()
+					end
+				end
+			end
+			RunService.Heartbeat:Wait()
+		end
+	end
+
+	if noclipConnection then noclipConnection:Disconnect() end
+end
+
+mainLogic()
+    end
+})
+
+Tab:AddButton({
+    Title = "Rejoin",
+    Icon = "solar/map-point-bold",
+    Callback = function()
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+TeleportService:Teleport(game.PlaceId, LocalPlayer)
+    end
+})
+
+Tab:AddButton({
+    Title = "T",
+    Icon = "solar/map-point-bold",
+    Callback = function()
+print("turn T")
+shared.SprintHookData = shared.SprintHookData or {
+    OldUpdate = nil,
+    IsHooked = false
+}
+
+local data = shared.SprintHookData
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local SprintModule = nil
+for _, v in pairs(getgc(true)) do
+    if type(v) == "table" and rawget(v, "Update") and rawget(v, "Init") and rawget(v, "GetStamina") then
+        SprintModule = v
+        break
+    end
+end
+
+if not SprintModule then
+    pcall(function()
+        local ClientControllers = LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("Client"):WaitForChild("Controllers")
+        SprintModule = require(ClientControllers:WaitForChild("SprintController"))
+    end)
+end
+
+if data.IsHooked and SprintModule then
+    if data.OldUpdate then
+        SprintModule.Update = data.OldUpdate
+    end
+    
+    local character = LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 24
+        end
+    end
+
+    shared.SprintHookData = nil
+    return
+end
+
+if SprintModule and SprintModule.Update then
+    data.OldUpdate = SprintModule.Update
+    data.IsHooked = true
+    
+    SprintModule.Update = function(p20, p21)
+        data.OldUpdate(p20, p21)
+        
+        local character = LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if humanoid.WalkSpeed == 24 then
+                    humanoid.WalkSpeed = 32
+                end
+            end
+        end
+    end
+end
+    end
+})
+
+local _G = _G or {}
+_G.EspRunning = false
+local espObjects = {}
+
+local function createESP(npc, color)
+    if not npc:FindFirstChild("ESPHighlight") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESPHighlight"
+        highlight.FillColor = color
+        highlight.FillOpacity = 0.4
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.OutlineOpacity = 1
+        highlight.Adornee = npc
+        highlight.Parent = npc
+        table.insert(espObjects, highlight)
+    end
+end
+
+local function clearESP()
+    for _, obj in pairs(espObjects) do
+        if obj and obj.Parent then
+            obj:Destroy()
+        end
+    end
+    espObjects = {}
+end
+
+local npcColors = {
+    ["Pirate"] = Color3.fromRGB(255, 0, 0),
+    ["StillLife"] = Color3.fromRGB(0, 255, 0),
+    ["Bacteria"] = Color3.fromRGB(255, 255, 0)
+}
+
+local Toggle = Tab:AddToggle("MyToggle", {
+    Title = "Esp npc", 
+    Default = false, 
+    Callback = function(Value)
+        _G.EspRunning = Value
+        
+        if Value then
+            print("It's ON!")
+            task.spawn(function()
+                while _G.EspRunning do
+                    local entities = workspace:FindFirstChild("Entities")
+                    if entities then
+                        for _, npc in pairs(entities:GetChildren()) do
+                            if npcColors[npc.Name] then
+                                createESP(npc, npcColors[npc.Name])
+                            end
+                        end
+                    end
+                    task.wait(3)
+                end
+            end)
+        else
+            print("Turned off!")
+            clearESP()
+        end
+    end
+})
