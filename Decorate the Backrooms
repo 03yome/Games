@@ -496,70 +496,58 @@ end
     end
 })
 
-local _G = _G or {}
-_G.EspRunning = false
-local espObjects = {}
-
-local function createESP(npc, color)
-    if not npc:FindFirstChild("ESPHighlight") then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "ESPHighlight"
-        highlight.FillColor = color
-        highlight.FillOpacity = 0.4
-        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-        highlight.OutlineOpacity = 1
-        highlight.Adornee = npc
-        highlight.Parent = npc
-        
-        espObjects[npc] = highlight
-        
-        local connection
-        connection = npc.AncestryChanged:Connect(function(_, parent)
-            if not parent then
-                espObjects[npc] = nil
-                if connection then connection:Disconnect() end
-            end
-        end)
-    end
-end
-
-local function clearESP()
-    for npc, obj in pairs(espObjects) do
-        if obj and obj.Parent then
-            obj:Destroy()
-        end
-    end
-    espObjects = {}
-end
-
-local npcColors = {
-    ["Default"] = Color3.fromRGB(255, 255, 255)
-}
-
 local Toggle = Tab:AddToggle("MyToggle", {
-    Title = "Esp npc", 
-    Default = false, 
+    Title = "Esp",
+    Default = false,
     Callback = function(Value)
-        _G.EspRunning = Value
-        
-        if Value then
-            print("It's ON!")
-            task.spawn(function()
-                while _G.EspRunning do
-                    local entities = workspace:FindFirstChild("Entities")
-                    if entities then
-                        for _, npc in pairs(entities:GetChildren()) do
-                            if npc:IsA("Model") and npc.Name ~= "NightGuard" then
-                                createESP(npc, npcColors["Default"])
-                            end
-                        end
-                    end
-                    task.wait(3)
-                end
-            end)
-        else
-            print("Turned off!")
-            clearESP()
+        _G.EspNpcEnabled = Value
+
+        local function createESP(npc)
+            if npc.Name == "NightGuard" then return end
+            
+            if npc:FindFirstChild("NpcESP") then
+                npc.NpcESP:Destroy()
+            end
+
+            if _G.EspNpcEnabled then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "NpcESP"
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                highlight.FillTransparency = 0.5
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                highlight.OutlineTransparency = 0
+                highlight.Adornee = npc
+                highlight.Parent = npc
+            end
         end
-    end
+
+        local function clearESP()
+            for _, npc in ipairs(workspace.Entities:GetChildren()) do
+                if npc:FindFirstChild("NpcESP") then
+                    npc.NpcESP:Destroy()
+                end
+            end
+        end
+
+        if _G.EspNpcEnabled then
+            for _, npc in ipairs(workspace.Entities:GetChildren()) do
+                createESP(npc)
+            end
+
+            if not _G.NpcAddedConnection then
+                _G.NpcAddedConnection = workspace.Entities.ChildAdded:Connect(function(newNpc)
+                    if _G.EspNpcEnabled then
+                        task.wait(1)
+                        createESP(newNpc)
+                    end
+                end)
+            end
+        else
+            clearESP()
+            if _G.NpcAddedConnection then
+                _G.NpcAddedConnection:Disconnect()
+                _G.NpcAddedConnection = nil
+            end
+        end
+    end,
 })
