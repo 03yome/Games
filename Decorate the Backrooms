@@ -551,3 +551,86 @@ local Toggle = Tab:AddToggle("MyToggle", {
         end
     end,
 })
+
+local Toggle = Tab:AddToggle("MyToggle", {
+    Title = "Esp safe",
+    Default = false,
+    Callback = function(Value)
+        _G.EspLampEnabled = Value
+
+        local targetLamps = {
+            ["Lava Lamp"] = true,
+            ["Floor Lamp"] = true,
+            ["TrafficLight"] = true,
+            ["Green Lamp"] = true,
+            ["Strawberry lamp"] = true
+        }
+
+        local function isValidLamp(model)
+            local name = model.Name
+            if not targetLamps[name] then return false end
+
+            if name == "Strawberry lamp" then
+                local current = model.Parent
+                while current and current ~= workspace do
+                    if string.find(string.lower(current.Name), "store") then
+                        return false
+                    end
+                    current = current.Parent
+                end
+            end
+
+            return true
+        end
+
+        local function createESP(model)
+            if not isValidLamp(model) then return end
+
+            if model:FindFirstChild("LampESP") then
+                model.LampESP:Destroy()
+            end
+
+            if _G.EspLampEnabled then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "LampESP"
+                highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                highlight.FillTransparency = 0.6
+                highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineTransparency = 0
+                highlight.Adornee = model
+                highlight.Parent = model
+            end
+        end
+
+        local function clearESP()
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:FindFirstChild("LampESP") then
+                    obj.LampESP:Destroy()
+                end
+            end
+        end
+
+        if _G.EspLampEnabled then
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj:IsA("Model") then
+                    createESP(obj)
+                end
+            end
+
+            if not _G.LampAddedConnection then
+                _G.LampAddedConnection = workspace.DescendantAdded:Connect(function(descendant)
+                    if _G.EspLampEnabled and descendant:IsA("Model") then
+                        task.wait(0.5)
+                        createESP(descendant)
+                    end
+                end)
+            end
+        else
+            clearESP()
+            if _G.LampAddedConnection then
+                _G.LampAddedConnection:Disconnect()
+                _G.LampAddedConnection = nil
+            end
+        end
+    end,
+})
