@@ -524,9 +524,7 @@ local function clearESP()
 end
 
 local npcColors = {
-    ["Pirate"] = Color3.fromRGB(255, 0, 0),
-    ["StillLife"] = Color3.fromRGB(0, 255, 0),
-    ["Bacteria"] = Color3.fromRGB(255, 255, 0)
+    ["Default"] = Color3.fromRGB(255, 255, 255)
 }
 
 local Toggle = Tab:AddToggle("MyToggle", {
@@ -542,8 +540,9 @@ local Toggle = Tab:AddToggle("MyToggle", {
                     local entities = workspace:FindFirstChild("Entities")
                     if entities then
                         for _, npc in pairs(entities:GetChildren()) do
-                            if npcColors[npc.Name] then
-                                createESP(npc, npcColors[npc.Name])
+                            if npc.Name ~= "NightGuard" then
+                                local color = npcColors["Default"]
+                                createESP(npc, color)
                             end
                         end
                     end
