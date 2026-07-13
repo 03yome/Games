@@ -1,10 +1,10 @@
 print("romd3976")
 
+while wait(1) do 
 workspace.Event.PlayerAttribute_RemoteEvent:FireServer({
     Data = {
         Value = 10000
     },
     TYPE = "UpdateEnergy"
 })
-
-wait(1)
+end
