@@ -1,0 +1,381 @@
+local p = game.Players.LocalPlayer
+
+local st
+st = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+
+    if not checkcaller() and p and self == p and method == "GetAttribute" and args[1] == "DonutActive" then
+        return true
+    end
+
+    return st(self, ...)
+end))
+
+print("Active☑:Inf Stamina")
+
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "Escape From SandWorm『romd3976』",
+    Icon = "door-open",
+    Author = "by @romd3976",
+    Folder = "nil",
+    
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    ToggleKey = Enum.KeyCode.LeftShift,
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
+    
+    User = {
+        Enabled = true,
+        Anonymous = false,
+        Callback = function()
+            print("clicked")
+        end,
+    },
+})
+
+local MainTab = Window:Tab({
+    Title = "Main",
+    Icon = "rbxassetid://7539983773",
+})
+
+local Button = MainTab:Button({
+    Title = "Fullbright",
+    Desc = "LoL",
+    Callback = function()
+        if not _G.FullBrightExecuted then
+
+	_G.FullBrightEnabled = false
+
+	_G.NormalLightingSettings = {
+		Brightness = game:GetService("Lighting").Brightness,
+		ClockTime = game:GetService("Lighting").ClockTime,
+		FogEnd = game:GetService("Lighting").FogEnd,
+		GlobalShadows = game:GetService("Lighting").GlobalShadows,
+		Ambient = game:GetService("Lighting").Ambient
+	}
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("Brightness"):Connect(function()
+		if game:GetService("Lighting").Brightness ~= 1 and game:GetService("Lighting").Brightness ~= _G.NormalLightingSettings.Brightness then
+			_G.NormalLightingSettings.Brightness = game:GetService("Lighting").Brightness
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").Brightness = 1
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("ClockTime"):Connect(function()
+		if game:GetService("Lighting").ClockTime ~= 12 and game:GetService("Lighting").ClockTime ~= _G.NormalLightingSettings.ClockTime then
+			_G.NormalLightingSettings.ClockTime = game:GetService("Lighting").ClockTime
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").ClockTime = 12
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(function()
+		if game:GetService("Lighting").FogEnd ~= 786543 and game:GetService("Lighting").FogEnd ~= _G.NormalLightingSettings.FogEnd then
+			_G.NormalLightingSettings.FogEnd = game:GetService("Lighting").FogEnd
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").FogEnd = 786543
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("GlobalShadows"):Connect(function()
+		if game:GetService("Lighting").GlobalShadows ~= false and game:GetService("Lighting").GlobalShadows ~= _G.NormalLightingSettings.GlobalShadows then
+			_G.NormalLightingSettings.GlobalShadows = game:GetService("Lighting").GlobalShadows
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").GlobalShadows = false
+		end
+	end)
+
+	game:GetService("Lighting"):GetPropertyChangedSignal("Ambient"):Connect(function()
+		if game:GetService("Lighting").Ambient ~= Color3.fromRGB(178, 178, 178) and game:GetService("Lighting").Ambient ~= _G.NormalLightingSettings.Ambient then
+			_G.NormalLightingSettings.Ambient = game:GetService("Lighting").Ambient
+			if not _G.FullBrightEnabled then
+				repeat
+					wait()
+				until _G.FullBrightEnabled
+			end
+			game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+		end
+	end)
+
+	game:GetService("Lighting").Brightness = 1
+	game:GetService("Lighting").ClockTime = 12
+	game:GetService("Lighting").FogEnd = 786543
+	game:GetService("Lighting").GlobalShadows = false
+	game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+
+	local LatestValue = true
+	spawn(function()
+		repeat
+			wait()
+		until _G.FullBrightEnabled
+		while wait() do
+			if _G.FullBrightEnabled ~= LatestValue then
+				if not _G.FullBrightEnabled then
+					game:GetService("Lighting").Brightness = _G.NormalLightingSettings.Brightness
+					game:GetService("Lighting").ClockTime = _G.NormalLightingSettings.ClockTime
+					game:GetService("Lighting").FogEnd = _G.NormalLightingSettings.FogEnd
+					game:GetService("Lighting").GlobalShadows = _G.NormalLightingSettings.GlobalShadows
+					game:GetService("Lighting").Ambient = _G.NormalLightingSettings.Ambient
+				else
+					game:GetService("Lighting").Brightness = 1
+					game:GetService("Lighting").ClockTime = 12
+					game:GetService("Lighting").FogEnd = 786543
+					game:GetService("Lighting").GlobalShadows = false
+					game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+				end
+				LatestValue = not LatestValue
+			end
+		end
+	end)
+end
+    end
+})
+
+local Workspace = game:GetService("Workspace")
+
+local targetWorms = {
+    ["SandWorm"] = true,
+    ["HookWorm"] = true,
+    ["Gravemaw"] = true
+}
+
+local function applyESP(worm)
+    if worm and worm:IsA("Model") and not worm:FindFirstChild("Worm_ESP") then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "Worm_ESP"
+        highlight.FillColor = Color3.fromRGB(255, 50, 50)
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineTransparency = 0
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.Adornee = worm
+        highlight.Parent = worm
+    end
+end
+
+local function removeESP(worm)
+    if worm and worm:FindFirstChild("Worm_ESP") then
+        worm.Worm_ESP:Destroy()
+    end
+end
+
+local wormAddedConnection = nil
+
+local Toggle = MainTab:Toggle({
+    Title = "Esp worm",
+    Value = false,
+    Callback = function(state) 
+        if state then
+            for _, child in ipairs(Workspace:GetChildren()) do
+                if targetWorms[child.Name] then
+                    applyESP(child)
+                end
+            end
+
+            wormAddedConnection = Workspace.ChildAdded:Connect(function(child)
+                if targetWorms[child.Name] then
+                    task.wait(0.3)
+                    applyESP(child)
+                end
+            end)
+        else
+            if wormAddedConnection then
+                wormAddedConnection:Disconnect()
+                wormAddedConnection = nil
+            end
+
+            for _, child in ipairs(Workspace:GetChildren()) do
+                if targetWorms[child.Name] then
+                    removeESP(child)
+                end
+            end
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local originalSpeed = nil
+
+local Toggle = MainTab:Toggle({
+    Title = "Speedboots 30%",
+    Value = false,
+    Callback = function(state) 
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        
+        if humanoid then
+            if state then
+                originalSpeed = humanoid.WalkSpeed
+                humanoid.WalkSpeed = originalSpeed * 1.30
+            else
+                if originalSpeed then
+                    humanoid.WalkSpeed = originalSpeed
+                    originalSpeed = nil
+                end
+            end
+        end
+    end
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local connections = {}
+
+local function applyESP(player)
+    if player == LocalPlayer then return end
+
+    local function highlightCharacter(character)
+        if not character then return end
+        
+        -- Kiểm tra nếu chưa có Highlight thì mới tạo
+        if not character:FindFirstChild("Player_ESP") then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "Player_ESP"
+            highlight.FillColor = Color3.fromRGB(0, 255, 0) -- Màu xanh lá
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- Viền trắng
+            highlight.FillTransparency = 0.5
+            highlight.OutlineTransparency = 0
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Adornee = character
+            highlight.Parent = character
+        end
+    end
+
+    if player.Character then
+        highlightCharacter(player.Character)
+    end
+
+    connections[player] = player.CharacterAdded:Connect(function(character)
+        task.wait(0.1)
+        highlightCharacter(character)
+    end)
+end
+
+local function removeESP(player)
+    if player.Character and player.Character:FindFirstChild("Player_ESP") then
+        player.Character.Player_ESP:Destroy()
+    end
+    
+    if connections[player] then
+        connections[player]:Disconnect()
+        connections[player] = nil
+    end
+end
+
+local playerAddedConnection = nil
+local playerRemovingConnection = nil
+
+local Toggle = MainTab:Toggle({
+    Title = "Esp players",
+    Value = false,
+    Callback = function(state) 
+        if state then
+            for _, player in ipairs(Players:GetPlayers()) do
+                applyESP(player)
+            end
+
+            playerAddedConnection = Players.PlayerAdded:Connect(function(player)
+                applyESP(player)
+            end)
+
+            playerRemovingConnection = Players.PlayerRemoving:Connect(function(player)
+                removeESP(player)
+            end)
+        else
+            if playerAddedConnection then
+                playerAddedConnection:Disconnect()
+                playerAddedConnection = nil
+            end
+            if playerRemovingConnection then
+                playerRemovingConnection:Disconnect()
+                playerRemovingConnection = nil
+            end
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                removeESP(player)
+            end
+        end
+    end
+})
+
+local Workspace = game:GetService("Workspace")
+
+local Toggle = MainTab:Toggle({
+    Title = "create part",
+    Value = false,
+    Callback = function(state) 
+        if state then
+            local folder = Workspace:FindFirstChild("AntiDetectParts")
+            if not folder then
+                folder = Instance.new("Folder")
+                folder.Name = "AntiDetectParts"
+                folder.Parent = Workspace
+            end
+
+            local detectionFolder = Workspace:FindFirstChild("DesertTown") 
+                and Workspace.DesertTown:FindFirstChild("SpecialParts")
+                and Workspace.DesertTown.SpecialParts:FindFirstChild("Detectionparts")
+
+            if detectionFolder then
+                local count = 0
+                for _, part in ipairs(detectionFolder:GetChildren()) do
+                    if part:IsA("BasePart") and part.Name:find("DetectionPart") then
+                        local newPart = Instance.new("Part")
+                        newPart.Name = part.Name .. "_Copied"
+                        newPart.Size = part.Size
+                        
+                        newPart.CFrame = part.CFrame * CFrame.new(0, 0.5, 0)
+                        
+                        newPart.Transparency = 0.25
+                        newPart.Anchored = true
+                        newPart.CanCollide = true
+                        newPart.Material = Enum.Material.SmoothPlastic
+                        newPart.Color = Color3.fromRGB(0, 255, 255)
+                        
+                        newPart.Parent = folder
+                        count = count + 1
+                    end
+                end
+                print("[AntiDetect] Đã tạo thành công " .. tostring(count) .. " parts từ Detectionparts!")
+            else
+                warn("[AntiDetect] Không tìm thấy Workspace.DesertTown.SpecialParts.Detectionparts!")
+            end
+        else
+            local folder = Workspace:FindFirstChild("AntiDetectParts")
+            if folder then
+                folder:Destroy()
+                print("[AntiDetect] Đã xóa thư mục AntiDetectParts!")
+            end
+        end
+    end
+})
