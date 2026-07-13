@@ -1,0 +1,10 @@
+print("romd3976")
+
+workspace.Event.PlayerAttribute_RemoteEvent:FireServer({
+    Data = {
+        Value = 10000
+    },
+    TYPE = "UpdateEnergy"
+})
+
+wait(1)
