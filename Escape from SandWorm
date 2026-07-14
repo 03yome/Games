@@ -379,3 +379,28 @@ local Toggle = MainTab:Toggle({
         end
     end
 })
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AbilityEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Global"):WaitForChild("Survivors"):WaitForChild("Ability2")
+
+local spamming = false
+
+local Toggle = MainTab:Toggle({
+    Title = "Spam Ability 2",
+    Value = false,
+    Callback = function(state) 
+        spamming = state
+        
+        if spamming then
+            task.spawn(function()
+                while spamming do
+                    local args = {
+                        vector.create(0.17546530067920685, -1.2077788769104814e-09, 0.9844856262207031)
+                    }
+                    AbilityEvent:FireServer(unpack(args))
+                    task.wait(0.01) -- Thời gian hoãn giữa mỗi lần gửi (giảm xuống 0 nếu muốn max tốc độ, nhưng dễ bị kick/lag)
+                end
+            end)
+        end
+    end
+})
