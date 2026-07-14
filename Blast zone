@@ -205,7 +205,7 @@ local InfStaminaToggle = Tab:CreateToggle({
    Callback = function(Value)
       getgenv().InfStamina = Value
       if Value then
-         task.spawn(InfStamina) -- Sử dụng task.spawn để chạy song song
+         task.spawn(InfStamina)
       end
    end,
 })
@@ -215,35 +215,56 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local tpwalking = nil
+local characterAddedConnection = nil
 local tpwalkSpeed = 2
+
+local function startTPWalk()
+    if tpwalking then 
+        tpwalking:Disconnect() 
+        tpwalking = nil
+    end
+
+    tpwalking = RunService.Heartbeat:Connect(function(delta)
+        local character = LocalPlayer.Character
+        local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
+
+        if character and humanoid and humanoid.Parent and humanoid.Health > 0 then
+            if humanoid.MoveDirection.Magnitude > 0 then
+                character:TranslateBy(humanoid.MoveDirection * tpwalkSpeed * delta * 10)
+            end
+        end
+    end)
+end
+
+local function stopTPWalk()
+    if tpwalking then
+        tpwalking:Disconnect()
+        tpwalking = nil
+    end
+end
 
 local Toggle = Tab:CreateToggle({
    Name = "TPWalk",
    CurrentValue = false,
    Flag = "TPWalkToggle",
    Callback = function(Value)
-       if tpwalking then 
-           tpwalking:Disconnect() 
-           tpwalking = nil
-       end
-
        if Value then
-           tpwalking = RunService.Heartbeat:Connect(function(delta)
-               local character = LocalPlayer.Character
-               local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
+           startTPWalk()
 
-               if not (character and humanoid and humanoid.Parent) then
-                   if tpwalking then
-                       tpwalking:Disconnect()
-                       tpwalking = nil
-                   end
-                   return
-               end
+           -- Tự động bật lại khi nhân vật chết và hồi sinh
+           if not characterAddedConnection then
+               characterAddedConnection = LocalPlayer.CharacterAdded:Connect(function()
+                   task.wait(0.5) -- Đợi nhân vật load hoàn chỉnh
+                   startTPWalk()
+               end)
+           end
+       else
+           stopTPWalk()
 
-               if humanoid.MoveDirection.Magnitude > 0 then
-                   character:TranslateBy(humanoid.MoveDirection * tpwalkSpeed * delta * 10)
-               end
-           end)
+           if characterAddedConnection then
+               characterAddedConnection:Disconnect()
+               characterAddedConnection = nil
+           end
        end
    end,
 })
