@@ -216,7 +216,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local tpwalking = nil
 local characterAddedConnection = nil
-local tpwalkSpeed = 2
+local tpwalkSpeed = 1.3
 
 local function startTPWalk()
     if tpwalking then 
@@ -251,10 +251,9 @@ local Toggle = Tab:CreateToggle({
        if Value then
            startTPWalk()
 
-           -- Tự động bật lại khi nhân vật chết và hồi sinh
            if not characterAddedConnection then
                characterAddedConnection = LocalPlayer.CharacterAdded:Connect(function()
-                   task.wait(0.5) -- Đợi nhân vật load hoàn chỉnh
+                   task.wait(0.5)
                    startTPWalk()
                end)
            end
