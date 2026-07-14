@@ -1,0 +1,64 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+    Title = "[🛠️] Zombies vs Security『romd3976』",
+    Icon = "door-open",
+    Author = "by @romd3976",
+    Folder = "nil",
+    
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    ToggleKey = Enum.KeyCode.LeftShift,
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
+    
+    User = {
+        Enabled = true,
+        Anonymous = false,
+        Callback = function()
+            print("clicked")
+        end,
+    },
+})
+
+local MainTab = Window:Tab({
+    Title = "Main",
+    Icon = "rbxassetid://7539983773",
+})
+
+local Button = MainTab:Button({
+    Title = "inf energy",
+    Desc = "LoL",
+    Callback = function()
+       local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function deleteCastRemote()
+    local source = ReplicatedStorage:FindFirstChild("Source")
+    if not source then return end
+
+    local packagesIndex = source:FindFirstChild("Packages") and source.Packages:FindFirstChild("_Index")
+    if not packagesIndex then return end
+
+    local knitPackage = packagesIndex:FindFirstChild("sleitnick_knit@1.7.0")
+    if not knitPackage then return end
+
+    local castRemote = knitPackage:FindFirstChild("knit") 
+        and knitPackage.knit:FindFirstChild("Services")
+        and knitPackage.knit.Services:FindFirstChild("SkillService")
+        and knitPackage.knit.Services.SkillService:FindFirstChild("RF")
+        and knitPackage.knit.Services.SkillService.RF:FindFirstChild("Cast")
+
+    if castRemote then
+        castRemote:Destroy()
+    end
+end
+
+deleteCastRemote()
+    end
+})
