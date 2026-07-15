@@ -1,0 +1,62 @@
+local Library = loadstring(game:HttpGet("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+
+local Window = Library:CreateWindow{
+	Title = "Fluent",
+	SubTitle = "by @romd3976",
+	TabWidth = 160,
+	Size = UDim2.fromOffset(830, 525),
+	Resize = true,
+	MinSize = Vector2.new(470, 380),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.RightControl
+}
+
+local Tabs = {
+	Main = Window:CreateTab{
+		Title = "Exploits",
+		Icon = "delete"
+	},
+	Main2 = Window:CreateTab{
+		Title = "Kk",
+		Icon = "delete"
+	},
+}
+
+
+local loopGrab = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop Grab",
+    Description = "Toggle description",
+    Default = false,
+    Callback = function(state)
+        loopGrab = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopGrab do
+                    local args = {
+	game:GetService("Players"):WaitForChild("x5_oz6")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("AbilityRemote"):FireServer(unpack(args))
+
+                    wait()
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = 'button',
+    Description = 'kkkk',
+    Callback = function()
+
+    end,
+})
