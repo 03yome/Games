@@ -9,83 +9,92 @@ local Window = Rayfield:CreateWindow({
 
 local Tab = Window:CreateTab("Main", 4483362458)
 
-_G.ESPEnabled = false
-local activeESPs = {}
-
-local ESP_COLOR = Color3.fromRGB(255, 0, 0)
-local FILL_TRANSPARENCY = 0.5
-local OUTLINE_TRANSPARENCY = 0
-
-local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
 
-local monstersFolder = Workspace:WaitForChild("GameSettings")
-                               :WaitForChild("FuncAssets")
-                               :WaitForChild("ShopBackground")
-                               :WaitForChild("Monsters")
+local MonstersFolder = workspace:WaitForChild("GameSettings", 5)
+    and workspace.GameSettings:WaitForChild("FuncAssets", 5)
+    and workspace.GameSettings.FuncAssets:WaitForChild("ShopBackground", 5)
+    and workspace.GameSettings.FuncAssets.ShopBackground:WaitForChild("Monsters", 5)
 
-local function createESP(model)
-    if not _G.ESPEnabled then return end
-    if model == LocalPlayer.Character or model.Name == LocalPlayer.Name or model:IsA("Player") then return end
-    if activeESPs[model] then return end
+local ESP_Cache = {}
+local ESP_Enabled = false
 
-    local highlight = Instance.new("Highlight")
-    highlight.Name = "ESP_Highlight"
-    highlight.FillColor = ESP_COLOR
-    highlight.FillTransparency = FILL_TRANSPARENCY
-    highlight.OutlineColor = ESP_COLOR
-    highlight.OutlineTransparency = OUTLINE_TRANSPARENCY
-    highlight.Adornee = model
-    highlight.Parent = model
+local function CreateESP(model)
+    if ESP_Cache[model] then return end
+    
+    local box = Drawing.new("Square")
+    box.Color = Color3.fromRGB(255, 0, 0)
+    box.Thickness = 1.5
+    box.Filled = false
+    box.Visible = false
 
-    activeESPs[model] = highlight
+    ESP_Cache[model] = {Box = box}
 end
 
-local function removeESP(model)
-    if activeESPs[model] then
-        activeESPs[model]:Destroy()
-        activeESPs[model] = nil
+local function RemoveESP(model)
+    if ESP_Cache[model] then
+        ESP_Cache[model].Box:Remove()
+        ESP_Cache[model] = nil
     end
 end
 
-local function clearAllESP()
-    for model, highlight in pairs(activeESPs) do
-        if highlight then
-            highlight:Destroy()
+local UpdateConnection
+UpdateConnection = RunService.RenderStepped:Connect(function()
+    if not ESP_Enabled or not MonstersFolder then
+        for _, esp in pairs(ESP_Cache) do
+            esp.Box.Visible = false
+        end
+        return
+    end
+
+    for _, monster in ipairs(MonstersFolder:GetChildren()) do
+        if monster:IsA("Model") and monster.Name ~= LocalPlayer.Name then
+            local primaryPart = monster.PrimaryPart or monster:FindFirstChildWhichIsA("BasePart")
+            
+            if primaryPart then
+                local vector, onScreen = Camera:WorldToViewportPoint(primaryPart.Position)
+                
+                if onScreen then
+                    if not ESP_Cache[monster] then
+                        CreateESP(monster)
+                    end
+                    
+                    local esp = ESP_Cache[monster]
+                    local sizeX = 1000 / vector.Z
+                    local sizeY = 1500 / vector.Z
+                    
+                    esp.Box.Size = Vector2.new(sizeX, sizeY)
+                    esp.Box.Position = Vector2.new(vector.X - sizeX / 2, vector.Y - sizeY / 2)
+                    esp.Box.Visible = true
+                else
+                    if ESP_Cache[monster] then
+                        ESP_Cache[monster].Box.Visible = false
+                    end
+                end
+            end
         end
     end
-    activeESPs = {}
-end
 
-monstersFolder.ChildAdded:Connect(function(child)
-    task.defer(function()
-        if child:IsA("Model") and _G.ESPEnabled then
-            createESP(child)
+    for model, _ in pairs(ESP_Cache) do
+        if not model or not model:IsDescendantOf(MonstersFolder) then
+            RemoveESP(model)
         end
-    end)
-end)
-
-monstersFolder.ChildRemoved:Connect(function(child)
-    if child:IsA("Model") then
-        removeESP(child)
     end
 end)
 
 local Toggle = Tab:CreateToggle({
-   Name = "Monster ESP",
+   Name = "Monsters ESP",
    CurrentValue = false,
-   Flag = "MonsterESP_Flag", 
+   Flag = "MonsterESP_Flag",
    Callback = function(Value)
-       _G.ESPEnabled = Value
-       if _G.ESPEnabled then
-           for _, child in ipairs(monstersFolder:GetChildren()) do
-               if child:IsA("Model") then
-                   createESP(child)
-               end
+       ESP_Enabled = Value
+       if not Value then
+           for model, _ in pairs(ESP_Cache) do
+               RemoveESP(model)
            end
-       else
-           clearAllESP()
        end
    end,
 })
