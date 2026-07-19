@@ -1086,6 +1086,7 @@ end)
 --------------------------------------------------
 -- Items
 --------------------------------------------------
+
 EscobaBtn.Text = "Escoba"
 EscobaBtn.MouseButton1Click:Connect(function()
     local Players = game:GetService("Players")
@@ -1094,7 +1095,8 @@ EscobaBtn.MouseButton1Click:Connect(function()
 
     local char = player.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
+    local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+    if not hrp or not hum then return end
 
     local originalCFrame = hrp.CFrame
     local nearestEscoba = nil
@@ -1131,25 +1133,43 @@ EscobaBtn.MouseButton1Click:Connect(function()
         local targetHandle = nearestEscoba.Handle
         local targetPrompt = targetHandle.TakePrompt
         
-        -- Dịch chuyển tới vị trí chổi
-        hrp.CFrame = targetHandle.CFrame + Vector3.new(0, 2, 0)
+        -- Hàm triệt tiêu hoàn toàn lực và quán tính vật lý
+        local function resetVelocity()
+            hrp.Velocity = Vector3.new(0, 0, 0)
+            hrp.RotVelocity = Vector3.new(0, 0, 0)
+            if char:FindFirstChild("AssemblyLinearVelocity") then
+                hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                hrp.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+            end
+        end
+
+        -- Đóng băng quán tính trước khi tele tới chổi
+        resetVelocity()
+        hrp.CFrame = targetHandle.CFrame + Vector3.new(0, 2.5, 0) -- Tăng độ cao lên 2.5 để tránh bị kẹt sàn
         
-        -- Tạo luồng chạy ngầm để spam fire prompt liên tục trong lúc đang ở vị trí chổi
+        -- Kích hoạt luồng spam nhặt chổi
         local teleporting = true
         task.spawn(function()
             if fireproximityprompt then
                 while teleporting do
                     fireproximityprompt(targetPrompt)
-                    task.wait() -- Spam siêu tốc theo mỗi frame của game
+                    task.wait()
                 end
             end
         end)
         
-        task.wait(0.2) -- Thời gian chờ ở vị trí chổi để spam nhặt (tăng lên 0.2s cho chắc chắn)
-        teleporting = false -- Dừng vòng lặp spam lại
+        task.wait(0.2)
+        teleporting = false
+        task.wait(0.02)
         
+        -- Đóng băng quán tính một lần nữa trước khi tele về vị trí cũ
+        resetVelocity()
+        hrp.CFrame = originalCFrame
+        
+        -- Đảm bảo trạng thái nhân vật không bị lỗi ngã (Ragdoll/Falling)
         task.wait(0.05)
-        hrp.CFrame = originalCFrame -- Quay trở về vị trí cũ
+        resetVelocity()
+        hum:ChangeState(Enum.HumanoidStateType.Running)
     end
 end)
 --------------------------------------------------
