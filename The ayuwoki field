@@ -550,6 +550,9 @@ end
 --------------------------------------------------
 local ShaderFullBrightEnabled = false
 local ShaderFullBrightConnections = {}
+local OriginalLightingSettings = {} 
+
+local props = {"Ambient", "OutdoorAmbient", "Brightness", "ClockTime", "FogColor", "FogEnd", "GlobalShadows"}
 
 local function applyShaderFullBright()
 	if not ShaderFullBrightEnabled then return end
@@ -570,18 +573,25 @@ local function toggleShaderFullBright()
 	table.clear(ShaderFullBrightConnections)
 	
 	if ShaderFullBrightEnabled then
+		table.clear(OriginalLightingSettings)
+		for _, prop in ipairs(props) do
+			OriginalLightingSettings[prop] = Lighting[prop]
+		end
+
 		applyShaderFullBright()
-		local props = {"Ambient", "OutdoorAmbient", "Brightness", "ClockTime", "FogColor", "FogEnd", "GlobalShadows"}
+		
 		for _, prop in ipairs(props) do
 			table.insert(ShaderFullBrightConnections, Lighting:GetPropertyChangedSignal(prop):Connect(function()
 				if ShaderFullBrightEnabled then task.defer(applyShaderFullBright) end
 			end))
 		end
 	else
-		Lighting.GlobalShadows = true
+		for prop, value in pairs(OriginalLightingSettings) do
+			Lighting[prop] = value
+		end
+		table.clear(OriginalLightingSettings)
 	end
 end
-
 --------------------------------------------------
 -- AYUWOKI WORKSPACE ESP SYSTEM
 --------------------------------------------------
