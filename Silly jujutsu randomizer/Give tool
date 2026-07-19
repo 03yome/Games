@@ -860,7 +860,7 @@ button.Archivable = true
 button.Parent = screenGui
 
 -- Đường dẫn tới RemoteEvent của bạn
-local remote = game:GetService("ReplicatedStorage").Remotes.Gojo.Lapsepull:FireServer()
+local remote = game:GetService("ReplicatedStorage").Remotes.Gojo.Lapsepull
 
 -- Sự kiện khi nhấn vào nút
 button.MouseButton1Click:Connect(function()
