@@ -1086,7 +1086,6 @@ end)
 --------------------------------------------------
 -- Items
 --------------------------------------------------
-
 EscobaBtn.Text = "Escoba"
 EscobaBtn.MouseButton1Click:Connect(function()
     local Players = game:GetService("Players")
@@ -1132,18 +1131,27 @@ EscobaBtn.MouseButton1Click:Connect(function()
         local targetHandle = nearestEscoba.Handle
         local targetPrompt = targetHandle.TakePrompt
         
+        -- Dịch chuyển tới vị trí chổi
         hrp.CFrame = targetHandle.CFrame + Vector3.new(0, 2, 0)
-        task.wait(0.15)
         
-        if fireproximityprompt then
-            fireproximityprompt(targetPrompt)
-        end
+        -- Tạo luồng chạy ngầm để spam fire prompt liên tục trong lúc đang ở vị trí chổi
+        local teleporting = true
+        task.spawn(function()
+            if fireproximityprompt then
+                while teleporting do
+                    fireproximityprompt(targetPrompt)
+                    task.wait() -- Spam siêu tốc theo mỗi frame của game
+                end
+            end
+        end)
         
-        task.wait(0.1)
-        hrp.CFrame = originalCFrame
+        task.wait(0.2) -- Thời gian chờ ở vị trí chổi để spam nhặt (tăng lên 0.2s cho chắc chắn)
+        teleporting = false -- Dừng vòng lặp spam lại
+        
+        task.wait(0.05)
+        hrp.CFrame = originalCFrame -- Quay trở về vị trí cũ
     end
 end)
-
 --------------------------------------------------
 -- INDEPENDENT MEMORY TRANSITION SYSTEM
 --------------------------------------------------
