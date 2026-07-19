@@ -445,6 +445,7 @@ local function createButton(text, parent)
 end
 
 local FullBrightBtn, FBtnStroke = createButton("Visual Full Bright", PageMainVisuals)
+local FullBrightShaderBtn, FBStnStroke = createButton("Shader Full Bright", PageMainVisuals)
 local EmoteBtn, EmBtnStroke      = createButton("Trigger Emote Button", PageMainVisuals)
 local TakeDamageBtn, TKBtnStroke      = createButton("Take Damage Button", PageMainVisuals)
 
