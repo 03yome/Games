@@ -184,11 +184,8 @@ Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
 --------------------------------------------------
 -- TAB NAVIGATION BAR (LEFT SIDEBAR)
 --------------------------------------------------
-local Sidebar = Instance.new("ScrollingFrame")
+local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 110, 1, -45)
-Sidebar.CanvasSize = UDim2.new(0, 0, 0, 250)
-Sidebar.ScrollBarThickness = 2
-Sidebar.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 60)
 Sidebar.Position = UDim2.new(0, 10, 0, 35)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
 Sidebar.BorderSizePixel = 0
@@ -261,6 +258,7 @@ local PageESP         = createTab("ESP stuff", false)
 local PageMisc        = createTab("Misc", false)
 local PageSP = createTab("03y_o", false)
 local PageCredits     = createTab("Credits", false)
+local PageItems     = createTab("Items", false)
 
 --------------------------------------------------
 -- INFO TAB DESIGN PRESETS
@@ -461,6 +459,8 @@ local SprintBoostBtn, SBStroke   = createButton("Force Sprint Boost", PageStamin
 local MonsterESPBtn, MESPStroke   = createButton("Toggle Monster ESP", PageESP)
 local PlayerESPBtn, PEStroke     = createButton("Toggle Player ESP", PageESP)
 local ItemsESPBtn, ItemsStroke   = createButton("Items ESP", PageESP)
+
+local EscobaBtn, EaStroke   = createButton("Escoba", PageItems)
 
 --------------------------------------------------
 -- TOGGLE SYSTEM ANIMATIONS
@@ -1078,6 +1078,62 @@ while tick() - startTime < 13 do
 	end
 	task.wait(0.1)
 end
+end)
+
+--------------------------------------------------
+-- Items
+--------------------------------------------------
+
+EscobaBtn.Text = "Escoba"
+EscobaBtn.MouseButton1Click:Connect(function()
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+
+local function getAllEscobas()
+    local escobaList = {}
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj.Name == "Escoba" then
+            local handle = obj:FindFirstChild("Handle")
+            if handle then
+                local prompt = handle:FindFirstChild("TakePrompt")
+                if prompt and prompt:IsA("ProximityPrompt") then
+                    table.insert(escobaList, obj)
+                end
+            end
+        end
+    end
+    return escobaList
+end
+
+local function telePickAndReturn()
+    local char = player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    
+    local allEscobas = getAllEscobas()
+    if #allEscobas == 0 then return end
+    
+    local originalCFrame = hrp.CFrame
+    
+    local randomIndex = math.random(1, #allEscobas)
+    local targetEscoba = allEscobas[randomIndex]
+    local handle = targetEscoba:FindFirstChild("Handle")
+    local prompt = handle:FindFirstChild("TakePrompt")
+    
+    hrp.CFrame = handle.CFrame + Vector3.new(0, 2, 0)
+    task.wait(0.15)
+    
+    if fireproximityprompt then
+        fireproximityprompt(prompt)
+    end
+    
+    task.wait(0.1)
+    hrp.CFrame = originalCFrame
+end
+
+telePickAndReturn()
 end)
 
 --------------------------------------------------
