@@ -1,5 +1,6 @@
 ---https://gist.githubusercontent.com/JungleScripts/a09af8e76c881f8ad37d7e5be6461b85/raw/5f49da2865630e5bb5260deeffc4384d7306370c/gistfile1.txt---
 
+
 --// SCERPER HUB ENGINE (PREMIUM CONFIGURATION V5.4)
 --// Independent Dual Position Matrix + KillerHumanoid Verification Layer
 
@@ -545,6 +546,43 @@ local function toggleFullBright()
 end
 
 --------------------------------------------------
+-- SHADER FULL BRIGHT SYSTEM (NEWLY INTEGRATED)
+--------------------------------------------------
+local ShaderFullBrightEnabled = false
+local ShaderFullBrightConnections = {}
+
+local function applyShaderFullBright()
+	if not ShaderFullBrightEnabled then return end
+	Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+	Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+	Lighting.Brightness = 25
+	Lighting.ClockTime = 14
+	Lighting.FogColor = Color3.fromRGB(255, 255, 255)
+	Lighting.FogEnd = 90000
+	Lighting.GlobalShadows = false
+end
+
+local function toggleShaderFullBright()
+	ShaderFullBrightEnabled = not ShaderFullBrightEnabled
+	animateToggle(FullBrightShaderBtn, FBStnStroke, ShaderFullBrightEnabled, "Shader Full Bright", Color3.fromRGB(45, 105, 65), Color3.fromRGB(65, 180, 100))
+	
+	for _, conn in pairs(ShaderFullBrightConnections) do conn:Disconnect() end
+	table.clear(ShaderFullBrightConnections)
+	
+	if ShaderFullBrightEnabled then
+		applyShaderFullBright()
+		local props = {"Ambient", "OutdoorAmbient", "Brightness", "ClockTime", "FogColor", "FogEnd", "GlobalShadows"}
+		for _, prop in ipairs(props) do
+			table.insert(ShaderFullBrightConnections, Lighting:GetPropertyChangedSignal(prop):Connect(function()
+				if ShaderFullBrightEnabled then task.defer(applyShaderFullBright) end
+			end))
+		end
+	else
+		Lighting.GlobalShadows = true
+	end
+end
+
+--------------------------------------------------
 -- AYUWOKI WORKSPACE ESP SYSTEM
 --------------------------------------------------
 getgenv().ESP_ENABLED = false
@@ -923,6 +961,7 @@ local function toggleSprintBoost() SprintBoostEnabled = not SprintBoostEnabled a
 -- ACTION COUPLINGS
 --------------------------------------------------
 FullBrightBtn.MouseButton1Click:Connect(toggleFullBright)
+FullBrightShaderBtn.MouseButton1Click:Connect(toggleShaderFullBright)
 MonsterESPBtn.MouseButton1Click:Connect(toggleMonsterESP)
 EmoteBtn.MouseButton1Click:Connect(toggleEmote)
 StamV1Btn.MouseButton1Click:Connect(toggleStamV1)
