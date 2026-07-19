@@ -184,7 +184,10 @@ Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
 --------------------------------------------------
 -- TAB NAVIGATION BAR (LEFT SIDEBAR)
 --------------------------------------------------
-local Sidebar = Instance.new("Frame")
+local Sidebar = Instance.new("ScrollingFrame")
+Sidebar.CanvasSize = UDim2.new(0, 0, 0, 250)
+Sidebar.ScrollBarThickness = 2
+Sidebar.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 60)
 Sidebar.Size = UDim2.new(0, 110, 1, -45)
 Sidebar.Position = UDim2.new(0, 10, 0, 35)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
