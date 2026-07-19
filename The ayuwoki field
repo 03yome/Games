@@ -1,304 +1,593 @@
-local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+--// SCERPER HUB ENGINE (PREMIUM CONFIGURATION V5.4)
+--// Independent Dual Position Matrix + KillerHumanoid Verification Layer
 
-local PhantomForcesWindow = Library:NewWindow("the ayuwoki")
-
-local KillingCheats = PhantomForcesWindow:NewSection("main")
-
-KillingCheats:CreateButton("inf stamina ", function()
---[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-]]
-while wait(0.1) do
-local args = {
-    [1] = 100
-}
-
-firesignal(game:GetService("ReplicatedStorage").Events.AddStamina.OnClientEvent, unpack(args))
-end
-print("HI")
-end)
-
-KillingCheats:CreateButton("full bright ", function()
---[[
-	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
-]]
-if not _G.FullBrightExecuted then
-
-	_G.FullBrightEnabled = false
-
-	_G.NormalLightingSettings = {
-		Brightness = game:GetService("Lighting").Brightness,
-		ClockTime = game:GetService("Lighting").ClockTime,
-		FogEnd = game:GetService("Lighting").FogEnd,
-		GlobalShadows = game:GetService("Lighting").GlobalShadows,
-		Ambient = game:GetService("Lighting").Ambient
-	}
-
-	game:GetService("Lighting"):GetPropertyChangedSignal("Brightness"):Connect(function()
-		if game:GetService("Lighting").Brightness ~= 1 and game:GetService("Lighting").Brightness ~= _G.NormalLightingSettings.Brightness then
-			_G.NormalLightingSettings.Brightness = game:GetService("Lighting").Brightness
-			if not _G.FullBrightEnabled then
-				repeat
-					wait()
-				until _G.FullBrightEnabled
-			end
-			game:GetService("Lighting").Brightness = 1
-		end
-	end)
-
-	game:GetService("Lighting"):GetPropertyChangedSignal("ClockTime"):Connect(function()
-		if game:GetService("Lighting").ClockTime ~= 12 and game:GetService("Lighting").ClockTime ~= _G.NormalLightingSettings.ClockTime then
-			_G.NormalLightingSettings.ClockTime = game:GetService("Lighting").ClockTime
-			if not _G.FullBrightEnabled then
-				repeat
-					wait()
-				until _G.FullBrightEnabled
-			end
-			game:GetService("Lighting").ClockTime = 12
-		end
-	end)
-
-	game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(function()
-		if game:GetService("Lighting").FogEnd ~= 786543 and game:GetService("Lighting").FogEnd ~= _G.NormalLightingSettings.FogEnd then
-			_G.NormalLightingSettings.FogEnd = game:GetService("Lighting").FogEnd
-			if not _G.FullBrightEnabled then
-				repeat
-					wait()
-				until _G.FullBrightEnabled
-			end
-			game:GetService("Lighting").FogEnd = 786543
-		end
-	end)
-
-	game:GetService("Lighting"):GetPropertyChangedSignal("GlobalShadows"):Connect(function()
-		if game:GetService("Lighting").GlobalShadows ~= false and game:GetService("Lighting").GlobalShadows ~= _G.NormalLightingSettings.GlobalShadows then
-			_G.NormalLightingSettings.GlobalShadows = game:GetService("Lighting").GlobalShadows
-			if not _G.FullBrightEnabled then
-				repeat
-					wait()
-				until _G.FullBrightEnabled
-			end
-			game:GetService("Lighting").GlobalShadows = false
-		end
-	end)
-
-	game:GetService("Lighting"):GetPropertyChangedSignal("Ambient"):Connect(function()
-		if game:GetService("Lighting").Ambient ~= Color3.fromRGB(178, 178, 178) and game:GetService("Lighting").Ambient ~= _G.NormalLightingSettings.Ambient then
-			_G.NormalLightingSettings.Ambient = game:GetService("Lighting").Ambient
-			if not _G.FullBrightEnabled then
-				repeat
-					wait()
-				until _G.FullBrightEnabled
-			end
-			game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
-		end
-	end)
-
-	game:GetService("Lighting").Brightness = 1
-	game:GetService("Lighting").ClockTime = 12
-	game:GetService("Lighting").FogEnd = 786543
-	game:GetService("Lighting").GlobalShadows = false
-	game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
-
-	local LatestValue = true
-	spawn(function()
-		repeat
-			wait()
-		until _G.FullBrightEnabled
-		while wait() do
-			if _G.FullBrightEnabled ~= LatestValue then
-				if not _G.FullBrightEnabled then
-					game:GetService("Lighting").Brightness = _G.NormalLightingSettings.Brightness
-					game:GetService("Lighting").ClockTime = _G.NormalLightingSettings.ClockTime
-					game:GetService("Lighting").FogEnd = _G.NormalLightingSettings.FogEnd
-					game:GetService("Lighting").GlobalShadows = _G.NormalLightingSettings.GlobalShadows
-					game:GetService("Lighting").Ambient = _G.NormalLightingSettings.Ambient
-				else
-					game:GetService("Lighting").Brightness = 1
-					game:GetService("Lighting").ClockTime = 12
-					game:GetService("Lighting").FogEnd = 786543
-					game:GetService("Lighting").GlobalShadows = false
-					game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
-				end
-				LatestValue = not LatestValue
-			end
-		end
-	end)
-end
-
-_G.FullBrightExecuted = true
-_G.FullBrightEnabled = not _G.FullBrightEnabled
-
--- Services
+--------------------------------------------------
+-- SERVICES & CONSTANTS
+--------------------------------------------------
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
--- Hàm tạo glow (có check tồn tại)
-local function addGlow(character)
-    if not character then return end
-    
-    local root = character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    -- Nếu đã có thì không tạo lại
-    if character:FindFirstChild("ExecutorGlow") then
-        return
-    end
-
-    -- Tạo part
-    local glow = Instance.new("Part")
-    glow.Name = "ExecutorGlow"
-    glow.Size = Vector3.new(2,2,2)
-    glow.Shape = Enum.PartType.Ball
-    glow.Material = Enum.Material.Neon
-    glow.Color = Color3.fromRGB(0,255,255)
-    glow.Transparency = 0.4
-    glow.CanCollide = false
-    glow.Massless = true
-    glow.Parent = character
-    glow.CFrame = root.CFrame
-
-    -- Weld
-    local weld = Instance.new("WeldConstraint")
-    weld.Part0 = glow
-    weld.Part1 = root
-    weld.Parent = glow
-
-    -- Light
-    local light = Instance.new("PointLight")
-    light.Brightness = 6
-    light.Range = 12
-    light.Color = glow.Color
-    light.Parent = glow
-
-    -- Nhấp nháy
-    task.spawn(function()
-        while glow and glow.Parent do
-            glow.Transparency = 0.3
-            task.wait(0.5)
-            glow.Transparency = 0.6
-            task.wait(0.5)
-        end
-    end)
-end
-
--- Khi spawn lần đầu
-if player.Character then
-    addGlow(player.Character)
-end
-
--- Khi respawn (chết → sống lại)
-player.CharacterAdded:Connect(function(char)
-    char:WaitForChild("HumanoidRootPart")
-    task.wait(0.2) -- tránh lỗi load
-    addGlow(char)
-end)
-
-print("HI")
-end)
-
-KillingCheats:CreateButton("anti Damage fall ", function()
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local folder = ReplicatedStorage:FindFirstChild("Events")
-local remoteName = "TakeDamage"
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
-if folder then
-    for _, obj in pairs(folder:GetChildren()) do
-        if obj.Name == remoteName and obj:IsA("RemoteEvent") then
-            obj:Destroy()
-        end
-    end
+--------------------------------------------------
+-- INTERCEPT RE-EXECUTION (RELOAD NOTIFICATION SYSTEM)
+--------------------------------------------------
+local ExistingGUI = PlayerGui:FindFirstChild("ScerperGUI") or PlayerGui:FindFirstChild("AyuwokiGUI")
+
+if ExistingGUI then
+	local OldPrompt = PlayerGui:FindFirstChild("ScerperReloadPrompt")
+	if OldPrompt then OldPrompt:Destroy() end
+
+	local PromptGui = Instance.new("ScreenGui")
+	PromptGui.Name = "ScerperReloadPrompt"
+	PromptGui.ResetOnSpawn = false
+	PromptGui.Parent = PlayerGui
+
+	local Card = Instance.new("Frame")
+	Card.Size = UDim2.new(0, 260, 0, 100)
+	Card.Position = UDim2.new(0.5, -130, 0.4, -50)
+	Card.BackgroundColor3 = Color3.fromRGB(25, 25, 28)
+	Card.BorderSizePixel = 0
+	Card.Parent = PromptGui
+	Instance.new("UICorner", Card).CornerRadius = UDim.new(0, 8)
+	local CardStroke = Instance.new("UIStroke", Card)
+	CardStroke.Color = Color3.fromRGB(55, 55, 65)
+	CardStroke.Thickness = 1.2
+
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(1, -20, 0, 40)
+	Label.Position = UDim2.new(0, 10, 0, 10)
+	Label.BackgroundTransparency = 1
+	Label.Text = "Are you sure you want to reload the GUI?"
+	Label.Font = Enum.Font.GothamBold
+	Label.TextSize = 11
+	Label.TextColor3 = Color3.fromRGB(240, 240, 245)
+	Label.TextWrapped = true
+	Label.Parent = Card
+
+	local Yep = Instance.new("TextButton")
+	Yep.Size = UDim2.new(0, 105, 0, 30)
+	Yep.Position = UDim2.new(0, 15, 1, -42)
+	Yep.BackgroundColor3 = Color3.fromRGB(45, 110, 65)
+	Yep.Text = "Yep"
+	Yep.Font = Enum.Font.GothamBold
+	Yep.TextSize = 11
+	Yep.TextColor3 = Color3.new(1, 1, 1)
+	Yep.Parent = Card
+	Instance.new("UICorner", Yep).CornerRadius = UDim.new(0, 5)
+
+	local Nop = Instance.new("TextButton")
+	Nop.Size = UDim2.new(0, 105, 0, 30)
+	Nop.Position = UDim2.new(1, -120, 1, -42)
+	Nop.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+	Nop.Text = "Nop"
+	Nop.Font = Enum.Font.GothamBold
+	Nop.TextSize = 11
+	Nop.TextColor3 = Color3.new(1, 1, 1)
+	Nop.Parent = Card
+	Instance.new("UICorner", Nop).CornerRadius = UDim.new(0, 5)
+
+	local answered = false
+
+	Yep.MouseButton1Click:Connect(function()
+		answered = true
+		PromptGui:Destroy()
+		if ExistingGUI then ExistingGUI:Destroy() task.wait(0.1) end
+	end)
+
+	local function cancelPrompt()
+		answered = true
+		PromptGui:Destroy()
+	end
+
+	Nop.MouseButton1Click:Connect(cancelPrompt)
+	
+	task.delay(8, function()
+		if not answered then cancelPrompt() end
+	end)
+
+	repeat task.wait() 
+	until answered == true
+	if PlayerGui:FindFirstChild("ScerperGUI") then return end
 end
 
-print("HI")
+--------------------------------------------------
+-- MAIN ENGINE SETUP
+--------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ScerperGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 390, 0, 260)
+Main.Position = UDim2.new(0.5, -195, 0.5, -130)
+Main.BackgroundColor3 = Color3.fromRGB(20, 20, 23)
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner", Main)
+MainCorner.CornerRadius = UDim.new(0, 9)
+
+local MainStroke = Instance.new("UIStroke", Main)
+MainStroke.Color = Color3.fromRGB(35, 35, 40)
+MainStroke.Thickness = 1.2
+
+local LastMainPosition = Main.Position
+local LastCirclePosition = UDim2.new(0.5, -25, 0.5, -25) 
+local CircleHasBeenMoved = false
+
+--------------------------------------------------
+-- MINIMIZE CIRCLE SYSTEM (GIỮ NGUYÊN NÚT SH GỐC)
+--------------------------------------------------
+local MinCircle = Instance.new("TextButton")
+MinCircle.Size = UDim2.new(0, 50, 0, 50)
+MinCircle.Position = LastCirclePosition
+MinCircle.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MinCircle.Text = "SH"
+MinCircle.Font = Enum.Font.GothamBold
+MinCircle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinCircle.TextSize = 14
+MinCircle.Visible = false 
+MinCircle.Parent = ScreenGui
+
+local MinCircleCorner = Instance.new("UICorner", MinCircle)
+MinCircleCorner.CornerRadius = UDim.new(1, 0)
+
+local MinCircleStroke = Instance.new("UIStroke", MinCircle)
+MinCircleStroke.Color = Color3.fromRGB(50, 50, 60)
+MinCircleStroke.Thickness = 1.5
+
+--------------------------------------------------
+-- TOP BAR (HEADER)
+--------------------------------------------------
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 35)
+TopBar.BackgroundTransparency = 1
+TopBar.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -60, 1, 0)
+Title.Position = UDim2.new(0, 12, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Scerper hub — The Ayuwoki Field"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 13
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 14, 0, 14)
+Close.Position = UDim2.new(1, -22, 0, 10)
+Close.BackgroundColor3 = Color3.fromRGB(250, 85, 85)
+Close.Text = ""
+Close.Parent = TopBar
+Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.new(0, 14, 0, 14)
+Minimize.Position = UDim2.new(1, -42, 0, 10)
+Minimize.BackgroundColor3 = Color3.fromRGB(250, 180, 50)
+Minimize.Text = ""
+Minimize.Parent = TopBar
+Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
+
+--------------------------------------------------
+-- TAB NAVIGATION BAR (LEFT SIDEBAR)
+--------------------------------------------------
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 110, 1, -45)
+Sidebar.Position = UDim2.new(0, 10, 0, 35)
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = Main
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 6)
+
+local SidebarLayout = Instance.new("UIListLayout", Sidebar)
+SidebarLayout.Padding = UDim.new(0, 4)
+SidebarLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local SidebarPadding = Instance.new("UIPadding", Sidebar)
+SidebarPadding.PaddingTop = UDim.new(0, 6)
+
+--------------------------------------------------
+-- MAIN PAGE DISPLAY AREA
+--------------------------------------------------
+local Container = Instance.new("Frame")
+Container.Size = UDim2.new(1, -135, 1, -45)
+Container.Position = UDim2.new(0, 125, 0, 35)
+Container.BackgroundTransparency = 1
+Container.Parent = Main
+
+local tabs = {}
+local pages = {}
+
+local function createTab(name, isDefault)
+	local TabBtn = Instance.new("TextButton")
+	TabBtn.Size = UDim2.new(0.9, 0, 0, 26)
+	TabBtn.BackgroundColor3 = isDefault and Color3.fromRGB(30, 30, 35) or Color3.fromRGB(20, 20, 23)
+	TabBtn.Text = name
+	TabBtn.Font = Enum.Font.GothamBold
+	TabBtn.TextSize = 10
+	TabBtn.TextColor3 = isDefault and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 160)
+	TabBtn.Parent = Sidebar
+	Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 5)
+
+	local Page = Instance.new("ScrollingFrame")
+	Page.Size = UDim2.new(1, 0, 1, 0)
+	Page.BackgroundTransparency = 1
+	Page.BorderSizePixel = 0
+	Page.Visible = isDefault
+	Page.CanvasSize = UDim2.new(0, 0, 0, 300) 
+	Page.ScrollBarThickness = 2
+	Page.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 60)
+	Page.Parent = Container
+
+	local PageLayout = Instance.new("UIListLayout", Page)
+	PageLayout.Padding = UDim.new(0, 5)
+
+	TabBtn.MouseButton1Click:Connect(function()
+		for _, p in pairs(pages) do p.Visible = false end
+		for t, active in pairs(tabs) do
+			t.BackgroundColor3 = Color3.fromRGB(20, 20, 23)
+			t.TextColor3 = Color3.fromRGB(150, 150, 160)
+		end
+		Page.Visible = true
+		TabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+		TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	end)
+
+	tabs[TabBtn] = isDefault
+	pages[name] = Page
+	return Page
+end
+
+local PageInfo        = createTab("Info", true)
+local PageMainVisuals = createTab("Main stuff", false)
+local PageStamina     = createTab("Stamina Stuff", false)
+local PageESP         = createTab("ESP stuff", false)
+local PageMisc        = createTab("Misc", false)
+local PageSP = createTab("03y_o", false)
+local PageCredits     = createTab("Credits", false)
+
+--------------------------------------------------
+-- INFO TAB DESIGN PRESETS
+--------------------------------------------------
+local ProfileContainer = Instance.new("Frame")
+ProfileContainer.Size = UDim2.new(1, 0, 0, 54)
+ProfileContainer.BackgroundTransparency = 1
+ProfileContainer.BorderSizePixel = 0
+ProfileContainer.Parent = PageInfo
+
+local ProfileImage = Instance.new("ImageLabel")
+ProfileImage.Size = UDim2.new(0, 50, 0, 50)
+ProfileImage.Position = UDim2.new(0, 18, 0, 2) 
+ProfileImage.BackgroundColor3 = Color3.fromRGB(28, 28, 33)
+ProfileImage.BorderSizePixel = 0
+ProfileImage.Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150"
+ProfileImage.ClipsDescendants = false
+ProfileImage.Parent = ProfileContainer
+
+local MainProfileCorner = Instance.new("UICorner", ProfileImage)
+MainProfileCorner.CornerRadius = UDim.new(1, 0)
+
+local ImgStroke = Instance.new("UIStroke", ProfileImage)
+ImgStroke.Color = Color3.fromRGB(50, 110, 250)
+ImgStroke.Thickness = 1.5
+
+local function createProfileLabel(text, parent)
+	local lbl = Instance.new("TextLabel")
+	lbl.Size = UDim2.new(1, -18, 0, 16)
+	lbl.Position = UDim2.new(0, 18, 0, 0)
+	lbl.BackgroundTransparency = 1
+	lbl.Text = text
+	lbl.Font = Enum.Font.GothamSemibold
+	lbl.TextSize = 11
+	lbl.TextColor3 = Color3.fromRGB(225, 225, 230)
+	lbl.TextXAlignment = Enum.TextXAlignment.Left
+	lbl.Parent = parent
+	return lbl
+end
+
+local UserLabel = createProfileLabel("Username: " .. Player.Name, PageInfo)
+local ExecLabel = createProfileLabel("Executor: " .. (identifyexecutor or function() return "Internal Linker" end)(), PageInfo)
+local TimeLabel = createProfileLabel("Time: Checking system...", PageInfo)
+
+local Divider = Instance.new("Frame")
+Divider.Size = UDim2.new(0.85, 0, 0, 1)
+Divider.Position = UDim2.new(0, 18, 0, 0)
+Divider.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+Divider.BorderSizePixel = 0
+Divider.Parent = PageInfo
+
+local GreetingLabel = Instance.new("TextLabel")
+GreetingLabel.Size = UDim2.new(1, -18, 0, 20)
+GreetingLabel.Position = UDim2.new(0, 18, 0, 0)
+GreetingLabel.BackgroundTransparency = 1
+GreetingLabel.Text = "Synchronizing Clock..."
+GreetingLabel.Font = Enum.Font.GothamBold
+GreetingLabel.TextSize = 11
+GreetingLabel.TextColor3 = Color3.fromRGB(110, 160, 255)
+GreetingLabel.TextXAlignment = Enum.TextXAlignment.Left
+GreetingLabel.Parent = PageInfo
+
+local ThanksLabel = Instance.new("TextLabel")
+ThanksLabel.Size = UDim2.new(1, -18, 0, 14)
+ThanksLabel.Position = UDim2.new(0, 18, 0, 0)
+ThanksLabel.BackgroundTransparency = 1
+ThanksLabel.Text = "Thanks for using Scerper Hub!"
+ThanksLabel.Font = Enum.Font.GothamMedium
+ThanksLabel.TextSize = 11
+ThanksLabel.TextColor3 = Color3.fromRGB(140, 140, 145)
+ThanksLabel.TextXAlignment = Enum.TextXAlignment.Left
+ThanksLabel.Parent = PageInfo
+
+task.spawn(function()
+	while task.wait(0.5) do
+		local date = os.date("*t")
+		TimeLabel.Text = string.format("Time: %02d:%02d:%02d", date.hour, date.min, date.sec)
+		
+		local textGreeting = "Good evening"
+		if date.hour >= 5 and date.hour < 12 then
+			textGreeting = "Good morning"
+		elseif date.hour >= 12 and date.hour < 18 then
+			textGreeting = "Good afternoon"
+		end
+		GreetingLabel.Text = textGreeting .. ", " .. Player.Name .. "."
+	end
 end)
 
-KillingCheats:CreateButton("esp render", function()
---========================================================--
---==      TOGGLE ESP MODEL + CẢNH BÁO 3 MỨC KHOẢNG CÁCH  ==--
---========================================================--
+--------------------------------------------------
+-- MISC TAB CONTENT
+--------------------------------------------------
+local MiscText = Instance.new("TextLabel")
+MiscText.Size = UDim2.new(1, -18, 0, 30)
+MiscText.Position = UDim2.new(0, 18, 0, 0)
+MiscText.BackgroundTransparency = 1
+MiscText.Text = "Adding more stuff soon"
+MiscText.Font = Enum.Font.GothamBold
+MiscText.TextSize = 11
+MiscText.TextColor3 = Color3.fromRGB(150, 150, 160)
+MiscText.TextXAlignment = Enum.TextXAlignment.Left
+MiscText.Parent = PageMisc
 
-getgenv().ESP_ENABLED = not getgenv().ESP_ENABLED
-if not getgenv().ESP_ENABLED then
-    for _, v in ipairs(workspace:GetDescendants()) do
-        if v:IsA("BoxHandleAdornment") and v.Name == "ModelESP" then
-            v:Destroy()
-        end
-    end
-    if game.CoreGui:FindFirstChild("WarnGui") then
-        game.CoreGui.WarnGui:Destroy()
-    end
-    print("ESP OFF")
-    return
+--------------------------------------------------
+-- CREDITS TAB CONTENT
+--------------------------------------------------
+local CreatorHeader = Instance.new("TextLabel")
+CreatorHeader.Size = UDim2.new(1, -18, 0, 22)
+CreatorHeader.Position = UDim2.new(0, 18, 0, 0)
+CreatorHeader.BackgroundTransparency = 1
+CreatorHeader.Text = "Main Creator:"
+CreatorHeader.Font = Enum.Font.GothamBold
+CreatorHeader.TextSize = 12
+CreatorHeader.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreatorHeader.TextXAlignment = Enum.TextXAlignment.Left
+CreatorHeader.Parent = PageCredits
+
+local CreatorName = Instance.new("TextLabel")
+CreatorName.Size = UDim2.new(1, -18, 0, 18)
+CreatorName.Position = UDim2.new(0, 18, 0, 0)
+CreatorName.BackgroundTransparency = 1
+CreatorName.Text = "• Junglescripts"
+CreatorName.Font = Enum.Font.GothamBold
+CreatorName.TextSize = 12
+CreatorName.TextColor3 = Color3.fromRGB(100, 180, 255)
+CreatorName.TextXAlignment = Enum.TextXAlignment.Left
+CreatorName.Parent = PageCredits
+
+local CreditDesc = Instance.new("TextLabel")
+CreditDesc.Size = UDim2.new(1, -30, 0, 40)
+CreditDesc.Position = UDim2.new(0, 18, 0, 0)
+CreditDesc.BackgroundTransparency = 1
+CreditDesc.Text = "Main creator of the user interface architecture and compilation."
+CreditDesc.Font = Enum.Font.GothamMedium
+CreditDesc.TextSize = 10
+CreditDesc.TextColor3 = Color3.fromRGB(150, 150, 155)
+CreditDesc.TextXAlignment = Enum.TextXAlignment.Left
+CreditDesc.TextWrapped = true
+CreditDesc.Parent = PageCredits
+
+local CrackerHeader = Instance.new("TextLabel")
+CrackerHeader.Size = UDim2.new(1, -18, 0, 22)
+CrackerHeader.Position = UDim2.new(0, 20, 0, 0)
+CrackerHeader.BackgroundTransparency = 1
+CrackerHeader.Text = "Cracker:"
+CrackerHeader.Font = Enum.Font.GothamBold
+CrackerHeader.TextSize = 12
+CrackerHeader.TextColor3 = Color3.fromRGB(255, 0, 0)
+CrackerHeader.TextXAlignment = Enum.TextXAlignment.Left
+CrackerHeader.Parent = PageCredits
+
+local CrackerName = Instance.new("TextLabel")
+CrackerName.Size = UDim2.new(1, -18, 0, 18)
+CrackerName.Position = UDim2.new(0, 20, 0, 0)
+CrackerName.BackgroundTransparency = 1
+CrackerName.Text = "『03y_o』"
+CrackerName.Font = Enum.Font.GothamBold
+CrackerName.TextSize = 12
+CrackerName.TextColor3 = Color3.fromRGB(128, 0, 0)
+CrackerName.TextXAlignment = Enum.TextXAlignment.Left
+CrackerName.Parent = PageCredits
+
+--------------------------------------------------
+-- BUTTON CREATOR UTILITY
+--------------------------------------------------
+local function createButton(text, parent)
+	local Btn = Instance.new("TextButton")
+	Btn.Size = UDim2.new(1, -6, 0, 34)
+	Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+	Btn.TextColor3 = Color3.fromRGB(200, 200, 210)
+	Btn.Font = Enum.Font.GothamBold
+	Btn.TextSize = 11
+	Btn.Text = text .. " : OFF"
+	Btn.Parent = parent
+
+	local BtnCorner = Instance.new("UICorner", Btn)
+	BtnCorner.CornerRadius = UDim.new(0, 5)
+
+	local BtnStroke = Instance.new("UIStroke", Btn)
+	BtnStroke.Color = Color3.fromRGB(38, 38, 45)
+	BtnStroke.Thickness = 1
+
+	return Btn, BtnStroke
 end
 
-print("ESP ON")
+local FullBrightBtn, FBtnStroke = createButton("Visual Full Bright", PageMainVisuals)
+local EmoteBtn, EmBtnStroke      = createButton("Trigger Emote Button", PageMainVisuals)
+local TakeDamageBtn, TKBtnStroke      = createButton("Take Damage Button", PageMainVisuals)
 
-local TargetNames = { "Ayuwoki" }
+local TakePromtBtn, TPBtnStroke      = createButton("Take Promt Button", PageSP)
+local TeleportBtn, TpBtnStroke      = createButton("Teleport Button", PageSP)
+local BackBtn, BkBtnStroke      = createButton("Back Button", PageSP)
 
--- Gui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "WarnGui"
-ScreenGui.Parent = game.CoreGui
+local StamV1Btn, S1Stroke        = createButton("Infinite Stamina V1", PageStamina)
+local StamV2Btn, S2Stroke        = createButton("Infinite Stamina V2", PageStamina)
+local SprintBoostBtn, SBStroke   = createButton("Force Sprint Boost", PageStamina)
 
-local Text = Instance.new("TextLabel")
-Text.Size = UDim2.new(0, 400, 0, 50)
-Text.Position = UDim2.new(0.5, -200, 0.08, 0)
-Text.BackgroundTransparency = 1
-Text.TextScaled = true
-Text.Font = Enum.Font.GothamBold
-Text.Text = ""
-Text.Visible = false
-Text.Parent = ScreenGui
+local MonsterESPBtn, MESPStroke   = createButton("Toggle Monster ESP", PageESP)
+local PlayerESPBtn, PEStroke     = createButton("Toggle Player ESP", PageESP)
+local ItemsESPBtn, ItemsStroke   = createButton("Items ESP", PageESP)
 
--- Kiểm tên mục tiêu
-local function isTarget(name)
-    for _, n in ipairs(TargetNames) do
-        if n == name then return true end
-    end
-    return false
+--------------------------------------------------
+-- TOGGLE SYSTEM ANIMATIONS
+--------------------------------------------------
+local function animateToggle(btn, stroke, state, textPrefix, activeColor, activeStroke)
+	if state then
+		btn.Text = textPrefix .. " : ON"
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = activeColor, TextColor3 = Color3.new(1, 1, 1)}):Play()
+		TweenService:Create(stroke, TweenInfo.new(0.2), {Color = activeStroke}):Play()
+	else
+		btn.Text = textPrefix .. " : OFF"
+		TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 30), TextColor3 = Color3.fromRGB(200, 200, 210)}):Play()
+		TweenService:Create(stroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(38, 38, 45)}):Play()
+	end
 end
 
--- ESP Box
+--------------------------------------------------
+-- INDEPENDENT POSITION DRAGGING HANDLER
+--------------------------------------------------
+local function makeDraggable(frame, identityKey)
+	local dragging, dragInput, dragStart, startPos
+	
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+			input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
+		end
+	end)
+
+	frame.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
+	end)
+
+	UIS.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			frame.Position = targetPos
+			
+			if identityKey == "MAIN" then
+				LastMainPosition = targetPos
+			elseif identityKey == "CIRCLE" then
+				LastCirclePosition = targetPos
+				CircleHasBeenMoved = true
+			end
+		end
+	end)
+end
+
+makeDraggable(Main, "MAIN")
+makeDraggable(MinCircle, "CIRCLE")
+
+--------------------------------------------------
+-- ENVIRONMENTAL MODIFICATIONS
+--------------------------------------------------
+local FullBrightEnabled = false
+local FullBrightConnections = {}
+
+local function applyFullBright()
+	if not FullBrightEnabled then return end
+	Lighting.Ambient, Lighting.OutdoorAmbient = Color3.new(1, 1, 1), Color3.new(1, 1, 1)
+	Lighting.Brightness, Lighting.FogEnd = 3, 100000
+	Lighting.GlobalShadows, Lighting.ClockTime = false, 14
+end
+
+local function setupFullBrightProtection()
+	for _, conn in pairs(FullBrightConnections) do conn:Disconnect() end
+	table.clear(FullBrightConnections)
+	local properties = {"Ambient", "OutdoorAmbient", "Brightness", "FogEnd", "GlobalShadows", "ClockTime"}
+	for _, prop in ipairs(properties) do
+		table.insert(FullBrightConnections, Lighting:GetPropertyChangedSignal(prop):Connect(function()
+			if FullBrightEnabled then task.defer(applyFullBright) end
+		end))
+	end
+end
+
+local function toggleFullBright()
+	FullBrightEnabled = not FullBrightEnabled
+	animateToggle(FullBrightBtn, FBtnStroke, FullBrightEnabled, "Visual Full Bright", Color3.fromRGB(45, 105, 65), Color3.fromRGB(65, 180, 100))
+	if FullBrightEnabled then applyFullBright() setupFullBrightProtection() else Lighting.GlobalShadows = true end
+end
+
+--------------------------------------------------
+-- AYUWOKI WORKSPACE ESP SYSTEM
+--------------------------------------------------
+getgenv().ESP_ENABLED = false
+local WarnScreenGui = nil
+local WarnTextLabel = nil
+
 local function createESP(model)
     local p = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
     if not p then return end
 
-    for _, v in ipairs(model:GetChildren()) do
-        if v:IsA("BoxHandleAdornment") and v.Name == "ModelESP" then
-            v:Destroy()
-        end
+    if not model:FindFirstChild("ModelESP") then
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = "ModelESP"
+        box.Adornee = p
+        box.Size = model:GetExtentsSize()
+        box.Color3 = Color3.new(0, 1, 0)
+        box.Transparency = 0.3
+        box.AlwaysOnTop = true
+        box.ZIndex = 5
+        box.Parent = model
     end
-
-    local box = Instance.new("BoxHandleAdornment")
-    box.Name = "ModelESP"
-    box.Adornee = p
-    box.Size = model:GetExtentsSize()
-    box.Color3 = Color3.new(0, 1, 0)
-    box.Transparency = 0.3
-    box.AlwaysOnTop = true
-    box.ZIndex = 5
-    box.Parent = model
 end
 
--- Loop update
-local RunService = game:GetService("RunService")
-local lp = game.Players.LocalPlayer
+local function cleanMonsterESP()
+    for _, v in ipairs(Workspace:GetChildren()) do
+        local box = v:FindFirstChild("ModelESP")
+        if box then box:Destroy() end
+    end
+    local oldGui = game.CoreGui:FindFirstChild("WarnGui")
+    if oldGui then oldGui:Destroy() end
+    WarnScreenGui = nil
+    WarnTextLabel = nil
+end
 
 RunService.RenderStepped:Connect(function()
     if not getgenv().ESP_ENABLED then return end
 
-    local char = lp.Character
+    local char = Player.Character
     local hrp = char and char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
     local nearestDist = math.huge
     local nearestModel = nil
 
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("Model") and isTarget(obj.Name) then
-            
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if obj:IsA("Model") and obj.Name == "Ayuwoki" then
             createESP(obj)
 
             local part = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
@@ -312,204 +601,355 @@ RunService.RenderStepped:Connect(function()
         end
     end
 
-    --===================================--
-    --==  CẢNH BÁO 3 MÀU (ĐỎ - VÀNG - XANH) ==
-    --===================================--
-
-    if nearestModel and nearestDist then
-
+    if nearestModel and nearestDist and WarnTextLabel then
         if nearestDist <= 101 then
-            Text.Text = "⚠ NGUY HIỂM – RẤT GẦN ("..math.floor(nearestDist)..")"
-            Text.TextColor3 = Color3.fromRGB(255, 0, 0) -- ĐỎ
-            Text.Visible = true
-
+            WarnTextLabel.Text = "⚠ NGUY HIỂM – RẤT GẦN ("..math.floor(nearestDist)..")"
+            WarnTextLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+            WarnTextLabel.Visible = true
         elseif nearestDist <= 201 then
-            Text.Text = "⚠ CẢNH BÁO – GẦN ("..math.floor(nearestDist)..")"
-            Text.TextColor3 = Color3.fromRGB(255, 200, 0) -- VÀNG
-            Text.Visible = true
-
+            WarnTextLabel.Text = "⚠ CẢNH BÁO – GẦN ("..math.floor(nearestDist)..")"
+            WarnTextLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+            WarnTextLabel.Visible = true
         elseif nearestDist <= 550 then
-            Text.Text = "✔ AN TOÀN – XA ("..math.floor(nearestDist)..")"
-            Text.TextColor3 = Color3.fromRGB(0, 255, 0) -- XANH LÁ
-            Text.Visible = true
-
+            WarnTextLabel.Text = "✔ AN TOÀN – XA ("..math.floor(nearestDist)..")"
+            WarnTextLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+            WarnTextLabel.Visible = true
         else
-            Text.Visible = false
+            WarnTextLabel.Visible = false
         end
-
     else
-        Text.Visible = false
+        if WarnTextLabel then WarnTextLabel.Visible = false end
     end
 end)
 
-print("HI")
+local function toggleMonsterESP()
+    getgenv().ESP_ENABLED = not getgenv().ESP_ENABLED
+    animateToggle(MonsterESPBtn, MESPStroke, getgenv().ESP_ENABLED, "Toggle Monster ESP", Color3.fromRGB(110, 35, 35), Color3.fromRGB(180, 50, 50))
+    
+    if getgenv().ESP_ENABLED then
+        WarnScreenGui = Instance.new("ScreenGui")
+        WarnScreenGui.Name = "WarnGui"
+        WarnScreenGui.Parent = game.CoreGui
+
+        WarnTextLabel = Instance.new("TextLabel")
+        WarnTextLabel.Size = UDim2.new(0, 400, 0, 50)
+        WarnTextLabel.Position = UDim2.new(0.5, -200, 0.08, 0)
+        WarnTextLabel.BackgroundTransparency = 1
+        WarnTextLabel.TextScaled = true
+        WarnTextLabel.Font = Enum.Font.GothamBold
+        WarnTextLabel.Text = ""
+        WarnTextLabel.Visible = false
+        WarnTextLabel.Parent = WarnScreenGui
+    else
+        cleanMonsterESP()
+    end
+end
+
+--------------------------------------------------
+-- GREEN PLAYER ESP ENGINE
+--------------------------------------------------
+local PlayerESPEnabled = false
+local PLAYER_TAG = "_player_esp_tag"
+
+local function cleanPlayerESP()
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p.Character then
+			local existing = p.Character:FindFirstChild(PLAYER_TAG)
+			if existing then existing:Destroy() end
+		end
+	end
+end
+
+local function applyPlayerESP()
+	if not PlayerESPEnabled then return end
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p ~= Player and p.Character and not p.Character:FindFirstChild(PLAYER_TAG) then
+			local h = Instance.new("Highlight")
+			h.Name = PLAYER_TAG
+			h.Adornee = p.Character
+			h.FillColor = Color3.fromRGB(50, 220, 110)
+			h.OutlineColor = Color3.fromRGB(50, 220, 110)
+			h.FillTransparency = 0.4
+			h.OutlineTransparency = 0
+			h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			h.Parent = p.Character
+		end
+	end
+end
+
+RunService.Heartbeat:Connect(function()
+	if PlayerESPEnabled then applyPlayerESP() end
 end)
 
-KillingCheats:CreateButton("menu flashbang ", function()
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StarterGui = game:GetService("StarterGui")
-local player = Players.LocalPlayer
-
-local camaraToolName = "Camara"
-local target = nil
-local active = false
-
-StarterGui:SetCore("SendNotification", {
-    Title = "FLASH BANG";
-    Text = "cracked by romd3976";
-    Duration = 3;
-})
-
-local screenGui = player:WaitForChild("PlayerGui"):FindFirstChild("FlashBangGui")
-if not screenGui then
-    screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "FlashBangGui"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = player:WaitForChild("PlayerGui")
-
-    local frame = Instance.new("Frame")
-    frame.Name = "MainFrame"
-    frame.Size = UDim2.new(0, 250, 0, 400)
-    frame.Position = UDim2.new(0.5, -125, 0.5, -200)
-    frame.BackgroundColor3 = Color3.new(1, 1, 1)
-    frame.AnchorPoint = Vector2.new(0.5, 0.5)
-    frame.Active = true
-    frame.Draggable = true
-    frame.Parent = screenGui
-
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.Position = UDim2.new(0, 0, 0, 0)
-    title.BackgroundTransparency = 1
-    title.Text = "FLASH BANG"
-    title.TextColor3 = Color3.new(0, 0, 0)
-    title.TextScaled = true
-    title.Parent = frame
-
-    local stopBtn = Instance.new("TextButton")
-    stopBtn.Size = UDim2.new(0, 80, 0, 30)
-    stopBtn.Position = UDim2.new(1, -85, 0, 0)
-    stopBtn.Text = "STOP"
-    stopBtn.BackgroundColor3 = Color3.new(1, 0, 0)
-    stopBtn.TextColor3 = Color3.new(1, 1, 1)
-    stopBtn.Parent = frame
-    stopBtn.MouseButton1Click:Connect(function()
-        active = false
-    end)
-
-    local scrollingFrame = Instance.new("ScrollingFrame")
-    scrollingFrame.Name = "PlayerList"
-    scrollingFrame.Size = UDim2.new(1, -10, 1, -40)
-    scrollingFrame.Position = UDim2.new(0, 5, 0, 35)
-    scrollingFrame.BackgroundTransparency = 1
-    scrollingFrame.ScrollBarThickness = 6
-    scrollingFrame.Parent = frame
+local function togglePlayerESP()
+	PlayerESPEnabled = not PlayerESPEnabled
+	animateToggle(PlayerESPBtn, PEStroke, PlayerESPEnabled, "Toggle Player ESP", Color3.fromRGB(30, 110, 80), Color3.fromRGB(45, 175, 120))
+	if not PlayerESPEnabled then cleanPlayerESP() end
 end
 
-local frame = screenGui:WaitForChild("MainFrame")
-local scrollingFrame = frame:WaitForChild("PlayerList")
+--------------------------------------------------
+-- UNIQUE MULTI-COLOR ITEMS ESP
+--------------------------------------------------
+local ItemsESPEnabled = false
+local ITEM_ESP_TAG = "_item_premium_esp"
 
-local function findLoadCharacter()
-    return ReplicatedStorage:FindFirstChild("LoadCharacter", true)
+local ItemConfig = {
+	["Camara"]          = {English = "Camera",     Color = Color3.fromRGB(0, 200, 255)},
+	["Mapa"]            = {English = "Map",        Color = Color3.fromRGB(255, 200, 0)},
+	["Rastreador"]      = {English = "Tracker",    Color = Color3.fromRGB(255, 50, 50)},
+	["Soda"]            = {English = "Soda",        Color = Color3.fromRGB(250, 100, 250)},
+	["BarraEnergetica"] = {English = "Energy Bar", Color = Color3.fromRGB(50, 255, 100)},
+	["Vendas"]          = {English = "Bandages",   Color = Color3.fromRGB(230, 230, 240)},
+	["Escoba"]          = {English = "Broom",      Color = Color3.fromRGB(200, 120, 50)}
+}
+
+local function verifyValidItem(obj)
+	if not obj or not obj:IsDescendantOf(Workspace) then return false end
+
+	for _, p in ipairs(Players:GetPlayers()) do
+		if p.Character and obj:IsDescendantOf(p.Character) then return false end
+		local bp = p:FindFirstChild("Backpack")
+		if bp and obj:IsDescendantOf(bp) then return false end
+	end
+
+	if obj:IsA("BasePart") and obj.Transparency >= 0.95 then
+		return false
+	elseif obj:IsA("Model") then
+		local representative = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+		if representative and representative.Transparency >= 0.95 then return false end
+	end
+
+	return true
 end
 
-local char = player.Character or player.CharacterAdded:Wait()
-local hrp = char:WaitForChild("HumanoidRootPart")
-player.CharacterAdded:Connect(function(newChar)
-    char = newChar
-    hrp = char:WaitForChild("HumanoidRootPart")
+local function attachItemESP(obj)
+	if not obj:IsA("BasePart") and not obj:IsA("Model") then return end
+	if obj:FindFirstChild(ITEM_ESP_TAG) then return end
+	
+	local itemData = ItemConfig[obj.Name]
+	if not itemData then return end
+	if not verifyValidItem(obj) then return end
+
+	local customColor = itemData.Color
+	local engName = itemData.English
+
+	local h = Instance.new("Highlight")
+	h.Name = ITEM_ESP_TAG
+	h.Adornee = obj
+	h.FillColor = customColor
+	h.OutlineColor = customColor
+	h.FillTransparency = 0.4
+	h.OutlineTransparency = 0
+	h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	h.Parent = obj
+
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = ITEM_ESP_TAG .. "_text"
+	billboard.Size = UDim2.new(0, 150, 0, 30)
+	billboard.AlwaysOnTop = true
+	billboard.MaxDistance = math.huge
+	billboard.StudsOffset = Vector3.new(0, 1.5, 0)
+	billboard.Parent = obj
+
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.Text = engName .. " [Checking...]"
+	label.Font = Enum.Font.GothamBold
+	label.TextColor3 = customColor
+	label.TextSize = 10
+	label.TextStrokeTransparency = 0.4
+	label.TextStrokeColor3 = Color3.new(0, 0, 0)
+	label.Parent = billboard
+
+	if obj:IsA("BasePart") then
+		billboard.Adornee = obj
+	else
+		billboard.Adornee = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart") or obj
+	end
+
+	task.spawn(function()
+		while billboard.Parent and ItemsESPEnabled do
+			if not verifyValidItem(obj) then
+				h:Destroy()
+				billboard:Destroy()
+				break
+			end
+			
+			local myChar = Player.Character
+			if myChar and myChar:FindFirstChild("HumanoidRootPart") and billboard.Adornee then
+				local targetPos = billboard.Adornee:IsA("BasePart") and billboard.Adornee.Position or billboard.Adornee:GetPivot().Position
+				if targetPos then
+					local dist = (myChar.HumanoidRootPart.Position - targetPos).Magnitude
+					local meters = math.floor(dist * 0.28)
+					label.Text = string.format("%s [%dm]", engName, meters)
+				end
+			end
+			task.wait(0.2)
+		end
+	end)
+end
+
+local function cleanItemsESP()
+	for _, v in ipairs(Workspace:GetDescendants()) do
+		if v.Name == ITEM_ESP_TAG or v.Name == ITEM_ESP_TAG .. "_text" then
+			v:Destroy()
+		end
+	end
+end
+
+local function scanAndApplyItemsESP()
+	if not ItemsESPEnabled then return end
+	for _, v in ipairs(Workspace:GetDescendants()) do
+		if ItemConfig[v.Name] then
+			attachItemESP(v)
+		end
+	end
+end
+
+Workspace.DescendantAdded:Connect(function(v)
+	if not ItemsESPEnabled then return end
+	
+	if ItemConfig[v.Name] then
+		task.wait(0.1)
+		attachItemESP(v)
+	else
+		local nameConnection
+		nameConnection = v:GetPropertyChangedSignal("Name"):Connect(function()
+			if not ItemsESPEnabled or not v.Parent then
+				nameConnection:Disconnect()
+				return
+			end
+			if ItemConfig[v.Name] then
+				nameConnection:Disconnect()
+				task.wait(0.1)
+				attachItemESP(v)
+			end
+		end)
+		task.delay(5, function() if nameConnection then nameConnection:Disconnect() end end)
+	end
 end)
 
-local function updateList()
-    scrollingFrame:ClearAllChildren()
-    local y = 0
-    for _, plr in pairs(Players:GetPlayers()) do
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, 0, 0, 30)
-        btn.Position = UDim2.new(0, 0, 0, y)
-        btn.Text = plr.Name
-        btn.BackgroundColor3 = Color3.new(0.8, 0.8, 0.8)
-        btn.TextColor3 = Color3.new(0, 0, 0)
-        btn.Parent = scrollingFrame
-        y = y + 35
-        btn.MouseButton1Click:Connect(function()
-            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-                target = plr.Character.HumanoidRootPart
-                active = true
-                StarterGui:SetCore("SendNotification", {
-                    Title = "FLASH BANG";
-                    Text = "Activated on "..plr.Name;
-                    Duration = 3;
-                })
-            end
-        end)
-    end
-    local ayu = workspace:FindFirstChild("Ayuwoki")
-    if ayu and ayu:FindFirstChild("HumanoidRootPart") then
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, 0, 0, 30)
-        btn.Position = UDim2.new(0, 0, 0, y)
-        btn.Text = "Ayuwoki"
-        btn.BackgroundColor3 = Color3.new(1, 0, 1)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Parent = scrollingFrame
-        btn.MouseButton1Click:Connect(function()
-            target = ayu.HumanoidRootPart
-            active = true
-            StarterGui:SetCore("SendNotification", {
-                Title = "FLASH BANG";
-                Text = "Activated on Ayuwoki";
-                Duration = 3;
-            })
-        end)
-        y = y + 35
-    end
-    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, y)
+task.spawn(function()
+	while true do
+		task.wait(3.5)
+		if ItemsESPEnabled then
+			scanAndApplyItemsESP()
+		end
+	end
+end)
+
+local function toggleItemsESP()
+	ItemsESPEnabled = not ItemsESPEnabled
+	animateToggle(ItemsESPBtn, ItemsStroke, ItemsESPEnabled, "Items ESP", Color3.fromRGB(90, 35, 130), Color3.fromRGB(160, 60, 230))
+	if ItemsESPEnabled then
+		scanAndApplyItemsESP()
+	else
+		cleanItemsESP()
+	end
 end
 
-Players.PlayerAdded:Connect(updateList)
-Players.PlayerRemoving:Connect(updateList)
-updateList()
+--------------------------------------------------
+-- EMOTE INTERACTION MODULE
+--------------------------------------------------
+local EmoteCircle = Instance.new("TextButton")
+EmoteCircle.Size = UDim2.new(0, 46, 0, 46)
+EmoteCircle.Position = UDim2.new(0.85, 0, 0.75, 0)
+EmoteCircle.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+EmoteCircle.Text = "Emote"
+EmoteCircle.TextColor3 = Color3.new(1, 1, 1)
+EmoteCircle.Font = Enum.Font.GothamBold
+EmoteCircle.TextSize = 10
+EmoteCircle.Visible = false
+EmoteCircle.Parent = ScreenGui
+Instance.new("UICorner", EmoteCircle).CornerRadius = UDim.new(1, 0)
+Instance.new("UIStroke", EmoteCircle).Color = Color3.new(1, 1, 1)
 
-spawn(function()
-    while true do
-        RunService.RenderStepped:Wait()
-        if active and target and char and hrp then
-            local lookVector = target.CFrame.LookVector
-            local frontPos = target.Position + lookVector * 20
-            hrp.CFrame = CFrame.new(frontPos, target.Position)
-            workspace.CurrentCamera.CFrame = CFrame.new(hrp.Position, target.Position)
-            local tool = player.Backpack:FindFirstChild(camaraToolName) or char:FindFirstChild(camaraToolName)
-            if tool then
-                char.Humanoid:EquipTool(tool)
-                if tool:FindFirstChild("Activate") then
-                    tool.Activate:FireServer()
-                else
-                    tool:Activate()
-                end
-                wait(2)
-                local loadChar = findLoadCharacter()
-                if loadChar then
-                    if loadChar:IsA("RemoteEvent") then
-                        loadChar:FireServer()
-                    elseif loadChar:IsA("RemoteFunction") then
-                        loadChar:InvokeServer()
-                    end
-                end
-            end
-            wait(0.5)
+-- Hàm kéo thả riêng cho nút Emote
+local function makeEmoteDraggable(frame)
+	local dragging, dragInput, dragStart, startPos
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+			input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
+		end
+	end)
+	frame.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end end)
+	UIS.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+end
+makeEmoteDraggable(EmoteCircle)
+
+local EmoteEnabled = false
+local function toggleEmote()
+	EmoteEnabled = not EmoteEnabled
+	animateToggle(EmoteBtn, EmBtnStroke, EmoteEnabled, "Trigger Emote Button", Color3.fromRGB(50, 50, 100), Color3.fromRGB(85, 85, 160))
+	EmoteCircle.Visible = EmoteEnabled
+end
+
+EmoteCircle.MouseButton1Click:Connect(function()
+	VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.X, false, game)
+	task.wait(0.02)
+	VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.X, false, game)
+end)
+
+--------------------------------------------------
+-- REMOTES STAMINA INTERACTION SYSTEM
+--------------------------------------------------
+local StamV1Enabled, StamV2Enabled, SprintBoostEnabled = false, false, false
+local AddStaminaEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("AddStamina")
+local SpeedBoostEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("SpeedBoost")
+
+RunService.Heartbeat:Connect(function()
+	if StamV1Enabled then task.defer(firesignal, AddStaminaEvent.OnClientEvent, nil, 3) end
+	if StamV2Enabled then task.defer(firesignal, AddStaminaEvent.OnClientEvent, 1000) end
+	if SprintBoostEnabled then task.defer(firesignal, SpeedBoostEvent.OnClientEvent, 6, 8) end
+end)
+
+local function toggleStamV1() StamV1Enabled = not StamV1Enabled animateToggle(StamV1Btn, S1Stroke, StamV1Enabled, "Infinite Stamina V1", Color3.fromRGB(70, 35, 105), Color3.fromRGB(120, 60, 180)) end
+local function toggleStamV2() StamV2Enabled = not StamV2Enabled animateToggle(StamV2Btn, S2Stroke, StamV2Enabled, "Infinite Stamina V2", Color3.fromRGB(90, 25, 90), Color3.fromRGB(155, 45, 155)) end
+local function toggleSprintBoost() SprintBoostEnabled = not SprintBoostEnabled animateToggle(SprintBoostBtn, SBStroke, SprintBoostEnabled, "Force Sprint Boost", Color3.fromRGB(105, 70, 0), Color3.fromRGB(175, 120, 10)) end
+
+--------------------------------------------------
+-- ACTION COUPLINGS
+--------------------------------------------------
+FullBrightBtn.MouseButton1Click:Connect(toggleFullBright)
+MonsterESPBtn.MouseButton1Click:Connect(toggleMonsterESP)
+EmoteBtn.MouseButton1Click:Connect(toggleEmote)
+StamV1Btn.MouseButton1Click:Connect(toggleStamV1)
+StamV2Btn.MouseButton1Click:Connect(toggleStamV2)
+SprintBoostBtn.MouseButton1Click:Connect(toggleSprintBoost)
+PlayerESPBtn.MouseButton1Click:Connect(togglePlayerESP)
+ItemsESPBtn.MouseButton1Click:Connect(toggleItemsESP)
+
+--------------------------------------------------
+-- Take damage
+--------------------------------------------------
+
+TakeDamageBtn.Text = "Take Damage"
+TakeDamageBtn.MouseButton1Click:Connect(function()
+    local folder = ReplicatedStorage:FindFirstChild("Events")
+    if folder then
+        for _, obj in pairs(folder:GetChildren()) do
+            if obj.Name == "TakeDamage" and obj:IsA("RemoteEvent") then obj:Destroy() end
         end
     end
 end)
-print("HI")
-end)
 
+--------------------------------------------------
+-- Tp and bk or g
+--------------------------------------------------
+
+TeleportBtn.Text = "TP"
+TeleportBtn.MouseButton1Click:Connect(function()
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-
-local savedCFrame = nil
 
 local targetCFrame = CFrame.new(
 	232.336884, 79, -96.4145508,
@@ -523,7 +963,33 @@ local function getHRP()
 	return char:WaitForChild("HumanoidRootPart")
 end
 
--- Lấy danh sách prompt
+local hrp = getHRP()
+_G.SavedCFrame = hrp.CFrame
+hrp.CFrame = targetCFrame
+end)
+
+BackBtn.Text = "Back"
+BackBtn.MouseButton1Click:Connect(function()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function getHRP()
+	local char = player.Character or player.CharacterAdded:Wait()
+	return char:WaitForChild("HumanoidRootPart")
+end
+
+if _G.SavedCFrame then
+	getHRP().CFrame = _G.SavedCFrame
+else
+	warn("Chưa có vị trí nào được lưu trước đó!")
+end
+end)
+
+TakePromtBtn.Text = "2s promt"
+TakePromtBtn.MouseButton1Click:Connect(function()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
 local function getPrompts()
 	local prompts = {}
 
@@ -532,9 +998,9 @@ local function getPrompts()
 			obj.Name == "Escoba" or 
 			obj.Name == "Soda" or 
 			obj.Name == "Vendas" or
-        obj.Name == "BarraEnergetica" or
-        obj.Name == "Rastreador" or
-        obj.Name == "Mapa"
+			obj.Name == "BarraEnergetica" or
+			obj.Name == "Rastreador" or
+			obj.Name == "Mapa"
 		) then
 			local handle = obj:FindFirstChild("Handle")
 			if handle then
@@ -549,35 +1015,118 @@ local function getPrompts()
 	return prompts
 end
 
--- Spam trong 2 giây
-local function spamPrompts(duration)
-	local prompts = getPrompts()
-	local startTime = tick()
+local prompts = getPrompts()
+local startTime = tick()
 
-	while tick() - startTime < duration do
-		for _, prompt in pairs(prompts) do
-			pcall(function()
-				fireproximityprompt(prompt)
-			end)
-		end
-		task.wait(0.1) -- tốc độ spam
+while tick() - startTime < 2 do
+	for _, prompt in pairs(prompts) do
+		pcall(function()
+			fireproximityprompt(prompt)
+		end)
 	end
+	task.wait(0.1)
+end
+end)
+
+--------------------------------------------------
+-- INDEPENDENT MEMORY TRANSITION SYSTEM
+--------------------------------------------------
+local function minimizeGUI()
+	if not CircleHasBeenMoved then
+		LastCirclePosition = UDim2.new(0, Main.AbsolutePosition.X + (Main.AbsoluteSize.X / 2) - 25, 0, Main.AbsolutePosition.Y + (Main.AbsoluteSize.Y / 2) - 25)
+	end
+	MinCircle.Position = LastCirclePosition
+	Main.Visible = false
+	MinCircle.Visible = true
+	MinCircle.Size = UDim2.new(0, 10, 0, 10)
+	TweenService:Create(MinCircle, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 50, 0, 50)}):Play()
 end
 
-player.Chatted:Connect(function(msg)
-	msg = msg:lower()
+local function maximizeGUI()
+	Main.Position = LastMainPosition
+	MinCircle.Visible = false
+	Main.Visible = true
+	Main.Size = UDim2.new(0, 40, 0, 30)
+	TweenService:Create(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, 390, 0, 260)}):Play()
+end
 
-	if msg == "/tp" then
-		local hrp = getHRP()
-		savedCFrame = hrp.CFrame
-		hrp.CFrame = targetCFrame
+Minimize.MouseButton1Click:Connect(minimizeGUI)
+MinCircle.MouseButton1Click:Connect(maximizeGUI)
 
-	elseif msg == "/bk" then
-		if savedCFrame then
-			getHRP().CFrame = savedCFrame
+Close.MouseButton1Click:Connect(function()
+	Title.Text = "Disconnecting..."
+	Container.Visible, Sidebar.Visible, EmoteCircle.Visible, MinCircle.Visible = false, false, false, false
+	cleanPlayerESP() cleanMonsterESP() cleanItemsESP()
+	TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, 390, 0, 35)}):Play()
+	task.wait(0.3) ScreenGui:Destroy()
+end)
+
+print("crack by 03y_o")
+
+--------------------------------------------------
+-- NÚT ĐEN XOAY ĐỘC LẬP - ĐÃ CHUYỂN LÊN GÓC TRÊN BÊN PHẢI
+--------------------------------------------------
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ScerperBlackToggle"
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Position = UDim2.new(0.85, 0, 0.05, 0) 
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15) 
+ToggleButton.Text = "" 
+ToggleButton.ZIndex = 10 
+ToggleButton.Parent = ScreenGui
+
+local ButtonCorner = Instance.new("UICorner", ToggleButton)
+ButtonCorner.CornerRadius = UDim.new(0, 12) 
+
+local ButtonStroke = Instance.new("UIStroke", ToggleButton)
+ButtonStroke.Color = Color3.fromRGB(45, 45, 45) 
+ButtonStroke.Thickness = 1.5
+
+local function makeBlackButtonDraggable(frame)
+	local dragging, dragInput, dragStart, startPos
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+			input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
 		end
+	end)
+	frame.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end end)
+	UIS.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+end
+makeBlackButtonDraggable(ToggleButton)
 
-	elseif msg == "/g" then
-		spamPrompts(2) -- spam 2 giây
-	end
+local isRotating = true 
+
+task.spawn(function()
+    while true do
+        if isRotating then
+            ToggleButton.Rotation = (ToggleButton.Rotation + 250 * task.wait()) % 360
+        else
+            if ToggleButton.Rotation ~= 0 then ToggleButton.Rotation = 0 end
+            task.wait(0.1)
+        end
+    end
+end)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    if Main.Visible then
+        Main.Visible = false
+        isRotating = false        
+    else
+        Main.Visible = true
+        MinCircle.Visible = false 
+        Main.Position = LastMainPosition
+        isRotating = true         
+    end
+end)
+
+Close.MouseButton1Click:Connect(function()
+    if ToggleButton then ToggleButton:Destroy() end
 end)
