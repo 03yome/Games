@@ -868,14 +868,23 @@ button.MouseButton1Click:Connect(function()
 	remote:FireServer()
 end)
 
--- --- HỦY GUI CŨ NẾU CÓ (Tránh trùng lặp khi chạy lại script) ---
-local oldGui = game.CoreInterface:FindFirstChild("MiniStorageGui") or game.Players.LocalPlayer.PlayerGui:FindFirstChild("MiniStorageGui")
-if oldGui then oldGui:Destroy() end
+-- --- HỦY GUI CŨ NẾU CÓ ---
+local function CleanOldGui()
+    local oldObj = game.Players.LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("MiniStorageGui")
+    if oldObj then oldObj:Destroy() end
+    
+    -- Kiểm tra thêm trong CoreGui đề phòng
+    pcall(function()
+        if game:GetService("CoreGui"):FindFirstChild("MiniStorageGui") then
+            game:GetService("CoreGui").MiniStorageGui:Destroy()
+        end
+    end)
+end
+CleanOldGui()
 
--- --- CẤU HÌNH ---
+-- --- CẤU HÌNH LOGIC ---
 local LocalPlayer = game.Players.LocalPlayer
 
--- Tạo kho chứa ẩn
 local Storage = game.ReplicatedStorage:FindFirstChild("MiniStorageBox")
 if not Storage then
     Storage = Instance.new("Folder")
@@ -883,7 +892,6 @@ if not Storage then
     Storage.Parent = game.ReplicatedStorage
 end
 
--- Danh sách combo (Chữ thường)
 local ComboTools = {
     ["tight hold"] = true, ["full throttle"] = true, ["inertia"] = true, 
     ["every last drop"] = true, ["dial up"] = true, ["critical point"] = true, 
@@ -892,9 +900,8 @@ local ComboTools = {
     ["bland passion"] = true, ["piercing blood"] = true
 }
 
-local State = 0 -- 0: Tất cả, 1: Chỉ hiện Ngoài Combo, 2: Chỉ hiện Trong Combo
+local State = 0 
 
--- Hàm gom tool
 local function GetAllTools()
     local all = {}
     local char = LocalPlayer.Character
@@ -904,53 +911,74 @@ local function GetAllTools()
     return all
 end
 
--- --- TẠO GIAO DIỆN SIÊU NHỎ ---
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MiniStorageGui"
--- Cố gắng bỏ vào CoreGui để không bị mất khi chết (nếu executor hỗ trợ), nếu không thì bỏ vào PlayerGui
-pcall(function() ScreenGui.Parent = game:GetService("CoreGui") end)
-if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
+-- --- HÀM TẠO GUI GẮN THẲNG VÀO PLAYERGUI ---
+local function CreateMiniGui()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "MiniStorageGui"
+    ScreenGui.ResetOnSpawn = false -- Giữ GUI không bị mất khi nhân vật hồi sinh
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Nút bấm chính (Rộng 120px, Cao 40px) đặt ở góc phải màn hình
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Size = UDim2.new(0, 120, 0, 40)
-ToggleBtn.Position = UDim2.new(1, -140, 0.5, -20) -- Nằm ở cạnh phải màn hình, chính giữa theo chiều dọc
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleBtn.BorderSizePixel = 0
-ToggleBtn.Text = "COMBO: TẤT CẢ"
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.Font = Enum.Font.SourceSansBold
-ToggleBtn.TextSize = 14
-ToggleBtn.Active = true
-ToggleBtn.Draggable = true -- Bạn có thể giữ chuột kéo nút này đi chỗ khác nếu vướng
-ToggleBtn.Parent = ScreenGui
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Size = UDim2.new(0, 120, 0, 40)
+    
+    -- Đặt vị trí: dịch sang trái một chút để tránh bị các nút mặc định của Roblox che mất
+    ToggleBtn.Position = UDim2.new(1, -150, 0.4, 0) 
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    ToggleBtn.BorderSizePixel = 0
+    ToggleBtn.Text = "COMBO: TẤT CẢ"
+    ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleBtn.Font = Enum.Font.SourceSansBold
+    ToggleBtn.TextSize = 14
+    ToggleBtn.Active = true
+    ToggleBtn.Draggable = true 
+    ToggleBtn.Parent = ScreenGui
 
--- Bo góc cho đẹp
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
-UICorner.Parent = ToggleBtn
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 8)
+    UICorner.Parent = ToggleBtn
 
--- --- XỬ LÝ CLICK ---
-ToggleBtn.MouseButton1Click:Connect(function()
-    if State == 0 or State == 2 then
-        State = 1
+    -- Giữ nguyên trạng thái màu sắc cũ nếu có bấm trước đó
+    if State == 1 then
         ToggleBtn.Text = "HIỆN: NGOÀI"
-        ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50) -- Đổi sang màu đỏ
-    else
-        State = 2
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    elseif State == 2 then
         ToggleBtn.Text = "HIỆN: COMBO"
-        ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50) -- Đổi sang màu xanh lá
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
     end
 
-    local allTools = GetAllTools()
-    local backpack = LocalPlayer.Backpack
-
-    for _, tool in ipairs(allTools) do
-        local isCombo = ComboTools[string.lower(tool.Name)] or false
-        if State == 1 then
-            tool.Parent = isCombo and Storage or backpack
-        elseif State == 2 then
-            tool.Parent = isCombo and backpack or Storage
+    -- Xử lý Click
+    ToggleBtn.MouseButton1Click:Connect(function()
+        if State == 0 or State == 2 then
+            State = 1
+            ToggleBtn.Text = "HIỆN: NGOÀI"
+            ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        else
+            State = 2
+            ToggleBtn.Text = "HIỆN: COMBO"
+            ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
         end
+
+        local allTools = GetAllTools()
+        local backpack = LocalPlayer.Backpack
+
+        for _, tool in ipairs(allTools) do
+            local isCombo = ComboTools[string.lower(tool.Name)] or false
+            if State == 1 then
+                tool.Parent = isCombo and Storage or backpack
+            elseif State == 2 then
+                tool.Parent = isCombo and backpack or Storage
+            end
+        end
+    end)
+end
+
+-- Chạy tạo GUI ngay lập tức
+CreateMiniGui()
+
+-- Nếu nhân vật bị reset và GUI bị game xóa mất, hàm này sẽ tự động hồi sinh lại cái nút bấm
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1) -- Chờ game load xong nhân vật
+    if not LocalPlayer.PlayerGui:FindFirstChild("MiniStorageGui") then
+        CreateMiniGui()
     end
 end)
