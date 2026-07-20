@@ -466,9 +466,7 @@ local player = Players.LocalPlayer
 
 -- ĐỊNH NGHĨA DANH SÁCH COMBO TRONG CODE TẠI ĐÂY (Bạn có thể tự do thêm bớt vũ khí tùy ý)
 local ComboList = {
-    "tight hold", "full throttle", "inertia", "every last drop", "dial up", 
-    "critical point", "hard grip", "twister", "carpet bomb", "spinning cyclone", 
-    "suplex", "slicing exorcism", "bland passion", "piercing blood"
+    "momentum", "hammer down", "festering", "granité blast"
 }
 
 -- Xóa GUI cũ để tránh trùng lặp khi chạy lại script
