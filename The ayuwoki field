@@ -126,7 +126,7 @@ local LastCirclePosition = UDim2.new(0.5, -25, 0.5, -25)
 local CircleHasBeenMoved = false
 
 --------------------------------------------------
--- MINIMIZE CIRCLE SYSTEM (GIỮ NGUYÊN NÚT SH GỐC)
+-- MINIMIZE CIRCLE SYSTEM
 --------------------------------------------------
 local MinCircle = Instance.new("TextButton")
 MinCircle.Size = UDim2.new(0, 50, 0, 50)
@@ -230,7 +230,7 @@ local function createTab(name, isDefault)
 	Page.BackgroundTransparency = 1
 	Page.BorderSizePixel = 0
 	Page.Visible = isDefault
-	Page.CanvasSize = UDim2.new(0, 0, 0, 300) 
+	Page.CanvasSize = UDim2.new(0, 0, 0, 350) 
 	Page.ScrollBarThickness = 2
 	Page.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 60)
 	Page.Parent = Container
@@ -259,9 +259,9 @@ local PageMainVisuals = createTab("Main stuff", false)
 local PageStamina     = createTab("Stamina Stuff", false)
 local PageESP         = createTab("ESP stuff", false)
 local PageMisc        = createTab("Misc", false)
-local PageSP = createTab("03y_o", false)
+local PageSP 		  = createTab("03y_o", false)
 local PageCredits     = createTab("Credits", false)
-local PageItems     = createTab("Items", false)
+local PageItems       = createTab("Items", false)
 
 --------------------------------------------------
 -- INFO TAB DESIGN PRESETS
@@ -306,6 +306,12 @@ local UserLabel = createProfileLabel("Username: " .. Player.Name, PageInfo)
 local ExecLabel = createProfileLabel("Executor: " .. (identifyexecutor or function() return "Internal Linker" end)(), PageInfo)
 local TimeLabel = createProfileLabel("Time: Checking system...", PageInfo)
 
+local GameTimerLabel = createProfileLabel("Game Timer: Waiting...", PageInfo)
+local GameDaynightLabel = createProfileLabel("Game Phase: Waiting...", PageInfo)
+
+GameTimerLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
+GameDaynightLabel.TextColor3 = Color3.fromRGB(200, 100, 255)
+
 local Divider = Instance.new("Frame")
 Divider.Size = UDim2.new(0.85, 0, 0, 1)
 Divider.Position = UDim2.new(0, 18, 0, 0)
@@ -336,6 +342,36 @@ ThanksLabel.TextXAlignment = Enum.TextXAlignment.Left
 ThanksLabel.Parent = PageInfo
 
 task.spawn(function()
+	local InGameTimer = Workspace:WaitForChild("Map", 5) and Workspace.Map:WaitForChild("Supermarket", 2) and Workspace.Map.Supermarket:WaitForChild("Clock", 2) and Workspace.Map.Supermarket.Clock:WaitForChild("Main", 2) and Workspace.Map.Supermarket.Clock.Main:WaitForChild("Gui", 2)
+	
+	if InGameTimer then
+		local TimerObj = InGameTimer:FindFirstChild("Timer")
+		local DaytimeObj = InGameTimer:FindFirstChild("Daytime")
+		
+		if TimerObj and DaytimeObj then
+			RunService.Heartbeat:Connect(function()
+				GameTimerLabel.Text = "Game Timer: " .. TimerObj.Text
+				pcall(function()
+					local rawText = DaytimeObj.Text
+					local splitText = rawText:split(" ")
+					
+					local phaseNumber = splitText[2] or ""
+					if phaseNumber ~= "" then
+						phaseNumber = " " .. phaseNumber
+					end
+					
+					if string.find(rawText, "NOCHE") or string.find(rawText, "Noche") then
+						GameDaynightLabel.Text = "Game Phase: NIGHT" .. phaseNumber
+					elseif string.find(rawText, "DIA") or string.find(rawText, "Dia") or string.find(rawText, "Día") then
+						GameDaynightLabel.Text = "Game Phase: DAY" .. phaseNumber
+					else
+						GameDaynightLabel.Text = "Game Phase: " .. rawText
+					end
+				end)
+			end)
+		end
+	end
+
 	while task.wait(0.5) do
 		local date = os.date("*t")
 		TimeLabel.Text = string.format("Time: %02d:%02d:%02d", date.hour, date.min, date.sec)
@@ -549,7 +585,7 @@ local function toggleFullBright()
 end
 
 --------------------------------------------------
--- SHADER FULL BRIGHT SYSTEM (NEWLY INTEGRATED)
+-- SHADER FULL BRIGHT SYSTEM
 --------------------------------------------------
 local ShaderFullBrightEnabled = false
 local ShaderFullBrightConnections = {}
@@ -919,7 +955,6 @@ EmoteCircle.Parent = ScreenGui
 Instance.new("UICorner", EmoteCircle).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", EmoteCircle).Color = Color3.new(1, 1, 1)
 
--- Hàm kéo thả riêng cho nút Emote
 local function makeEmoteDraggable(frame)
 	local dragging, dragInput, dragStart, startPos
 	frame.InputBegan:Connect(function(input)
@@ -1133,7 +1168,6 @@ EscobaBtn.MouseButton1Click:Connect(function()
         local targetHandle = nearestEscoba.Handle
         local targetPrompt = targetHandle.TakePrompt
         
-        -- Hàm triệt tiêu hoàn toàn lực và quán tính vật lý
         local function resetVelocity()
             hrp.Velocity = Vector3.new(0, 0, 0)
             hrp.RotVelocity = Vector3.new(0, 0, 0)
@@ -1143,11 +1177,9 @@ EscobaBtn.MouseButton1Click:Connect(function()
             end
         end
 
-        -- Đóng băng quán tính trước khi tele tới chổi
         resetVelocity()
-        hrp.CFrame = targetHandle.CFrame + Vector3.new(0, 2.5, 0) -- Tăng độ cao lên 2.5 để tránh bị kẹt sàn
+        hrp.CFrame = targetHandle.CFrame + Vector3.new(0, 2.5, 0)
         
-        -- Kích hoạt luồng spam nhặt chổi
         local teleporting = true
         task.spawn(function()
             if fireproximityprompt then
@@ -1162,11 +1194,9 @@ EscobaBtn.MouseButton1Click:Connect(function()
         teleporting = false
         task.wait(0.02)
         
-        -- Đóng băng quán tính một lần nữa trước khi tele về vị trí cũ
         resetVelocity()
         hrp.CFrame = originalCFrame
         
-        -- Đảm bảo trạng thái nhân vật không bị lỗi ngã (Ragdoll/Falling)
         task.wait(0.05)
         resetVelocity()
         hum:ChangeState(Enum.HumanoidStateType.Running)
@@ -1208,7 +1238,7 @@ end)
 print("crack by 03y_o")
 
 --------------------------------------------------
--- NÚT ĐEN XOAY ĐỘC LẬP - ĐÃ CHUYỂN LÊN GÓC TRÊN BÊN PHẢI
+-- ROTATING TOGGLE BUTTON
 --------------------------------------------------
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Name = "ScerperBlackToggle"
