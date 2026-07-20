@@ -486,6 +486,7 @@ local FullBrightBtn, FBtnStroke = createButton("Visual Full Bright", PageMainVis
 local FullBrightShaderBtn, FBStnStroke = createButton("Shader Full Bright", PageMainVisuals)
 local EmoteBtn, EmBtnStroke      = createButton("Trigger Emote Button", PageMainVisuals)
 local TakeDamageBtn, TKBtnStroke      = createButton("Take Damage Button", PageMainVisuals)
+local NoclipBtn, NoclipStroke = createButton("Toggle Noclip", PageMainVisuals)
 
 local TakePromtBtn, TPBtnStroke      = createButton("Take Promt Button", PageSP)
 local TeleportBtn, TpBtnStroke      = createButton("Teleport Button", PageSP)
@@ -1017,7 +1018,40 @@ StamV2Btn.MouseButton1Click:Connect(toggleStamV2)
 SprintBoostBtn.MouseButton1Click:Connect(toggleSprintBoost)
 PlayerESPBtn.MouseButton1Click:Connect(togglePlayerESP)
 ItemsESPBtn.MouseButton1Click:Connect(toggleItemsESP)
+--------------------------------------------------
+-- NOCLIP SYSTEM (GUI TOGGLE)
+--------------------------------------------------
+local NoclipEnabled = false
+local NoclipConnection
 
+local function toggleNoclip()
+	NoclipEnabled = not NoclipEnabled
+	
+	animateToggle(NoclipBtn, NoclipStroke, NoclipEnabled, "Toggle Noclip", Color3.fromRGB(110, 35, 110), Color3.fromRGB(180, 50, 180))
+	
+	if NoclipEnabled then
+		NoclipConnection = RunService.Stepped:Connect(function()
+			if Player.Character then
+				for _, part in ipairs(Player.Character:GetDescendants()) do
+					if part:IsA("BasePart") and part.CanCollide then
+						part.CanCollide = false
+					end
+				end
+			end
+		end)
+	else
+		if NoclipConnection then
+			NoclipConnection:Disconnect()
+			NoclipConnection = nil
+		end
+	end
+end
+
+NoclipBtn.MouseButton1Click:Connect(toggleNoclip)
+
+Close.MouseButton1Click:Connect(function()
+	if NoclipConnection then NoclipConnection:Disconnect() end
+end)
 --------------------------------------------------
 -- Take damage
 --------------------------------------------------
