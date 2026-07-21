@@ -98,10 +98,10 @@ gui.Parent = game:GetService("CoreGui")
 local button = Instance.new("TextButton")
 button.Size = UDim2.new(0, 150, 0, 50)
 button.Position = UDim2.new(0.5, -75, 0, 10)
-button.Text = "Touch Enter"
+button.Text = "Touch Enter: OFF"
 button.Font = Enum.Font.GothamBold
 button.TextSize = 14
-button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+button.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
 button.Parent = gui
 
@@ -109,6 +109,10 @@ button.Parent = gui
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 8)
 corner.Parent = button
+
+-- Biến trạng thái Toggle
+local toggled = false
+local loopConnection = nil
 
 -- Hàm xử lý chạm vật lý gõ thẳng vào Class hệ thống
 local function fireTouch(part)
@@ -122,7 +126,7 @@ local function fireTouch(part)
     firetouchinterest(hrp, part, 1)
 end
 
--- Hàm tìm kiếm đường dẫn an toàn từng bước (Sửa lỗi logic của ChatGPT)
+-- Hàm tìm kiếm đường dẫn an toàn từng bước
 local function getEnterPart()
     local plots = workspace:FindFirstChild("Plots")
     if not plots then return nil end
@@ -136,21 +140,30 @@ local function getEnterPart()
     return interact:FindFirstChild("Enter")
 end
 
--- Sự kiện Click nút bấm từ tay bạn
+-- Sự kiện Click nút bấm từ tay bạn (Chuyển thành Toggle)
 button.MouseButton1Click:Connect(function()
-    local enter = getEnterPart()
+    toggled = not toggled
 
-    if enter and enter:IsA("BasePart") then
-        -- Tạo hiệu ứng đổi màu nhẹ để biết nút có phản hồi
-        button.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+    if toggled then
+        button.Text = "Touch Enter: ON"
+        button.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
         
-        fireTouch(enter)
-        
-        task.wait(0.1)
-        button.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        -- Vòng lặp tự động gọi liên tục khi bật
+        loopConnection = task.spawn(function()
+            while toggled do
+                local enter = getEnterPart()
+                if enter and enter:IsA("BasePart") then
+                    fireTouch(enter)
+                else
+                    warn("Không tìm thấy đường dẫn đến khối Enter!")
+                end
+                task.wait(0.5) -- Thời gian chờ giữa các lần lặp (có thể chỉnh lại tùy ý)
+            end
+        end)
     else
-        warn("Không tìm thấy đường dẫn đên khối Enter!")
+        button.Text = "Touch Enter: OFF"
+        button.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
     end
 end)
 
-print("=== SCRIPT SỬA LỖI AI ĐÃ SẴN SÀNG ===")
+print("=== SCRIPT TOGGLE ĐÃ SẴN SÀNG ===")
