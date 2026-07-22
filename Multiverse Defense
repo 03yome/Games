@@ -1,0 +1,106 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+
+local PhantomForcesWindow = Library:NewWindow("Multiverse Defense")
+
+local KillingCheats = PhantomForcesWindow:NewSection("main")
+
+KillingCheats:CreateButton("1,000Gems", function()
+local args = {
+	{
+		type = "PurchaseRequest",
+		productInfo = {
+          targetCurrencyType = "Wood",
+			type = "Currency",
+			name = " LittleWood",
+			count = 0,
+			spent = -1000,
+			productID = 4,
+			currencyType = "Gem",
+			itemType = "LitteWood"
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("MarketEvent"):FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("2,200Gems", function()
+local args = {
+	{
+		type = "PurchaseRequest",
+		productInfo = {
+          targetCurrencyType = "Wood",
+			type = "Currency",
+			name = " LittleWood",
+			count = 0,
+			spent = -2200,
+			productID = 4,
+			currencyType = "Gem",
+			itemType = "LitteWood"
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("MarketEvent"):FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("5,000Gems", function()
+local args = {
+	{
+		type = "PurchaseRequest",
+		productInfo = {
+          targetCurrencyType = "Wood",
+			type = "Currency",
+			name = " LittleWood",
+			count = 0,
+			spent = -5000,
+			productID = 4,
+			currencyType = "Gem",
+			itemType = "LitteWood"
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("MarketEvent"):FireServer(unpack(args))
+print("HI")
+end)
+
+KillingCheats:CreateButton("12,000Gems", function()
+local args = {
+	{
+		type = "PurchaseRequest",
+		productInfo = {
+          targetCurrencyType = "Wood",
+			type = "Currency",
+			name = " LittleWood",
+			count = 0,
+			spent = -12000,
+			productID = 4,
+			currencyType = "Gem",
+			itemType = "LitteWood"
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("MarketEvent"):FireServer(unpack(args))
+print("HI")
+end)
+
+
+KillingCheats:CreateButton("30,000Gems", function()
+local args = {
+	{
+		type = "PurchaseRequest",
+		productInfo = {
+          targetCurrencyType = "Wood",
+			type = "Currency",
+			name = " LittleWood",
+			count = 0,
+			spent = -30000,
+			productID = 4,
+			currencyType = "Gem",
+			itemType = "LitteWood"
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("MarketEvent"):FireServer(unpack(args))
+print("HI")
+end)
