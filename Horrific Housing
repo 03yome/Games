@@ -87,18 +87,7 @@ ItemsTab:CreateToggle({
 ItemsTab:CreateButton({
     Name = "No Cooldown Prompts",
     Callback = function()
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj:IsA("ProximityPrompt") then
-                obj.HoldDuration = 0
-            end
-        end
-    end
-})
-
-ItemsTab:CreateButton({
-    Name = "Auto Get Map",
-    Callback = function()
-local PromptExecutor = {}
+        local PromptExecutor = {}
 PromptExecutor.__index = PromptExecutor
 
 function PromptExecutor.new()
@@ -126,6 +115,27 @@ end
 
 local promptHandler = PromptExecutor.new()
 promptHandler:Initialize()
+    end
+})
+
+ItemsTab:CreateButton({
+    Name = "Auto Get Map",
+    Callback = function()
+        local hrp = getHRP()
+        local oldCFrame = hrp.CFrame
+
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj.Name == "MapModel" or obj.Name == "Point" then
+                local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
+                if prompt then
+                    hrp.CFrame = obj:GetPivot()
+                    task.wait(0.2)
+                    fireproximityprompt(prompt)
+                end
+            end
+        end
+
+        hrp.CFrame = oldCFrame
     end
 })
 
