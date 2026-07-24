@@ -87,14 +87,16 @@ ItemsTab:CreateToggle({
 ItemsTab:CreateButton({
     Name = "No Cooldown Prompts",
     Callback = function()
-while true do
-for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj:IsA("ProximityPrompt") then
-                obj.HoldDuration =Ds 0
+        task.spawn(function()
+            while true do
+                for _, obj in ipairs(workspace:GetDescendants()) do
+                    if obj:IsA("ProximityPrompt") then
+                        obj.HoldDuration = 0
+                    end
+                end
+              wait(0.9)
             end
-         end
-          wait(0.9)
-      end
+        end)
     end
 })
 
