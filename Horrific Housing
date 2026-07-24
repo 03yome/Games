@@ -98,21 +98,34 @@ ItemsTab:CreateButton({
 ItemsTab:CreateButton({
     Name = "Auto Get Map",
     Callback = function()
-        local hrp = getHRP()
-        local oldCFrame = hrp.CFrame
+local PromptExecutor = {}
+PromptExecutor.__index = PromptExecutor
 
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            if obj.Name == "MapModel" or obj.Name == "Point" then
-                local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt", true)
-                if prompt then
-                    hrp.CFrame = obj:GetPivot()
-                    task.wait(0.2)
-                    fireproximityprompt(prompt)
-                end
-            end
+function PromptExecutor.new()
+    local self = setmetatable({}, PromptExecutor)
+    self.isConnected = false
+    return self
+end
+
+function PromptExecutor:Initialize()
+    if self.isConnected then return end
+    self.isConnected = true
+
+    for _, descendant in ipairs(workspace:GetDescendants()) do
+        if descendant:IsA("ProximityPrompt") then
+            descendant.HoldDuration = 0
         end
+    end
 
-        hrp.CFrame = oldCFrame
+    workspace.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("ProximityPrompt") then
+            descendant.HoldDuration = 0
+        end
+    end)
+end
+
+local promptHandler = PromptExecutor.new()
+promptHandler:Initialize()
     end
 })
 
