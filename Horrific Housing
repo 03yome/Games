@@ -90,10 +90,11 @@ ItemsTab:CreateButton({
 while true do
 for _, obj in ipairs(Workspace:GetDescendants()) do
             if obj:IsA("ProximityPrompt") then
-                obj.HoldDuration = 0
+                obj.HoldDuration =Ds 0
             end
+         end
           wait(0.9)
-        end
+      end
     end
 })
 
