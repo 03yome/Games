@@ -87,18 +87,13 @@ ItemsTab:CreateToggle({
 ItemsTab:CreateButton({
     Name = "No Cooldown Prompts",
     Callback = function()
-local ProximityPromptService = game:GetService("ProximityPromptService")
-local function instantPrompt(prompt)
-	if prompt:IsA("ProximityPrompt") then
-		prompt.HoldDuration = 0
-	end
-end
-for _, obj in ipairs(workspace:GetDescendants()) do
-	instantPrompt(obj)
-end
-workspace.DescendantAdded:Connect(function(obj)
-	instantPrompt(obj)
-end)
+while true do
+for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") then
+                obj.HoldDuration = 0
+            end
+        end
+      wait(1)
     end
 })
 
