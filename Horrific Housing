@@ -92,8 +92,8 @@ for _, obj in ipairs(Workspace:GetDescendants()) do
             if obj:IsA("ProximityPrompt") then
                 obj.HoldDuration = 0
             end
+          wait(0.9)
         end
-      wait(1)
     end
 })
 
