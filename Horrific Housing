@@ -94,7 +94,7 @@ ItemsTab:CreateButton({
                         obj.HoldDuration = 0
                     end
                 end
-              wait(0.9)
+                task.wait(0.9)
             end
         end)
     end
