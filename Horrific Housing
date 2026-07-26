@@ -803,8 +803,8 @@ local Toggle = PlayerTab:CreateToggle({
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
-local originalPosition = nil
-local currentDest = nil
+local originalPosition = nil 
+local currentDest = nil      
 local connection = nil
 local isRunning = false
 local parts = {}
@@ -814,7 +814,7 @@ local startY = 405.72
 local startZ = 225.66
 
 local Toggle = PlayerTab:CreateToggle({
-   Name = "Safe zone",
+   Name = "Auto safe",
    CurrentValue = false,
    Flag = "TenPartsLoopToggle",
    Callback = function(Value)
@@ -830,6 +830,7 @@ local Toggle = PlayerTab:CreateToggle({
            if humanoid then
                humanoid.PlatformStand = true 
            end
+
            for i = 1, 10 do
                local p = Instance.new("Part")
                p.Size = Vector3.new(10, 1, 10)
@@ -841,6 +842,7 @@ local Toggle = PlayerTab:CreateToggle({
                p.Parent = workspace
                table.insert(parts, p)
            end
+
            task.spawn(function()
                while isRunning do
                    for i = 1, 10 do
@@ -855,6 +857,7 @@ local Toggle = PlayerTab:CreateToggle({
                    end
                end
            end)
+
            connection = RunService.Heartbeat:Connect(function()
                if isRunning and currentDest and rootPart then
                    rootPart.CFrame = currentDest
@@ -869,6 +872,7 @@ local Toggle = PlayerTab:CreateToggle({
                connection:Disconnect()
                connection = nil
            end
+
            for _, p in ipairs(parts) do
                if p then p:Destroy() end
            end
@@ -878,6 +882,7 @@ local Toggle = PlayerTab:CreateToggle({
            if humanoid then
                humanoid.PlatformStand = false
            end
+
            if originalPosition then
                rootPart.CFrame = originalPosition
                originalPosition = nil
