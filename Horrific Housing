@@ -885,3 +885,39 @@ local Toggle = PlayerTab:CreateToggle({
        end
    end,
 })
+
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Flag = "NoclipToggle",
+   Callback = function(Value)
+       local RunService = game:GetService("RunService")
+       local player = game.Players.LocalPlayer
+       
+       if Value then
+           _G.NoclipConnection = RunService.Stepped:Connect(function()
+               local character = player.Character
+               if character then
+                   for _, part in ipairs(character:GetDescendants()) do
+                       if part:IsA("BasePart") and part.CanCollide then
+                           part.CanCollide = false
+                       end
+                   end
+               end
+           end)
+       else
+           if _G.NoclipConnection then
+               _G.NoclipConnection:Disconnect()
+               _G.NoclipConnection = nil
+           end
+           local character = player.Character
+           if character then
+               for _, part in ipairs(character:GetDescendants()) do
+                   if part:IsA("BasePart") then
+                       part.CanCollide = true
+                   end
+               end
+           end
+       end
+   end,
+})
