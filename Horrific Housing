@@ -1320,3 +1320,150 @@ Gamemodes:CreateToggle({
         end
     end,
 })
+
+Gamemodes:CreateButton({
+    Name = "Anti-Stun/Freeze",
+    Callback = function()
+        local character = game.Players.LocalPlayer.Character
+        if character then
+            local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+            if humanoidRootPart then
+                humanoidRootPart.Anchored = false
+                humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+            end
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Running)
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateButton({
+    Name = "Anti-Slowness",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if character then
+            local function resetSpeed()
+                character:WaitForChild("Humanoid").WalkSpeed = 16
+            end
+            character:WaitForChild("Humanoid").DescendantAdded:Connect(resetSpeed)
+            resetSpeed()
+        else
+            player.CharacterAdded:Wait()
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Anti-Infection",
+    Default = false,
+    CurrentValue = false,
+    Flag = "AntiInfectionFlag",
+    Callback = function(Value)
+        _G.AntiZombie = Value
+        task.spawn(function()
+            while _G.AntiZombie do
+                task.wait()
+                for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
+                    local humanoid = targetPlayer.Character and targetPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid and humanoid:FindFirstChild("isZombie") then
+                        local rootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if rootPart then
+                            for _, connection in ipairs(getconnections(rootPart.Touched)) do
+                                connection:Disable()
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end,
+})
+
+Gamemodes:CreateButton({
+    Name = "Anti-Deathnote",
+    Callback = function()
+          while true do
+                wait();
+                safeFromNote = state; 
+            end;
+            return;
+        end)
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Anti Projectile Damage (Disables Godmode)",
+    Default = false,
+    CurrentValue = false,
+    Flag = "AntiProjectileDamageFlag",
+    Callback = function(Value)
+        if Value then
+            local mt = getrawmetatable(game)
+            make_writeable(mt)
+            local oldNamecall = mt.__namecall
+            mt.__namecall = newcclosure(function(self, ...)
+                local args = {...}
+                if getnamecallmethod() == "FireServer" and (tostring(self) == "damageMe" or tostring(self) == "GhasterBlaster") then
+                    return
+                end
+                return oldNamecall(self, table.unpack(args))
+            end)
+        end
+    end,
+})
+
+
+Gamemodes:CreateButton({
+    Name = "Escape Supstance Field",
+    Callback = function()
+        local subspaceArena = workspace:FindFirstChild("SubspaceArena")
+        local targetPart = subspaceArena and subspaceArena:GetChildren()[55]
+        if targetPart then
+            local character = game.Players.LocalPlayer.Character
+            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                rootPart.CFrame = targetPart.CFrame
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateButton({
+    Name = "Escape Black Hole",
+    Callback = function()
+        local portal = workspace:FindFirstChild("Portal")
+        local escapePortal = portal and portal:FindFirstChild("EscapePortal")
+        if escapePortal then
+            local rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                rootPart.CFrame = escapePortal.CFrame
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateButton({
+    Name = "Give Random Player Exploding Microwave",
+    Callback = function()
+        local playingTeam = game.Teams:FindFirstChild("Playing")
+        if playingTeam then
+            local teamPlayers = playingTeam:GetPlayers()
+            if #teamPlayers > 0 then
+                local rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    local randomPlayer = teamPlayers[math.random(1, #teamPlayers)]
+                    local targetRoot = randomPlayer.Character and randomPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if targetRoot then
+                        local originalCFrame = rootPart.CFrame
+                        rootPart.CFrame = targetRoot.CFrame
+                        task.wait(1)
+                        rootPart.CFrame = originalCFrame
+                    end
+                end
+            end
+        end
+    end,
+})
