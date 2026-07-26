@@ -1065,3 +1065,46 @@ local Toggle = ItemsTab:CreateToggle({
         end)
     end,
 })
+
+local isReachEnabled = false
+
+ItemsTab:CreateToggle({
+    Name = "Reach (For Sword)",
+    CurrentValue = false,
+    Flag = "ReachForSwordFlag",
+    Callback = function(Value)
+        isReachEnabled = Value
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if not character then return end
+
+        for _, tool in ipairs(character:GetChildren()) do
+            if tool:IsA("Tool") then
+                local handle = tool:FindFirstChild("Handle")
+                if handle then
+                    if isReachEnabled then
+                        local selectionBox = Instance.new("SelectionBox")
+                        selectionBox.Adornee = handle
+                        selectionBox.Parent = handle
+                        
+                        handle.Size = Vector3.new(0.5, 0.5, 60)
+                        tool.GripPos = Vector3.new(0, 0, 0)
+                        
+                        local humanoid = character:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            humanoid:UnequipTools()
+                        end
+                    else
+                        for _, child in ipairs(handle:GetChildren()) do
+                            if child:IsA("SelectionBox") then
+                                child:Destroy()
+                            end
+                        end
+                        handle.Size = Vector3.new(1, 1, 1)
+                        tool.GripPos = Vector3.new(0, 0, 0)
+                    end
+                end
+            end
+        end
+    end,
+})
