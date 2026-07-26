@@ -921,3 +921,147 @@ local Toggle = PlayerTab:CreateToggle({
        end
    end,
 })
+
+local ItemsTab = Window:CreateTab("Items",nil)
+
+local Button = ItemsTab:CreateButton({
+    Name = "Get Umbrellas",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local rootPart = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if not rootPart then return end
+
+        for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
+            local plate = workspace.Plates:FindFirstChild(targetPlayer.Name)
+            if plate then
+                local house = plate:FindFirstChild("House")
+                if house then
+                    local jumpField = house:FindFirstChild("JumpField")
+                    if jumpField and jumpField:FindFirstChild("TouchInterest") then
+                        firetouchinterest(rootPart, jumpField, 0)
+                        firetouchinterest(rootPart, jumpField, 1)
+                        task.wait(0.1)
+                    end
+                end
+            end
+        end
+    end,
+})
+
+local Button = ItemsTab:CreateButton({
+    Name = "Get Gravity Coil (CLIENT)",
+    Callback = function()
+        local localPlayer = game.Players.LocalPlayer
+        local gravityCoil = nil
+
+        for _, descendant in ipairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
+            if descendant:IsA("Tool") and descendant.Name == "Gravity Coil" then
+                gravityCoil = descendant
+                break
+            end
+        end
+
+        if gravityCoil then
+            local clonedCoil = gravityCoil:Clone()
+            
+            local function onEquipped()
+                task.wait(0.1)
+                local char = localPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.JumpPower = 100
+                end
+            end
+
+            local function onUnequipped()
+                task.wait(0.1)
+                local char = localPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.JumpPower = 50
+                end
+            end
+
+            clonedCoil.Equipped:Connect(onEquipped)
+            clonedCoil.Unequipped:Connect(onUnequipped)
+            
+            local backpack = localPlayer:FindFirstChildOfClass("Backpack")
+            if backpack then
+                clonedCoil.Parent = backpack
+            end
+        end
+    end,
+})
+
+local Button = ItemsTab:CreateButton({
+    Name = "Get Umbrella (CLIENT)",
+    Callback = function()
+        local localPlayer = game.Players.LocalPlayer
+        local umbrella = nil
+
+        for _, descendant in ipairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
+            if descendant:IsA("Tool") and descendant.Name == "Umbrella" then
+                umbrella = descendant
+                break
+            end
+        end
+
+        if umbrella then
+            local backpack = localPlayer:FindFirstChildOfClass("Backpack")
+            if backpack then
+                umbrella:Clone().Parent = backpack
+            end
+        end
+    end,
+})
+
+local Button = ItemsTab:CreateButton({
+    Name = "Candy Cane Sword (Must be Santa)",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        local remoteEvent = char and char:FindFirstChild("RemoteEvent")
+
+        if remoteEvent then
+            for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
+                local plate = workspace.Plates:FindFirstChild(targetPlayer.Name)
+                if plate then
+                    remoteEvent:FireServer(plate)
+                end
+            end
+        end
+    end,
+})
+
+local Button = ItemsTab:CreateButton({
+    Name = "Reset 'Orbital Strike Flute' Cooldown (OSF Required)",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        local fluteRemote = char and char:FindFirstChild("Flute") and char.Flute:FindFirstChild("Remote")
+        if fluteRemote then
+            fluteRemote:FireServer(0)
+        end
+    end,
+})
+
+local Toggle = ItemsTab:CreateToggle({
+    Name = "Weapon Exploit",
+    CurrentValue = false,
+    Flag = "WeaponExploitFlag",
+    Callback = function(Value)
+        _G.WeaponExploitActive = Value
+        task.spawn(function()
+            while _G.WeaponExploitActive do
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    for _, tool in ipairs(char:GetChildren()) do
+                        if tool:IsA("Tool") then
+                            local event = tool:FindFirstChild("Event")
+                            if event then
+                                event:FireServer()
+                            end
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end,
+})
