@@ -799,3 +799,54 @@ local Toggle = PlayerTab:CreateToggle({
       })
    end,
 })
+
+local player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local savedPosition = nil
+local connection = nil
+local isHolding = false
+
+local Toggle = PlayerTab:CreateToggle({
+   Name = "auto safe",
+   CurrentValue = false,
+   Flag = "PositionLockToggle",
+   Callback = function(Value)
+       local character = player.Character
+       if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+       local rootPart = character.HumanoidRootPart
+       local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+       if Value then
+           savedPosition = rootPart.CFrame
+           isHolding = true
+           
+           if humanoid then
+               humanoid.PlatformStand = true 
+           end
+
+           connection = RunService.Heartbeat:Connect(function()
+               if isHolding and savedPosition and rootPart then
+                   rootPart.CFrame = savedPosition
+                   rootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                   rootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+               end
+           end)
+       else
+           isHolding = false
+           if connection then
+               connection:Disconnect()
+               connection = nil
+           end
+
+           if humanoid then
+               humanoid.PlatformStand = false
+           end
+
+           if savedPosition then
+               rootPart.CFrame = savedPosition
+               savedPosition = nil
+           end
+       end
+   end,
+})
