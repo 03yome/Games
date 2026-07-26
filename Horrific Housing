@@ -1382,7 +1382,7 @@ Gamemodes:CreateToggle({
     end,
 })
 
-Gamenodes:CreateButton({
+Gamemodes:CreateButton({
    Name = "Anti-deathnote",
    Callback = function()
 while true do
