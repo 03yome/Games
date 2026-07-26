@@ -806,9 +806,12 @@ local RunService = game:GetService("RunService")
 local savedPosition = nil
 local connection = nil
 local isHolding = false
+local createdPart = nil
+
+local targetPosition = Vector3.new(4633.00, 405.72, 225.66)
 
 local Toggle = PlayerTab:CreateToggle({
-   Name = "auto safe",
+   Name = "Auto safe",
    CurrentValue = false,
    Flag = "PositionLockToggle",
    Callback = function(Value)
@@ -820,6 +823,19 @@ local Toggle = PlayerTab:CreateToggle({
        if Value then
            savedPosition = rootPart.CFrame
            isHolding = true
+           
+           createdPart = Instance.new("Part")
+           createdPart.Size = Vector3.new(10, 1, 10)
+           createdPart.Position = targetPosition
+           createdPart.Anchored = true        
+           createdPart.CanCollide = true      
+           createdPart.BrickColor = BrickColor.new("Bright green")
+           createdPart.Material = Enum.Material.Neon
+           createdPart.Parent = workspace
+
+           local destinationCFrame = CFrame.new(targetPosition + Vector3.new(0, 3, 0))
+           rootPart.CFrame = destinationCFrame
+           savedPosition = destinationCFrame
            
            if humanoid then
                humanoid.PlatformStand = true 
@@ -837,6 +853,11 @@ local Toggle = PlayerTab:CreateToggle({
            if connection then
                connection:Disconnect()
                connection = nil
+           end
+
+           if createdPart then
+               createdPart:Destroy()
+               createdPart = nil
            end
 
            if humanoid then
