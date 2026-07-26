@@ -1109,8 +1109,8 @@ ItemsTab:CreateToggle({
     end,
 })
 
-local GamemodesTab = Window:CreateTab("Gamemodes",nil)
-local Section = GamemodesTab:CreateSection("Lobby")
+local Gamemodes = Window:CreateTab("Gamemodes",nil)
+local Section = Gamemodes:CreateSection("Lobby")
 
 Gamemodes:CreateButton({
     Name = "Destroy Vending Machine",
@@ -1143,7 +1143,7 @@ Gamemodes:CreateButton({
     end,
 })
 
-local Section = GamemodesTab:CreateSection("Events")
+local Section = Gamemodes:CreateSection("Events")
 
 Gamemodes:CreateToggle({
     Name = "Loop Destroy Meteor",
