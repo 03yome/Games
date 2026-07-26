@@ -694,6 +694,8 @@ local PlayerTab = Window:CreateTab("Player", 7992557358)
 
 PlayerTab:CreateSection("Player Settings")
 
+local currentSpeed = nil
+
 PlayerTab:CreateInput({
     Name = "Speed",
     CurrentValue = "",
@@ -702,12 +704,28 @@ PlayerTab:CreateInput({
     Flag = "SpeedInput",
 
     Callback = function(text)
-        local player = game.Players.LocalPlayer
-        local humanoid = (player.Character or player.CharacterAdded:Wait()):WaitForChild("Humanoid")
-
-        humanoid.WalkSpeed = tonumber(text) or 16
+        currentSpeed = text
     end
 })
+
+task.spawn(function()
+    while true do
+        if currentSpeed and currentSpeed ~= "" then
+            local speedNumber = tonumber(currentSpeed)
+            if speedNumber then
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.WalkSpeed = speedNumber
+                    end
+                end
+            end
+        end
+        wait(2)
+    end
+end)
 
 PlayerTab:CreateInput({
     Name = "JumpPower",
