@@ -1108,3 +1108,215 @@ ItemsTab:CreateToggle({
         end
     end,
 })
+
+local GamemodesTab = Window:CreateTab("Gamemodes",nil)
+local Section = GamemodesTab:CreateSection("Lobby")
+
+Gamemodes:CreateButton({
+    Name = "Destroy Vending Machine",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local otherObjects = workspace:WaitForChild("OtherObjects")
+        local vendingMachine = otherObjects:FindFirstChild("VendingMachine")
+        if vendingMachine then
+            vendingMachine:Destroy()
+        else
+            print("Error: VendingMachine already removed or not found.")
+        end
+    end,
+})
+
+Gamemodes:CreateButton({
+    Name = "Make All Spleef Tiles fall",
+    Callback = function()
+        local players = game:GetService("Players")
+        local spleefFolder = workspace.Spleef
+        local rootPart = players.LocalPlayer.Character and players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        
+        if rootPart then
+            for _, tile in pairs(spleefFolder:GetChildren()) do
+                if tile:FindFirstChild("TouchInterest") then
+                    firetouchinterest(rootPart, tile, 0)
+                end
+            end
+        end
+    end,
+})
+
+local Section = GamemodesTab:CreateSection("Events")
+
+Gamemodes:CreateToggle({
+    Name = "Loop Destroy Meteor",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LoopDestroyMeteorFlag",
+    Callback = function(Value)
+        _G.Meteor = Value
+        if Value then
+            _G.MeteorConnection = workspace.ChildAdded:Connect(function(child)
+                if child.Name == "Meteor" then
+                    child:Destroy()
+                end
+            end)
+            for _, obj in pairs(workspace:GetChildren()) do
+                if obj.Name == "Meteor" then
+                    obj:Destroy()
+                end
+            end
+        else
+            if _G.MeteorConnection then
+                _G.MeteorConnection:Disconnect()
+                _G.MeteorConnection = nil
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "LavaPlate Immunity",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LavaPlateImmunityFlag",
+    Callback = function(Value)
+        _G.LavaImmunity = Value
+        if Value then
+            _G.LavaConnection = game.Players.PlayerAdded:Connect(function(player)
+                task.wait(1)
+                local plate = workspace.Plates:FindFirstChild(player.Name)
+                if plate then
+                    local platePart = plate:FindFirstChild("Plate")
+                    if platePart then
+                        local touchInterest = platePart:FindFirstChild("TouchInterest")
+                        local lavaScript = platePart:FindFirstChild("LavaScript")
+                        if touchInterest then touchInterest:Destroy() end
+                        if lavaScript then lavaScript:Destroy() end
+                    end
+                end
+            end)
+            for _, player in pairs(game.Players:GetPlayers()) do
+                local plate = workspace.Plates:FindFirstChild(player.Name)
+                if plate then
+                    local platePart = plate:FindFirstChild("Plate")
+                    if platePart then
+                        local touchInterest = platePart:FindFirstChild("TouchInterest")
+                        local lavaScript = platePart:FindFirstChild("LavaScript")
+                        if touchInterest then touchInterest:Destroy() end
+                        if lavaScript then lavaScript:Destroy() end
+                    end
+                end
+            end
+        else
+            if _G.LavaConnection then
+                _G.LavaConnection:Disconnect()
+                _G.LavaConnection = nil
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Loop Destroy Flood",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LoopDestroyFloodFlag",
+    Callback = function(Value)
+        _G.AntiFlood = Value
+        if Value then
+            _G.FloodConnection = workspace.ChildAdded:Connect(function(child)
+                if child.Name == "Kill" then
+                    child:Destroy()
+                end
+            end)
+            local killPart = workspace:FindFirstChild("Kill")
+            if killPart then
+                killPart:Destroy()
+            end
+        else
+            if _G.FloodConnection then
+                _G.FloodConnection:Disconnect()
+                _G.FloodConnection = nil
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Loop Destroy Icicle",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LoopDestroyIcicleFlag",
+    Callback = function(Value)
+        _G.Spike = Value
+        if Value then
+            _G.SpikeConnection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "spike" or descendant.Name == "Spike" then
+                    descendant:Destroy()
+                end
+            end)
+            for _, descendant in pairs(workspace.Plates:GetDescendants()) do
+                if descendant.Name == "Spike" or descendant.Name == "spike" then
+                    descendant:Destroy()
+                end
+            end
+        else
+            if _G.SpikeConnection then
+                _G.SpikeConnection:Disconnect()
+                _G.SpikeConnection = nil
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Loop Destroy Corrupted Portal",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LoopDestroyPortalFlag",
+    Callback = function(Value)
+        _G.CorruptedPortal = Value
+        if Value then
+            _G.PortalConnection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("BasePart") and descendant.Name == "Portal" and descendant.Color == Color3.new(1, 0.4, 0.8) then
+                    descendant:Destroy()
+                end
+            end)
+            for _, descendant in pairs(workspace:GetDescendants()) do
+                if descendant:IsA("BasePart") and descendant.Name == "Portal" and descendant.Color == Color3.new(1, 0.4, 0.8) then
+                    descendant:Destroy()
+                end
+            end
+        else
+            if _G.PortalConnection then
+                _G.PortalConnection:Disconnect()
+                _G.PortalConnection = nil
+            end
+        end
+    end,
+})
+
+Gamemodes:CreateToggle({
+    Name = "Loop Destroy Coal",
+    SectionParent = d,
+    CurrentValue = false,
+    Flag = "LoopDestroyCoalFlag",
+    Callback = function(Value)
+        _G.Coal = Value
+        if Value then
+            _G.CoalConnection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "Coal" or descendant.Name == "coal" then
+                    descendant:Destroy()
+                end
+            end)
+            for _, obj in pairs(workspace:GetChildren()) do
+                if obj.Name == "Coal" or obj.Name == "coal" then
+                    obj:Destroy()
+                end
+            end
+        else
+            if _G.CoalConnection then
+                _G.CoalConnection:Disconnect()
+                _G.CoalConnection = nil
+            end
+        end
+    end,
+})
