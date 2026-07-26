@@ -12,6 +12,8 @@ local Window = Rayfield:CreateWindow({
     }
 })
 
+Rayfield.Notify = function() end
+
 local function getHRP()
     return (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait())
         :WaitForChild("HumanoidRootPart")
