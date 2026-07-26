@@ -812,8 +812,8 @@ local startX = 4633.00
 local startY = 405.72
 local startZ = 225.66
 
-local Toggle = Tab:CreateToggle({
-   Name = "Vòng lặp 10 Part",
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Auto safe",
    CurrentValue = false,
    Flag = "TenPartsLoopToggle",
    Callback = function(Value)
