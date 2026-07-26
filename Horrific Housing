@@ -1382,6 +1382,16 @@ Gamemodes:CreateToggle({
     end,
 })
 
+Gamenodes:CreateButton({
+   Name = "Anti-deathnote",
+   Callback = function()
+while true do
+    wait()
+    safeFromNote = state
+end
+   end,
+})
+
 Gamemodes:CreateToggle({
     Name = "Anti Projectile Damage (Disables Godmode)",
     Default = false,
