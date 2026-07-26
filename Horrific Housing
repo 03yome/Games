@@ -805,15 +805,17 @@ local RunService = game:GetService("RunService")
 
 local savedPosition = nil
 local connection = nil
-local isHolding = false
-local createdPart = nil
+local isRunning = false
+local parts = {}
 
-local targetPosition = Vector3.new(4633.00, 405.72, 225.66)
+local startX = 4633.00
+local startY = 405.72
+local startZ = 225.66
 
-local Toggle = PlayerTab:CreateToggle({
-   Name = "Auto safe",
+local Toggle = Tab:CreateToggle({
+   Name = "Vòng lặp 10 Part",
    CurrentValue = false,
-   Flag = "PositionLockToggle",
+   Flag = "TenPartsLoopToggle",
    Callback = function(Value)
        local character = player.Character
        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
@@ -822,43 +824,58 @@ local Toggle = PlayerTab:CreateToggle({
 
        if Value then
            savedPosition = rootPart.CFrame
-           isHolding = true
-           
-           createdPart = Instance.new("Part")
-           createdPart.Size = Vector3.new(10, 1, 10)
-           createdPart.Position = targetPosition
-           createdPart.Anchored = true        
-           createdPart.CanCollide = true      
-           createdPart.BrickColor = BrickColor.new("Bright green")
-           createdPart.Material = Enum.Material.Neon
-           createdPart.Parent = workspace
-
-           local destinationCFrame = CFrame.new(targetPosition + Vector3.new(0, 3, 0))
-           rootPart.CFrame = destinationCFrame
-           savedPosition = destinationCFrame
+           isRunning = true
            
            if humanoid then
                humanoid.PlatformStand = true 
            end
 
+           for i = 1, 10 do
+               local p = Instance.new("Part")
+               p.Size = Vector3.new(10, 1, 10)
+               p.Position = Vector3.new(startX + 30 + (i - 1) * 30, startY, startZ)
+               p.Anchored = true        
+               p.CanCollide = true      
+               p.BrickColor = BrickColor.new("Bright green")
+               p.Material = Enum.Material.Neon
+               p.Parent = workspace
+               table.insert(parts, p)
+           end
+
+           task.spawn(function()
+               while isRunning do
+                   for i = 1, 10 do
+                       if not isRunning then break end
+                       local targetPart = parts[i]
+                       if targetPart and rootPart then
+                           local dest = CFrame.new(targetPart.Position + Vector3.new(0, 3, 0))
+                           rootPart.CFrame = dest
+                           savedPosition = dest
+                       end
+                       task.wait(1)
+                   end
+               end
+           end)
+
            connection = RunService.Heartbeat:Connect(function()
-               if isHolding and savedPosition and rootPart then
+               if isRunning and savedPosition and rootPart then
                    rootPart.CFrame = savedPosition
                    rootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                    rootPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                end
            end)
        else
-           isHolding = false
+           isRunning = false
+           
            if connection then
                connection:Disconnect()
                connection = nil
            end
 
-           if createdPart then
-               createdPart:Destroy()
-               createdPart = nil
+           for _, p in ipairs(parts) do
+               if p then p:Destroy() end
            end
+           parts = {}
 
            if humanoid then
                humanoid.PlatformStand = false
