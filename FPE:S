@@ -1,0 +1,62 @@
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Exploit System",
+    Text = "Made by 03y_o",
+    Duration = 3,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+if Character:GetAttribute("MaxStamina") == nil then
+    if LocalPlayer:GetAttribute("MaxStamina") == nil then
+        local Objects = {
+            Character,
+            LocalPlayer,
+            Character:FindFirstChildOfClass("Humanoid")
+        }
+
+        for _, Object in pairs(Objects) do
+            if Object then
+                for AttributeName in pairs(Object:GetAttributes()) do
+                    if AttributeName:lower():find("stamina") then
+                        Object:SetAttribute(AttributeName, math.huge)
+                    end
+                end
+            end
+        end
+    else
+        LocalPlayer:SetAttribute("MaxStamina", math.huge)
+    end
+else
+    Character:SetAttribute("MaxStamina", math.huge)
+end
+
+task.wait(1)
+
+LocalPlayer = Players.LocalPlayer
+Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+if Character:GetAttribute("Stamina") == nil then
+    if LocalPlayer:GetAttribute("Stamina") == nil then
+        local Objects = {
+            Character,
+            LocalPlayer,
+            Character:FindFirstChildOfClass("Humanoid")
+        }
+
+        for _, Object in pairs(Objects) do
+            if Object then
+                for AttributeName in pairs(Object:GetAttributes()) do
+                    if AttributeName:lower():find("stamina") then
+                        Object:SetAttribute(AttributeName, math.huge)
+                    end
+                end
+            end
+        end
+    else
+        LocalPlayer:SetAttribute("Stamina", math.huge)
+    end
+else
+    Character:SetAttribute("Stamina", math.huge)
+end
