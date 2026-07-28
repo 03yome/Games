@@ -1,0 +1,13 @@
+repeat task.wait(1)
+    local Car = nil
+    workspace:WaitForChild("__THINGS"):WaitForChild("__REMOTES"):WaitForChild("vehicle_spawn"):InvokeServer()
+    for i,v in pairs(workspace.__THINGS.Vehicles:GetChildren()) do
+        if v:GetAttribute("OwnerId") == game.Players.LocalPlayer.UserId then
+            Car = v
+        end
+    end
+    repeat task.wait(.2) until Car ~= nil
+    if Car then Car:PivotTo(CFrame.new(175, -115, -9e34)) end
+    task.wait(.3)
+    workspace:WaitForChild("__THINGS"):WaitForChild("__REMOTES"):WaitForChild("vehicle_stop"):InvokeServer()
+until ass == false
