@@ -1,0 +1,23 @@
+task.wait(3)
+local _0x7f4a = nil
+for _, _0x3b8c in pairs(getgc(true)) do
+    if type(_0x3b8c) == "function" then
+        local _0x1a9e = debug.getinfo(_0x3b8c)
+        if _0x1a9e.name == "changeStaminaBy" then
+            _0x7f4a = _0x3b8c
+            break
+        end
+    end
+end
+if _0x7f4a and type(hookfunction) == "function" then
+    local _0x9c2d
+    _0x9c2d = hookfunction(_0x7f4a, function(_0x5e1b)
+        if type(_0x5e1b) == "number" and _0x5e1b < 0 then
+            _0x5e1b = 0 
+        end
+        return _0x9c2d(_0x5e1b)
+    end)
+    print("Success")
+else
+    warn("Failed to initialize process.")
+end
