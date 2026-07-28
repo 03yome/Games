@@ -1579,3 +1579,96 @@ Gamemodes:CreateToggle({
         end
     end
 })
+
+local Section = Gamemodes:CreateSection("Spleef")
+
+Gamemodes:CreateParagraph({
+    Title = "Spleef",
+    Content = "Spleef minigame utilities."
+})
+
+Gamemodes:CreateButton({
+    Name = "Make Spleef Tiles Fall",
+    Callback = function()
+        local spleefArena = workspace:FindFirstChild("Spleef Arena")
+        if spleefArena then
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local rootPart = character.HumanoidRootPart
+                for _, tile in pairs(spleefArena:GetChildren()) do
+                    if tile:FindFirstChild("TouchInterest") then
+                        firetouchinterest(rootPart, tile, 0)
+                        firetouchinterest(rootPart, tile, 1)
+                    end
+                end
+            end
+        end
+    end
+})
+
+local Section = Gamemodes:CreateSection("Rising Lava")
+
+Gamemodes:CreateParagraph({
+    Title = "Rising Lava",
+    Content = "Rising lava minigame protections."
+})
+
+Gamemodes:CreateButton({
+    Name = "Lava Protection",
+    Callback = function()
+        if _G.TouchConnection then
+            _G.TouchConnection:Disconnect()
+            _G.TouchConnection = nil
+        end
+        
+        _G.TouchConnection = workspace.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("TouchTransmitter") then
+                descendant:Destroy()
+            end
+        end)
+        
+        local keywords = {"lava"}
+        for _, descendant in pairs(workspace:GetDescendants()) do
+            local nameLower = string.lower(descendant.Name)
+            for _, keyword in ipairs(keywords) do
+                if string.find(nameLower, keyword) then
+                    descendant:Destroy()
+                    break
+                end
+            end
+            
+            if descendant:IsA("TouchTransmitter") then
+                descendant:Destroy()
+            end
+        end
+    end
+})
+
+local Section = Gamemodes:CreateSection("Sweeper")
+
+Gamemodes:CreateParagraph({
+    Title = "Sweeper",
+    Content = "Sweeper minigame controls."
+})
+
+Gamemodes:CreateButton({
+    Name = "Remove Sweeper",
+    Callback = function()
+        for _, descendant in pairs(workspace:GetDescendants()) do
+            if descendant.Name == "Spinner" then
+                descendant:Destroy()
+            end
+        end
+        
+        if _G.SweeperConnection then
+            _G.SweeperConnection:Disconnect()
+            _G.SweeperConnection = nil
+        end
+        
+        _G.SweeperConnection = workspace.DescendantAdded:Connect(function(descendant)
+            if descendant.Name == "Spinner" then
+                descendant:Destroy()
+            end
+        end)
+    end
+})
