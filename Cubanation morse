@@ -1,0 +1,5 @@
+local args = {
+	"TeleportToCode",
+	"5C9E7"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ClientServerLink"):WaitForChild("Data"):InvokeServer(unpack(args))
