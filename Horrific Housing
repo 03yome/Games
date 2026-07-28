@@ -1465,3 +1465,117 @@ Gamemodes:CreateButton({
         end
     end,
 })
+
+local Section = Gamemodes:CreateSection("User Interface")
+
+Gamemodes:CreateToggle({
+    Name = "Auto Remove Advertisments UI",
+    CurrentValue = false,
+    Flag = "RemoveAdsToggle",
+    Callback = function(Value)
+        _G.RemoveAds = Value
+        local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        
+        if Value then
+            _G.AdsConnection = playerGui.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "Ads" then
+                    descendant:Destroy()
+                end
+            end)
+            
+            for _, descendant in pairs(playerGui:GetDescendants()) do
+                if descendant.Name == "Ads" then
+                    descendant:Destroy()
+                end
+            end
+        else
+            if _G.AdsConnection then
+                _G.AdsConnection:Disconnect()
+                _G.AdsConnection = nil
+            end
+        end
+    end
+})
+
+Gamemodes:CreateToggle({
+    Name = "Auto Remove Assasin UI",
+    CurrentValue = false,
+    Flag = "RemoveAssasinToggle",
+    Callback = function(Value)
+        _G.RemoveAssasin = Value
+        local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        
+        if Value then
+            _G.AssasinConnection = playerGui.DescendantAdded:Connect(function(descendant)
+                if descendant.Name == "Assasin" then
+                    descendant:Destroy()
+                end
+            end)
+            
+            for _, descendant in pairs(playerGui:GetDescendants()) do
+                if descendant.Name == "Assasin" then
+                    descendant:Destroy()
+                end
+            end
+        else
+            if _G.AssasinConnection then
+                _G.AssasinConnection:Disconnect()
+                _G.AssasinConnection = nil
+            end
+        end
+    end
+})
+
+local Section = Gamemodes:CreateSection("Match")
+
+Gamemodes:CreateButton({
+    Name = "Invisible House",
+    Callback = function()
+        local houseColour = game:GetService("ReplicatedStorage"):FindFirstChild("HouseColour")
+        if houseColour then
+            houseColour:FireServer(Color3.new(0, 0, 1), "ForceField", 1)
+        end
+        
+        if r2 and r2.Notify then
+            r2:Notify({
+                Title = "NOTICE",
+                Content = "You can Disable this by switching house materials!",
+                Duration = 5,
+                Image = 12967561554
+            })
+        end
+    end
+})
+
+Gamemodes:CreateButton({
+    Name = "Open/Close All (Possible) Doors",
+    Callback = function()
+        for _, descendant in pairs(workspace:GetDescendants()) do
+            if descendant:IsA("ClickDetector") then
+                fireclickdetector(descendant)
+            end
+        end
+    end
+})
+
+Gamemodes:CreateToggle({
+    Name = "Anti-Void",
+    CurrentValue = false,
+    Flag = "AntiVoidToggle",
+    Callback = function(Value)
+        if Value then
+            local invisiblePart = Instance.new("Part")
+            invisiblePart.Name = "InvisiblePart"
+            invisiblePart.Anchored = true
+            invisiblePart.Transparency = 1
+            invisiblePart.Size = Vector3.new(300, 1, 300)
+            invisiblePart.CFrame = CFrame.new(Vector3.new(-30, -15, 98))
+            invisiblePart.Parent = workspace
+        else
+            local invisiblePart = workspace:FindFirstChild("InvisiblePart")
+            if invisiblePart then
+                invisiblePart:Destroy()
+            end
+        end
+    end
+})
