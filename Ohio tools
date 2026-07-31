@@ -452,44 +452,24 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 CombatPlayers:CreateButton({
     Name = "NoCoolDownGui",
     Callback = function()
-        _G.NoCooldownToggle = not _G.NoCooldownToggle
+        local gui = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+        if not gui then return end
 
-        if _G.NoCooldownLoop then
-            return
+        if gui.Enabled then
+            gui.Enabled = false
+        else
+            gui.Enabled = true
         end
-        _G.NoCooldownLoop = true
-
-        task.spawn(function()
-            while true do
-                task.wait(0.35)
-                local gui = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
-                if gui then
-                    gui.Enabled = _G.NoCooldownToggle
-                end
-            end
-        end)
     end
 })
 
 CombatPlayers:CreateButton({
     Name = "Spam ultimate",
     Callback = function()
-        _G.SpamGuiToggle = not _G.SpamGuiToggle
+        local gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
+        if not gui then return end
 
-        if _G.SpamGuiLoop then
-            return
-        end
-        _G.SpamGuiLoop = true
-
-        task.spawn(function()
-            while true do
-                task.wait(0.35)
-                local gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
-                if gui then
-                    gui.Enabled = _G.SpamGuiToggle
-                end
-            end
-        end)
+        gui.Enabled = not gui.Enabled
     end
 })
 
