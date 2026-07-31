@@ -1,4 +1,4 @@
-local ScreenGui = Instance.new("ScreenGui")
+local CoreGui = Instance.new("CoreGui")
 ScreenGui.Name = "SpamGUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = game.CoreGui
@@ -452,24 +452,24 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 CombatPlayers:CreateButton({
     Name = "NoCoolDownGui",
     Callback = function()
-        local gui = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
-        if not gui then return end
+        _G.toggle1 = not _G.toggle1
 
-        if gui.Enabled then
-            gui.Enabled = false
-        else
-            gui.Enabled = true
-        end
+while true do
+    task.wait(0.35)
+    game:GetService("CoreGui").NoCooldownUI.Enabled = _G.toggle1
+end
     end
 })
 
 CombatPlayers:CreateButton({
-    Name = "Spam ultimate",
+    Name = "SpamGui",
     Callback = function()
-        local gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
-        if not gui then return end
+        _G.toggle2 = not _G.toggle2
 
-        gui.Enabled = not gui.Enabled
+while true do
+    task.wait(0.35)
+    game:GetService("Players").LocalPlayer.PlayerGui.SpamGUI.Enabled = _G.toggle2
+end
     end
 })
 
