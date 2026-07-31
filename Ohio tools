@@ -456,7 +456,7 @@ CombatPlayers:CreateButton({
 
 while true do
     task.wait(0.35)
-    game:GetService("CoreGui").SpamGUI.Enabled = _G.NoCooldownToggle
+    game:GetService("CoreGui").NoCooldownUI.Enabled = _G.NoCooldownToggle
 end
     end
 })
@@ -468,7 +468,7 @@ CombatPlayers:CreateButton({
 
 while true do
     task.wait(0.35)
-    game:GetService("Players").LocalPlayer.PlayerGui.NoCooldownUI.Enabled = _G.SpamGuiToggle
+    game:GetService("Players").LocalPlayer.PlayerGui.SpamGUI.Enabled = _G.SpamGuiToggle
 end
     end
 })
