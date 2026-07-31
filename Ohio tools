@@ -1,6 +1,3 @@
------------------
-Spam Ultimate
------------‐-----
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SpamGUI"
 ScreenGui.ResetOnSpawn = false
@@ -455,11 +452,11 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 CombatPlayers:CreateButton({
     Name = "NoCoolDownGui",
     Callback = function()
-        _G.toggle = not _G.toggle
+        _G.NoCooldownToggle = not _G.NoCooldownToggle
 
 while true do
     task.wait(0.35)
-    game:GetService("CoreGui").SpamGUI.Enabled = _G.toggle
+    game:GetService("CoreGui").SpamGUI.Enabled = _G.NoCooldownToggle
 end
     end
 })
@@ -467,11 +464,11 @@ end
 CombatPlayers:CreateButton({
     Name = "Spam ultimate",
     Callback = function()
-        _G.toggle = not _G.toggle
+        _G.SpamGuiToggle = not _G.SpamGuiToggle
 
 while true do
     task.wait(0.35)
-    game:GetService("Players").LocalPlayer.PlayerGui.NoCooldownUI.Enabled = _G.toggle
+    game:GetService("Players").LocalPlayer.PlayerGui.NoCooldownUI.Enabled = _G.SpamGuiToggle
 end
     end
 })
