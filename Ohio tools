@@ -1,0 +1,931 @@
+local lp = game.Players.LocalPlayer
+local playerGui = lp:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+
+if not hookfunction then
+    lp:Kick("Seu exploit não suporta hookfunction. Tente outro executor. ("..identifyexecutor()..")")
+    return
+end
+
+local enabled = false
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "NoCooldownUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+ 
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Parent = screenGui
+mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mainFrame.BorderSizePixel = 2
+mainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+mainFrame.Position = UDim2.new(0, 20, 0, 200)
+mainFrame.Size = UDim2.new(0, 120, 0, 60)
+mainFrame.Active = true
+
+local button = Instance.new("TextButton")
+button.Name = "NoCooldownButton"
+button.Size = UDim2.new(1, -10, 1, -10)
+button.Position = UDim2.new(0, 5, 0, 5)
+button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 18
+button.Text = "No Cooldown OFF"
+button.Parent = mainFrame
+
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+local function updateButton()
+    if enabled then
+        button.Text = "No Cooldown ON"
+        button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+    else
+        button.Text = "No Cooldown OFF"
+        button.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+    end
+end
+
+local oldWait
+oldWait = hookfunction(wait, function(seconds)
+    if enabled then
+        return oldWait(0)
+    else
+        return oldWait(seconds)
+    end
+end)
+
+local oldTaskWait
+oldTaskWait = hookfunction(task.wait, function(seconds)
+    if enabled then
+        return oldTaskWait(0)
+    else
+        return oldTaskWait(seconds)
+    end
+end)
+
+local oldTick
+oldTick = hookfunction(tick, function()
+    if enabled then
+        return 0
+    else
+        return oldTick()
+    end
+end)
+
+local oldClock
+oldClock = hookfunction(os.clock, function()
+    if enabled then
+        return 0
+    else
+        return oldClock()
+    end
+end)
+
+button.MouseButton1Click:Connect(function()
+    enabled = not enabled
+    updateButton()
+end)
+
+updateButton()
+
+--[[
+    Ohio Tools - Deobfuscated Reconstruction
+    Source: OhioTools.dump.lua.txt
+
+    Note:
+    Some original logic was removed/blanked by the obfuscator/dump.
+    Those sections are marked as [UNRECOVERED] below.
+]]
+
+local Rayfield
+local Players
+local LocalPlayer
+
+local ReplicatedStorage
+local SelectedPlayer = ""
+
+local SelectedPlayerCharacter
+local LocalCharacter
+local LocalHumanoidRootPart
+
+local HitboxScriptURL =
+    "https://raw.githubusercontent.com/Golovission1/Script_on_SoulScript/refs/heads/main/Hit%20box"
+
+if pcall(function()
+    Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+    Players = game:GetService("Players")
+end) then
+    LocalPlayer = Players.LocalPlayer
+end
+
+local function getLocalCharacter()
+    return LocalPlayer and LocalPlayer.Character
+end
+
+local function getLocalHumanoid()
+    local character = getLocalCharacter()
+    return character and character:FindFirstChildOfClass("Humanoid")
+end
+
+local Window = Rayfield:CreateWindow({
+    LoadingTitle = "SoulHub",
+    Name = "Ohio Tools",
+    KeySystem = false,
+    LoadingSubtitle = "t.me/Soul_Scr1pt",
+    Discord = {
+        Enabled = false
+    },
+    ConfigurationSaving = {
+        Enabled = false
+    }
+})
+
+local CombatPlayers = Window:CreateTab("Combat / Players", 4483362458)
+local Movement = Window:CreateTab("Movement", 4483362458)
+local ESP = Window:CreateTab("ESP", 4483362458)
+local MainWorld = Window:CreateTab("Main / World", 4483362458)
+local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
+
+--==================================================
+-- Combat / Players
+--==================================================
+
+CombatPlayers:CreateButton({
+    Name = "NoCoolDownGui",
+    Callback = function()
+        _G.toggle = not _G.toggle
+
+while true do
+    task.wait(0.35)
+    game:GetService("Players").LocalPlayer.PlayerGui.NoCooldownUI.Enabled = _G.toggle
+end
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "Enable Hitboxes (Works on almost all weapons)",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGet(HitboxScriptURL))()
+        end)
+    end
+})
+
+CombatPlayers:CreateSection("Player Selection")
+
+-- Original dump attempts to build a player list here,
+-- but resets the table inside the loop.
+-- Reconstructed as the apparent intended behavior.
+local function getPlayerNames()
+    local playerNames = {}
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerNames, player.Name)
+        end
+    end
+
+    return playerNames
+end
+
+local PlayerDropdown = CombatPlayers:CreateDropdown({
+    Name = "Select Player",
+    CurrentOption = "",
+    MultipleOptions = false,
+    Options = getPlayerNames(),
+    Callback = function(options)
+        SelectedPlayer = options[1] or ""
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "Refresh Players List",
+    Callback = function()
+        PlayerDropdown:Refresh(getPlayerNames(), true)
+    end
+})
+
+CombatPlayers:CreateSection("Player Actions")
+
+CombatPlayers:CreateButton({
+    Name = "Teleport to Selected Player",
+    Callback = function()
+        if SelectedPlayer == "" then
+            return
+        end
+
+        local targetPlayer = Players:FindFirstChild(SelectedPlayer)
+        if not targetPlayer or not targetPlayer.Character then
+            return
+        end
+
+        local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local localCharacter = getLocalCharacter()
+        local localRoot = localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+
+        if targetRoot and localRoot then
+            localRoot.CFrame = targetRoot.CFrame
+        end
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "Car Drop on Selected Player",
+    Callback = function()
+        if SelectedPlayer == "" then
+            return
+        end
+
+        local targetPlayer = Players:FindFirstChild(SelectedPlayer)
+        if not targetPlayer or not targetPlayer.Character then
+            return
+        end
+
+        local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not targetRoot then
+            return
+        end
+
+        ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local CarDropRemote = ReplicatedStorage:FindFirstChild("SVDDR22")
+
+        if CarDropRemote then
+            CarDropRemote:FireServer(targetRoot.Position)
+        end
+    end
+})
+
+CombatPlayers:CreateSection("Random Actions")
+
+CombatPlayers:CreateButton({
+    Name = "Car Drop on Random Player",
+    Callback = function()
+        local validPlayers = {}
+
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer
+                and player.Character
+                and player.Character:FindFirstChild("HumanoidRootPart") then
+
+                table.insert(validPlayers, player)
+            end
+        end
+
+        if #validPlayers == 0 then
+            return
+        end
+
+        ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local CarDropRemote = ReplicatedStorage:FindFirstChild("SVDDR22")
+
+        if CarDropRemote then
+            local target =
+                validPlayers[math.random(1, #validPlayers)]
+
+            CarDropRemote:FireServer(
+                target.Character.HumanoidRootPart.Position
+            )
+        end
+    end
+})
+
+CombatPlayers:CreateSection("Self Actions")
+
+CombatPlayers:CreateButton({
+    Name = "Dead You (Suicide)",
+    Callback = function()
+        ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+        local ExplodeEvent =
+            ReplicatedStorage:FindFirstChild("ExplodeEvent")
+
+        if ExplodeEvent then
+            ExplodeEvent:FireServer(LocalPlayer)
+        end
+    end
+})
+
+--==================================================
+-- Movement
+--==================================================
+
+local WalkSpeedValue = 16
+local JumpPowerValue = 50
+
+Movement:CreateSection("Speed & Jump")
+
+Movement:CreateSlider({
+    Name = "WalkSpeed",
+    Suffix = "speed",
+    CurrentValue = 16,
+    Increment = 1,
+    Range = {16, 500},
+    Flag = "SpeedSlider",
+
+    Callback = function(value)
+        WalkSpeedValue = value
+
+        local humanoid = getLocalHumanoid()
+        if humanoid then
+            humanoid.WalkSpeed = value
+        end
+    end
+})
+
+Movement:CreateSlider({
+    Name = "JumpPower",
+    Suffix = "power",
+    CurrentValue = 50,
+    Increment = 1,
+    Range = {50, 500},
+    Flag = "JumpSlider",
+
+    Callback = function(value)
+        JumpPowerValue = value
+
+        local humanoid = getLocalHumanoid()
+        if humanoid then
+            humanoid.UseJumpPower = true
+            humanoid.JumpPower = value
+        end
+    end
+})
+
+LocalPlayer.CharacterAdded:Connect(function(character)
+    task.wait(0.1)
+
+    local humanoid = character:WaitForChild("Humanoid")
+
+    humanoid.WalkSpeed = WalkSpeedValue
+    humanoid.UseJumpPower = true
+    humanoid.JumpPower = JumpPowerValue
+end)
+
+Movement:CreateSection("Movement Modes")
+
+local InfiniteJumpConnection
+
+Movement:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfJumpToggle",
+
+    Callback = function(enabled)
+        if InfiniteJumpConnection then
+            InfiniteJumpConnection:Disconnect()
+            InfiniteJumpConnection = nil
+        end
+
+        if not enabled then
+            return
+        end
+
+        InfiniteJumpConnection =
+            game:GetService("UserInputService").JumpRequest:Connect(function()
+                local humanoid = getLocalHumanoid()
+
+                if humanoid then
+                    humanoid:ChangeState("Jumping")
+                end
+            end)
+    end
+})
+
+local NoclipConnection
+
+Movement:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "NoclipToggle",
+
+    Callback = function(enabled)
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+
+        if not enabled then
+            return
+        end
+
+        NoclipConnection =
+            game:GetService("RunService").Stepped:Connect(function()
+                local character = getLocalCharacter()
+
+                if not character then
+                    return
+                end
+
+                for _, object in ipairs(character:GetDescendants()) do
+                    if object:IsA("BasePart") then
+                        object.CanCollide = false
+                    end
+                end
+            end)
+    end
+})
+
+--==================================================
+-- ESP
+--==================================================
+
+ESP:CreateSection("Main")
+
+--==================================================
+-- ESP
+--==================================================
+
+local ESPEnabled = false
+local ShowName = true
+local ShowDistance = true
+local ShowHighlight = true
+local ShowHealthBar = true
+
+local HighlightColor = Color3.fromRGB(0, 170, 255)
+local TextColor = Color3.fromRGB(255, 255, 255)
+
+local ESPObjects = {}
+
+local function getDistanceFromLocalPlayer(targetRoot)
+    local localCharacter = getLocalCharacter()
+    local localRoot =
+        localCharacter and localCharacter:FindFirstChild("HumanoidRootPart")
+
+    if not localRoot or not targetRoot then
+        return 0
+    end
+
+    return math.floor(
+        (localRoot.Position - targetRoot.Position).Magnitude
+    )
+end
+
+local function getHealthColor(healthPercent)
+    healthPercent = math.clamp(healthPercent, 0, 1)
+
+    if healthPercent > 0.5 then
+        return Color3.fromRGB(
+            255 * (1 - (healthPercent - 0.5) * 2),
+            255,
+            0
+        )
+    end
+
+    return Color3.fromRGB(
+        255,
+        255 * (healthPercent * 2),
+        0
+    )
+end
+
+local function removeESP(player)
+    local data = ESPObjects[player]
+
+    if not data then
+        return
+    end
+
+    for _, object in pairs(data) do
+        if typeof(object) == "Instance" then
+            object:Destroy()
+        elseif typeof(object) == "RBXScriptConnection" then
+            object:Disconnect()
+        end
+    end
+
+    ESPObjects[player] = nil
+end
+
+local function createESP(player)
+    if player == LocalPlayer then
+        return
+    end
+
+    removeESP(player)
+
+    local data = {}
+    ESPObjects[player] = data
+
+    local function setupCharacter(character)
+        removeESP(player)
+
+        data = {}
+        ESPObjects[player] = data
+
+        local humanoid =
+            character:FindFirstChildOfClass("Humanoid")
+
+        local root =
+            character:FindFirstChild("HumanoidRootPart")
+
+        if not humanoid or not root then
+            return
+        end
+
+        -- Highlight
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "OhioToolsESP"
+        highlight.Adornee = character
+        highlight.FillColor = HighlightColor
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineTransparency = 0
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.Enabled = ESPEnabled and ShowHighlight
+        highlight.Parent = character
+
+        data.Highlight = highlight
+
+        -- Billboard GUI
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "OhioToolsESP"
+        billboard.Adornee = root
+        billboard.Size = UDim2.fromOffset(220, 80)
+        billboard.StudsOffset = Vector3.new(0, 3, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Enabled = ESPEnabled
+        billboard.Parent = root
+
+        data.Billboard = billboard
+
+        local frame = Instance.new("Frame")
+        frame.BackgroundTransparency = 1
+        frame.Size = UDim2.fromScale(1, 1)
+        frame.Parent = billboard
+
+        data.Frame = frame
+
+        -- Player name
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Name = "Name"
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Size = UDim2.new(1, 0, 0, 20)
+        nameLabel.Text = player.Name
+        nameLabel.TextColor3 = TextColor
+        nameLabel.TextStrokeTransparency = 0
+        nameLabel.TextScaled = true
+        nameLabel.Visible = ShowName
+        nameLabel.Parent = frame
+
+        data.NameLabel = nameLabel
+
+        -- Distance
+        local distanceLabel = Instance.new("TextLabel")
+        distanceLabel.Name = "Distance"
+        distanceLabel.BackgroundTransparency = 1
+        distanceLabel.Position = UDim2.fromOffset(0, 20)
+        distanceLabel.Size = UDim2.new(1, 0, 0, 20)
+        distanceLabel.TextColor3 = TextColor
+        distanceLabel.TextStrokeTransparency = 0
+        distanceLabel.TextScaled = true
+        distanceLabel.Visible = ShowDistance
+        distanceLabel.Parent = frame
+
+        data.DistanceLabel = distanceLabel
+
+        -- Health bar background
+        local healthBackground = Instance.new("Frame")
+        healthBackground.Name = "HealthBackground"
+        healthBackground.Position = UDim2.new(0.1, 0, 0, 43)
+        healthBackground.Size = UDim2.new(0.8, 0, 0, 8)
+        healthBackground.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        healthBackground.BorderSizePixel = 0
+        healthBackground.Visible = ShowHealthBar
+        healthBackground.Parent = frame
+
+        data.HealthBackground = healthBackground
+
+        -- Health bar
+        local healthBar = Instance.new("Frame")
+        healthBar.Name = "HealthBar"
+        healthBar.Size = UDim2.fromScale(1, 1)
+        healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        healthBar.BorderSizePixel = 0
+        healthBar.Parent = healthBackground
+
+        data.HealthBar = healthBar
+
+        local function updateESP()
+            if not character.Parent then
+                return
+            end
+
+            local healthPercent = 0
+
+            if humanoid.MaxHealth > 0 then
+                healthPercent =
+                    humanoid.Health / humanoid.MaxHealth
+            end
+
+            healthPercent =
+                math.clamp(healthPercent, 0, 1)
+
+            if data.DistanceLabel then
+                data.DistanceLabel.Text =
+                    tostring(
+                        getDistanceFromLocalPlayer(root)
+                    ) .. " m"
+            end
+
+            if data.HealthBar then
+                data.HealthBar.Size =
+                    UDim2.new(
+                        healthPercent,
+                        0,
+                        1,
+                        0
+                    )
+
+                data.HealthBar.BackgroundColor3 =
+                    getHealthColor(healthPercent)
+            end
+
+            if data.Highlight then
+                data.Highlight.Enabled =
+                    ESPEnabled and ShowHighlight
+
+                data.Highlight.FillColor =
+                    HighlightColor
+            end
+
+            if data.Billboard then
+                data.Billboard.Enabled =
+                    ESPEnabled
+            end
+
+            if data.NameLabel then
+                data.NameLabel.Visible = ShowName
+                data.NameLabel.TextColor3 = TextColor
+            end
+
+            if data.DistanceLabel then
+                data.DistanceLabel.Visible =
+                    ShowDistance
+
+                data.DistanceLabel.TextColor3 =
+                    TextColor
+            end
+
+            if data.HealthBackground then
+                data.HealthBackground.Visible =
+                    ShowHealthBar
+            end
+        end
+
+        data.HealthConnection =
+            humanoid.HealthChanged:Connect(updateESP)
+
+        data.UpdateConnection =
+            game:GetService("RunService").RenderStepped:Connect(
+                updateESP
+            )
+
+        updateESP()
+    end
+
+    if player.Character then
+        setupCharacter(player.Character)
+    end
+
+    data.CharacterConnection =
+        player.CharacterAdded:Connect(function(character)
+            task.wait(0.1)
+            setupCharacter(character)
+        end)
+end
+
+local function refreshESP()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if ESPEnabled then
+                createESP(player)
+            else
+                removeESP(player)
+            end
+        end
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if ESPEnabled then
+        createESP(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    removeESP(player)
+end)
+
+ESP:CreateSection("Main")
+
+ESP:CreateToggle({
+    Name = "Enable ESP",
+    CurrentValue = false,
+    Flag = "EspToggle",
+
+    Callback = function(enabled)
+        ESPEnabled = enabled
+        refreshESP()
+    end
+})
+
+ESP:CreateSection("Elements")
+
+ESP:CreateToggle({
+    Name = "Show Name",
+    CurrentValue = true,
+    Flag = "EspNameToggle",
+
+    Callback = function(enabled)
+        ShowName = enabled
+
+        for _, data in pairs(ESPObjects) do
+            if data.NameLabel then
+                data.NameLabel.Visible = enabled
+            end
+        end
+    end
+})
+
+ESP:CreateToggle({
+    Name = "Show Distance",
+    CurrentValue = true,
+    Flag = "EspDistanceToggle",
+
+    Callback = function(enabled)
+        ShowDistance = enabled
+
+        for _, data in pairs(ESPObjects) do
+            if data.DistanceLabel then
+                data.DistanceLabel.Visible = enabled
+            end
+        end
+    end
+})
+
+ESP:CreateToggle({
+    Name = "Show Highlight",
+    CurrentValue = true,
+    Flag = "EspHighlightToggle",
+
+    Callback = function(enabled)
+        ShowHighlight = enabled
+
+        for _, data in pairs(ESPObjects) do
+            if data.Highlight then
+                data.Highlight.Enabled =
+                    ESPEnabled and enabled
+            end
+        end
+    end
+})
+
+ESP:CreateToggle({
+    Name = "Show Health Bar",
+    CurrentValue = true,
+    Flag = "EspHealthToggle",
+
+    Callback = function(enabled)
+        ShowHealthBar = enabled
+
+        for _, data in pairs(ESPObjects) do
+            if data.HealthBackground then
+                data.HealthBackground.Visible = enabled
+            end
+        end
+    end
+})
+
+ESP:CreateSection("Colors")
+
+ESP:CreateColorPicker({
+    Name = "Highlight Color",
+    Color = HighlightColor,
+    Flag = "EspHighlightColor",
+
+    Callback = function(color)
+        HighlightColor = color
+
+        for _, data in pairs(ESPObjects) do
+            if data.Highlight then
+                data.Highlight.FillColor = color
+            end
+        end
+    end
+})
+
+ESP:CreateColorPicker({
+    Name = "Text Color",
+    Color = TextColor,
+    Flag = "EspTextColor",
+
+    Callback = function(color)
+        TextColor = color
+
+        for _, data in pairs(ESPObjects) do
+            if data.NameLabel then
+                data.NameLabel.TextColor3 = color
+            end
+
+            if data.DistanceLabel then
+                data.DistanceLabel.TextColor3 = color
+            end
+        end
+    end
+})
+
+--==================================================
+-- Main / World
+--==================================================
+
+MainWorld:CreateSection("Server")
+
+MainWorld:CreateButton({
+    Name = "Rejoin Server",
+    Callback = function()
+        if #Players:GetPlayers() <= 1 then
+            game:GetService("TeleportService")
+                :TeleportToPlaceInstance(
+                    game.PlaceId,
+                    game.JobId,
+                    LocalPlayer
+                )
+        end
+    end
+})
+
+MainWorld:CreateSection("World")
+
+MainWorld:CreateButton({
+    Name = "Remove Music",
+    Callback = function()
+        ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+        local PlayMusicEvent =
+            ReplicatedStorage:FindFirstChild("PlayMusicEvent")
+
+        if PlayMusicEvent then
+            PlayMusicEvent:FireServer(false)
+        end
+    end
+})
+
+AntiVoid:CreateButton({
+    Name = "AntiVoid wall",
+    Callback = function()
+       if _G.wallToggle == nil then
+    _G.wallToggle = false
+end
+
+_G.wallToggle = not _G.wallToggle
+
+if _G.wallToggle then
+    local part = Instance.new("Part")
+    part.Name = "WallToggle"
+    part.Size = Vector3.new(2048, 1, 2048)
+    part.CFrame = CFrame.new(168.94545, -2.79491425, -256, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+    part.Color = Color3.fromRGB(163, 162, 165)
+    part.Transparency = 0.7
+    part.Anchored = true
+    part.CanCollide = true
+    part.Parent = workspace
+else
+    local existingPart = workspace:FindFirstChild("wallToggle")
+    if existingPart then
+        existingPart:Destroy()
+    end
+end
+    end
+})
+
+Rayfield:LoadConfiguration()
