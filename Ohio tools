@@ -454,10 +454,20 @@ CombatPlayers:CreateButton({
     Callback = function()
         _G.NoCooldownToggle = not _G.NoCooldownToggle
 
-while true do
-    task.wait(0.35)
-    game:GetService("CoreGui").NoCooldownUI.Enabled = _G.NoCooldownToggle
-end
+        if _G.NoCooldownLoop then
+            return
+        end
+        _G.NoCooldownLoop = true
+
+        task.spawn(function()
+            while true do
+                task.wait(0.35)
+                local gui = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+                if gui then
+                    gui.Enabled = _G.NoCooldownToggle
+                end
+            end
+        end)
     end
 })
 
@@ -466,10 +476,20 @@ CombatPlayers:CreateButton({
     Callback = function()
         _G.SpamGuiToggle = not _G.SpamGuiToggle
 
-while true do
-    task.wait(0.35)
-    game:GetService("Players").LocalPlayer.PlayerGui.SpamGUI.Enabled = _G.SpamGuiToggle
-end
+        if _G.SpamGuiLoop then
+            return
+        end
+        _G.SpamGuiLoop = true
+
+        task.spawn(function()
+            while true do
+                task.wait(0.35)
+                local gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
+                if gui then
+                    gui.Enabled = _G.SpamGuiToggle
+                end
+            end
+        end)
     end
 })
 
