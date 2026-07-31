@@ -1,3 +1,275 @@
+-----------------
+Spam Ultimate
+-----------‐-----
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SpamGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
+
+-- Tạo MainFrame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderColor3 = Color3.fromRGB(27, 42, 53)
+MainFrame.Position = UDim2.new(0.100000001, -5, 0.200000003, -13)
+MainFrame.Size = UDim2.new(0, 260, 0, 310)
+MainFrame.Draggable = true
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
+
+-- Tạo Title
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.BackgroundTransparency = 0
+Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "TOOL SPAMMER ULTIMATE"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 15
+Title.Parent = MainFrame
+
+-- Hàm tiện ích để tạo TextButton nhanh chóng
+local function createButton(name, text, pos, size, bgColor)
+	local btn = Instance.new("TextButton")
+	btn.Name = name
+	btn.Text = text
+	btn.BackgroundColor3 = bgColor
+	btn.BorderColor3 = Color3.fromRGB(27, 42, 53)
+	btn.Position = pos
+	btn.Size = size
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.SourceSans
+	btn.TextSize = 14
+	
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.CornerRadius = UDim.new(0.6, 0)
+	uiCorner.Parent = btn
+	
+	btn.Parent = MainFrame
+	return btn
+end
+
+-- Tạo các TextButton
+local FreezeToggleBtn = createButton("FreezeToggleBtn", "Freeze Spam", UDim2.new(0, 10, 0, 45), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+local TrashbagToggleBtn = createButton("TrashbagToggleBtn", "Trashbag Spam", UDim2.new(0, 10, 0, 88), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+local BrickToggleBtn = createButton("BrickToggleBtn", "Brick Spam", UDim2.new(0, 10, 0, 131), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+local FishToggleBtn = createButton("FishToggleBtn", "Throw Fish Spam", UDim2.new(0, 10, 0, 174), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+local PlaneToggleBtn = createButton("PlaneToggleBtn", "Plane(All)", UDim2.new(0, 10, 0, 217), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+local TrainToggleBtn = createButton("TrainToggleBtn", "Train Strike(All)", UDim2.new(0, 10, 0, 260), UDim2.new(0, 145, 0, 35), Color3.fromRGB(50, 50, 50))
+
+local LoopBtn = createButton("LoopBtn", "Loop:OFF", UDim2.new(0, 165, 0, 45), UDim2.new(0, 85, 0, 35), Color3.fromRGB(150, 50, 50))
+local CircleBtn = createButton("CircleBtn", "Circle:OFF", UDim2.new(0, 165, 0, 88), UDim2.new(0, 85, 0, 35), Color3.fromRGB(150, 50, 50))
+
+-- LOGIC XỬ LÝ CHỨC NĂNG SPAM & TOGGLE
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+-- Trạng thái bật/tắt của các chức năng
+local states = {
+	Freeze = false,
+	Trashbag = false,
+	Brick = false,
+	Fish = false,
+	Plane = false,
+	Train = false,
+	Loop = false,
+	Circle = false
+}
+
+-- Xử lý nút Loop chung
+LoopBtn.MouseButton1Click:Connect(function()
+	states.Loop = not states.Loop
+	if states.Loop then
+		LoopBtn.Text = "Loop:ON"
+		LoopBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+	else
+		LoopBtn.Text = "Loop:OFF"
+		LoopBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+	end
+end)
+
+-- Xử lý nút Circle
+CircleBtn.MouseButton1Click:Connect(function()
+	states.Circle = not states.Circle
+	if states.Circle then
+		CircleBtn.Text = "Circle:ON"
+		CircleBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+	else
+		CircleBtn.Text = "Circle:OFF"
+		CircleBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+	end
+end)
+
+-- Hàm quản lý trạng thái khi bấm vào các nút Spam
+local function setupToggle(btn, stateKey, actionCallback)
+	btn.MouseButton1Click:Connect(function()
+		states[stateKey] = not states[stateKey]
+		
+		if states[stateKey] then
+			btn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+			
+			task.spawn(function()
+				while states[stateKey] do
+					pcall(actionCallback)
+					if not states.Loop then
+						states[stateKey] = false
+						btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+						break
+					end
+					task.wait(0.1)
+				end
+			end)
+		else
+			btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+		end
+	end)
+end
+
+-- 1. Freeze Spam
+setupToggle(FreezeToggleBtn, "Freeze", function()
+	local char = LocalPlayer.Character
+	if char then
+		local iceStick = char:FindFirstChild("Ice Stick")
+		if iceStick then
+			local freezeEvent = iceStick:FindFirstChild("FreezeEvent")
+			if freezeEvent then
+				freezeEvent:FireServer()
+			end
+		end
+	end
+end)
+
+-- 2. Trashbag Spam
+setupToggle(TrashbagToggleBtn, "Trashbag", function()
+	local char = LocalPlayer.Character
+	if char then
+		local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+		local trashBag = char:FindFirstChild("Trash Bag")
+		
+		if humanoidRootPart and trashBag then
+			local throwEvent = trashBag:FindFirstChild("ThrowEvent")
+			if throwEvent then
+				if states.Circle then
+					for i = 1, 8 do
+						local angle = i / 8 * 2 * math.pi
+						local dir = Vector3.new(
+							math.cos(angle),
+							-0.35,
+							math.sin(angle)
+						)
+						throwEvent:FireServer(dir)
+					end
+				else
+					local lookVector = humanoidRootPart.CFrame.LookVector
+					local args = {
+						Vector3.new(lookVector.X, -0.35, lookVector.Z)
+					}
+					throwEvent:FireServer(unpack(args))
+				end
+			end
+		end
+	end
+end)
+
+setupToggle(BrickToggleBtn, "Brick", function()
+	local char = LocalPlayer.Character
+	if char then
+		local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+		local legoBrick = char:FindFirstChild("Lego Brick")
+		
+		if humanoidRootPart and legoBrick then
+			local throwEvent = legoBrick:FindFirstChild("ThrowEvent")
+			if throwEvent then
+				if states.Circle then
+					for i = 1, 8 do
+						local angle = i / 8 * 2 * math.pi
+						local dir = Vector3.new(
+							math.cos(angle),
+							-0.35,
+							math.sin(angle)
+						)
+						throwEvent:FireServer(dir)
+					end
+				else
+					local lookVector = humanoidRootPart.CFrame.LookVector
+					local args = {
+						Vector3.new(lookVector.X, -0.35, lookVector.Z)
+					}
+					throwEvent:FireServer(unpack(args))
+				end
+			end
+		end
+	end
+end)
+
+setupToggle(FishToggleBtn, "Fish", function()
+	local char = LocalPlayer.Character
+	if char then
+		local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+		local throwFish = char:FindFirstChild("Throw Fish")
+		
+		if humanoidRootPart and throwFish then
+			local fishEvent = throwFish:FindFirstChild("FishEvent")
+			if fishEvent then
+				if states.Circle then
+					for i = 1, 8 do
+						local angle = i / 8 * 2 * math.pi
+						local dir = Vector3.new(
+							math.cos(angle),
+							1,
+							math.sin(angle)
+						)
+						fishEvent:FireServer(dir)
+					end
+				else
+					local lookVector = humanoidRootPart.CFrame.LookVector
+					local args = {
+						Vector3.new(lookVector.X, 1, lookVector.Z)
+					}
+					fishEvent:FireServer(unpack(args))
+				end
+			end
+		end
+	end
+end)
+
+setupToggle(PlaneToggleBtn, "Plane(All)", function()
+	local remote = ReplicatedStorage:WaitForChild("!ansnns")
+	if remote then
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= LocalPlayer and player.Character then
+				local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					local args = {
+						vector.create(hrp.Position.X, hrp.Position.Y, hrp.Position.Z)
+					}
+					remote:FireServer(unpack(args))
+				end
+			end
+		end
+	end
+end)
+
+setupToggle(TrainToggleBtn, "Train Strike(All)", function()
+	local remote = ReplicatedStorage:WaitForChild("1332mmm")
+	if remote then
+		for _, player in pairs(Players:GetPlayers()) do
+			if player ~= LocalPlayer and player.Character then
+				local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					local args = {
+						vector.create(hrp.Position.X, hrp.Position.Y, hrp.Position.Z)
+					}
+					remote:FireServer(unpack(args))
+				end
+			end
+		end
+	end
+end)
+
 local lp = game.Players.LocalPlayer
 local playerGui = lp:WaitForChild("PlayerGui")
 local UserInputService = game:GetService("UserInputService")
@@ -182,6 +454,18 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 
 CombatPlayers:CreateButton({
     Name = "NoCoolDownGui",
+    Callback = function()
+        _G.toggle = not _G.toggle
+
+while true do
+    task.wait(0.35)
+    game:GetService("CoreGui").SpamGUI.Enabled = _G.toggle
+end
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "Spam ultimate",
     Callback = function()
         _G.toggle = not _G.toggle
 
