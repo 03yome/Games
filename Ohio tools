@@ -455,10 +455,12 @@ CombatPlayers:CreateButton({
         getgenv().NoCooldownState = not getgenv().NoCooldownState
         local newState = getgenv().NoCooldownState
         
-        local coreGuiUI = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
-        if coreGuiUI and coreGuiUI:IsA("ScreenGui") then
-            coreGuiUI.Enabled = newState
-        end
+        pcall(function()
+            local coreGuiUI = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+            if coreGuiUI and coreGuiUI:IsA("ScreenGui") then
+                coreGuiUI.Enabled = newState
+            end
+        end)
     end
 })
 
@@ -468,10 +470,15 @@ CombatPlayers:CreateButton({
         getgenv().SpamGUIState = not getgenv().SpamGUIState
         local newState = getgenv().SpamGUIState
         
-        local playerGuiUI = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
-        if playerGuiUI and playerGuiUI:IsA("ScreenGui") then
-            playerGuiUI.Enabled = newState
-        end
+        pcall(function()
+            local playerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+            if playerGui then
+                local playerGuiUI = playerGui:FindFirstChild("SpamGUI")
+                if playerGuiUI and playerGuiUI:IsA("ScreenGui") then
+                    playerGuiUI.Enabled = newState
+                end
+            end
+        end)
     end
 })
 
