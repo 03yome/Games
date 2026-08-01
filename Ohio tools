@@ -453,11 +453,10 @@ CombatPlayers:CreateButton({
     Name = "NoCoolDownGui",
     Callback = function()
         _G.toggle1 = not _G.toggle1
-
-while true do
-    task.wait(0.35)
-    game:GetService("CoreGui").NoCooldownUI.Enabled = _G.toggle1
-end
+        local ui = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+        if ui then
+            ui.Enabled = _G.toggle1
+        end
     end
 })
 
@@ -465,11 +464,10 @@ CombatPlayers:CreateButton({
     Name = "SpamGui",
     Callback = function()
         _G.toggle2 = not _G.toggle2
-
-while true do
-    task.wait(0.35)
-    game:GetService("Players").LocalPlayer.PlayerGui.SpamGUI.Enabled = _G.toggle2
-end
+        local spamGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
+        if spamGui then
+            spamGui.Enabled = _G.toggle2
+        end
     end
 })
 
