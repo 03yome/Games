@@ -1,7 +1,7 @@
-local CoreGui = Instance.new("CoreGui")
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SpamGUI"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = game.CoreGui
+ScreenGui.Parent = game:GetService("CoreGui")
 
 -- Tạo MainFrame
 local MainFrame = Instance.new("Frame")
@@ -448,6 +448,39 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 --==================================================
 -- Combat / Players
 --==================================================
+
+CombatPlayers:CreateButton({
+    Name = "NoCoolDownGui",
+    Callback = function()
+        getgenv().NoCooldownState = not getgenv().NoCooldownState
+        local newState = getgenv().NoCooldownState
+        
+        pcall(function()
+            local coreGuiUI = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+            if coreGuiUI and coreGuiUI:IsA("ScreenGui") then
+                coreGuiUI.Enabled = newState
+            end
+        end)
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "SpamGui",
+    Callback = function()
+        getgenv().SpamGUIState = not getgenv().SpamGUIState
+        local newState = getgenv().SpamGUIState
+        
+        pcall(function()
+            local playerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+            if playerGui then
+                local playerGuiUI = playerGui:FindFirstChild("SpamGUI")
+                if playerGuiUI and playerGuiUI:IsA("ScreenGui") then
+                    playerGuiUI.Enabled = newState
+                end
+            end
+        end)
+    end
+})
 
 CombatPlayers:CreateButton({
     Name = "Enable Hitboxes (Works on almost all weapons)",
