@@ -450,6 +450,32 @@ local AntiVoid = Window:CreateTab("Anti Void", 4483362458)
 --==================================================
 
 CombatPlayers:CreateButton({
+    Name = "NoCoolDownGui",
+    Callback = function()
+        getgenv().NoCooldownState = not getgenv().NoCooldownState
+        local newState = getgenv().NoCooldownState
+        
+        local coreGuiUI = game:GetService("CoreGui"):FindFirstChild("NoCooldownUI")
+        if coreGuiUI and coreGuiUI:IsA("ScreenGui") then
+            coreGuiUI.Enabled = newState
+        end
+    end
+})
+
+CombatPlayers:CreateButton({
+    Name = "SpamGui",
+    Callback = function()
+        getgenv().SpamGUIState = not getgenv().SpamGUIState
+        local newState = getgenv().SpamGUIState
+        
+        local playerGuiUI = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("SpamGUI")
+        if playerGuiUI and playerGuiUI:IsA("ScreenGui") then
+            playerGuiUI.Enabled = newState
+        end
+    end
+})
+
+CombatPlayers:CreateButton({
     Name = "Enable Hitboxes (Works on almost all weapons)",
     Callback = function()
         pcall(function()
