@@ -1,0 +1,409 @@
+local rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local window = rayfield:CreateWindow({
+    ["Name"] = "Punch Up | 03y_o",
+    ["LoadingTitle"] = "Instilizing...",
+    ["LoadingSubtitle"] = "Subscribe For More Video!",
+    ["ConfigurationSaving"] = { ["Enabled"] = false },
+    ["Discord"] = { ["Enabled"] = false },
+    ["KeySystem"] = false,
+})
+local players = game:GetService("Players")
+local localValuePlayer = players.LocalPlayer
+local punchSystemModule, blockSystemModule, tgsMiscModule
+pcall(function()
+    punchSystemModule = require(workspace.Src.PunchSystem)
+end)
+pcall(function()
+    blockSystemModule = require(workspace.Src.BlockSystem)
+end)
+pcall(function()
+    tgsMiscModule = require(workspace.Lib.TGSMisc)
+end)
+local hitBotsData = {
+    ["PunchAura"] = false,
+    ["HitPlayers"] = true,
+    ["HitBots"] = false,
+    ["AuraRadius"] = 27 - 17,
+    ["AttackDelay"] = 751.1 - (54 + 697),
+    ["AutoBlock"] = false,
+    ["BlockRadius"] = 871 - (564 + 292),
+    ["SpeedHack"] = false,
+    ["WalkSpeed"] = 1722 - (1121 + 569),
+    ["AntiRagdoll"] = false,
+}
+local tab = window:CreateTab("Combat", 5263626795 - 780264337)
+local secondaryTab = window:CreateTab("Player", 4328701293 - -154661165)
+tab:CreateSection("Auto Punch Aura")
+tab:CreateToggle({
+    ["Name"] = "Enable Punch Aura",
+    ["CurrentValue"] = false,
+    ["Flag"] = "PunchAuraToggle",
+    ["Callback"] = function(punchAura)
+        hitBotsData.PunchAura = punchAura
+    end,
+})
+tab:CreateToggle({
+    ["Name"] = "Target Players",
+    ["CurrentValue"] = true,
+    ["Flag"] = "TargetPlayersToggle",
+    ["Callback"] = function(hitPlayers)
+        hitBotsData.HitPlayers = hitPlayers
+    end,
+})
+tab:CreateToggle({
+    ["Name"] = "Target Bots / NPCs",
+    ["CurrentValue"] = true,
+    ["Flag"] = "TargetBotsToggle",
+    ["Callback"] = function(hitBots)
+        hitBotsData.HitBots = hitBots
+    end,
+})
+tab:CreateSlider({
+    ["Name"] = "Aura Radius (Studs)",
+    ["Range"] = { 199 - (48 + 146), 1368 - 868 },
+    ["Increment"] = 589 - (294 + 294),
+    ["Suffix"] = "Studs",
+    ["CurrentValue"] = 88 - 38,
+    ["Flag"] = "AuraRadiusSlider",
+    ["Callback"] = function(auraRadius)
+        hitBotsData.AuraRadius = auraRadius
+    end,
+})
+tab:CreateSlider({
+    ["Name"] = "Attack Delay (Speed)",
+    ["Range"] = { 0.03 + 0, 1613.5 - (1565 + 48) },
+    ["Increment"] = 0.01 + 0,
+    ["Suffix"] = "s",
+    ["CurrentValue"] = 0.1 - 0,
+    ["Flag"] = "AttackDelaySlider",
+    ["Callback"] = function(attackDelay)
+        hitBotsData.AttackDelay = attackDelay
+    end,
+})
+tab:CreateSection("Defense & Auto Block")
+tab:CreateToggle({
+    ["Name"] = "Auto Block (Auto Defense)",
+    ["CurrentValue"] = false,
+    ["Flag"] = "AutoBlockToggle",
+    ["Callback"] = function(autoBlock)
+        hitBotsData.AutoBlock = autoBlock
+    end,
+})
+secondaryTab:CreateSection("Movement & Character Mods")
+secondaryTab:CreateToggle({
+    ["Name"] = "Anti Ragdoll",
+    ["CurrentValue"] = false,
+    ["Flag"] = "AntiRagdollToggle",
+    ["Callback"] = function(antiRagdoll)
+        local number = 0
+        while true do
+            if number == (0 + 0) then
+                hitBotsData.AntiRagdoll = antiRagdoll
+                if not antiRagdoll and localValuePlayer.Character then
+                    local difference = 236 - (141 + 95)
+                    local humanoid
+                    while true do
+                        if difference == (0 + 0) then
+                            humanoid = localValuePlayer.Character:FindFirstChildOfClass("Humanoid")
+                            if humanoid then
+                                local difference = 1138 - (782 + 356)
+                                local number
+                                while true do
+                                    if difference == (0 - 0) then
+                                        number = 267 - (176 + 91)
+                                        while true do
+                                            if number == (0 - 0) then
+                                                humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, true)
+                                                humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+                                                break
+                                            end
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+                break
+            end
+        end
+    end,
+})
+secondaryTab:CreateToggle({
+    ["Name"] = "Enable Custom WalkSpeed",
+    ["CurrentValue"] = false,
+    ["Flag"] = "SpeedHackToggle",
+    ["Callback"] = function(speedHack)
+        local difference = 0 - 0
+        while true do
+            if difference == 0 then
+                hitBotsData.SpeedHack = speedHack
+                if
+                    not speedHack
+                    and localValuePlayer.Character
+                    and localValuePlayer.Character:FindFirstChildOfClass("Humanoid")
+                then
+                    localValuePlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 9 + 7
+                end
+                break
+            end
+        end
+    end,
+})
+secondaryTab:CreateSlider({
+    ["Name"] = "WalkSpeed",
+    ["Range"] = { 1108 - (975 + 117), 82 + 18 },
+    ["Increment"] = 3 - 2,
+    ["Suffix"] = "Speed",
+    ["CurrentValue"] = 109 - 77,
+    ["Flag"] = "WalkSpeedSlider",
+    ["Callback"] = function(walkSpeed)
+        hitBotsData.WalkSpeed = walkSpeed
+    end,
+})
+local function handleData(input)
+    local dataNumber = 0
+    local data
+    while true do
+        local difference = 765 - (574 + 191)
+        while true do
+            if difference == (1018 - (697 + 321)) then
+                if (0 - 0) == dataNumber then
+                    data = {}
+                    if hitBotsData.HitPlayers then
+                        for index, item in ipairs(players:GetPlayers()) do
+                            if (item ~= localValuePlayer) and item.Character then
+                                local difference = 0 - 0
+                                local humanoidRootPart
+                                local humanoid
+                                while true do
+                                    if difference == 0 then
+                                        humanoidRootPart = item.Character:FindFirstChild("HumanoidRootPart")
+                                        humanoid = item.Character:FindFirstChildOfClass("Humanoid")
+                                        difference = 1 - 0
+                                    end
+                                    if difference == (2 - 1) then
+                                        if humanoidRootPart and humanoid and (humanoid.Health > (0 + 0)) then
+                                            local difference = 0 - 0
+                                            local magnitude
+                                            while true do
+                                                if difference == (0 - 0) then
+                                                    magnitude = (humanoidRootPart.Position - input.Position).Magnitude
+                                                    if magnitude <= hitBotsData.AuraRadius then
+                                                        table.insert(
+                                                            data,
+                                                            { ["Player"] = item, ["Root"] = humanoidRootPart, ["IsBot"] = false }
+                                                        )
+                                                    end
+                                                    break
+                                                end
+                                            end
+                                        end
+                                        break
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    dataNumber = 2 - 1
+                end
+                if dataNumber == (1228 - (322 + 905)) then
+                    if hitBotsData.HitBots then
+                        for index, humanoidRootPartContainer in ipairs(workspace:GetChildren()) do
+                            if
+                                humanoidRootPartContainer:IsA("Model")
+                                and (humanoidRootPartContainer ~= localValuePlayer.Character)
+                            then
+                                if
+                                    (humanoidRootPartContainer.Name == "BoxingBot")
+                                    or humanoidRootPartContainer:FindFirstChildOfClass("Humanoid")
+                                then
+                                    local difference = 611 - (602 + 9)
+                                    local humanoidRootPart
+                                    local humanoid
+                                    while true do
+                                        if difference == (1190 - (449 + 740)) then
+                                            if humanoidRootPart and humanoid and (humanoid.Health > (0 - 0)) then
+                                                local magnitude = (humanoidRootPart.Position - input.Position).Magnitude
+                                                if magnitude <= hitBotsData.AuraRadius then
+                                                    table.insert(
+                                                        data,
+                                                        { ["Player"] = nil, ["Root"] = humanoidRootPart, ["IsBot"] = true }
+                                                    )
+                                                end
+                                            end
+                                            break
+                                        end
+                                        if difference == (939 - (714 + 225)) then
+                                            humanoidRootPart =
+                                                humanoidRootPartContainer:FindFirstChild("HumanoidRootPart")
+                                            humanoid = humanoidRootPartContainer:FindFirstChildOfClass("Humanoid")
+                                            difference = 873 - (826 + 46)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    return data
+                end
+                break
+            end
+        end
+    end
+end
+task.spawn(function()
+    while task.wait(hitBotsData.AttackDelay) do
+        if hitBotsData.PunchAura then
+            local humanoidRootPartContainer = localValuePlayer.Character
+            if humanoidRootPartContainer then
+                local difference = 0 - 0
+                local humanoidRootPart
+                while true do
+                    if difference == (0 + 0) then
+                        humanoidRootPart = humanoidRootPartContainer:FindFirstChild("HumanoidRootPart")
+                        if humanoidRootPart then
+                            local number = 0
+                            local data
+                            while true do
+                                if number == (947 - (245 + 702)) then
+                                    data = handleData(humanoidRootPart)
+                                    for index, item in ipairs(data) do
+                                        local difference = 0 - 0
+                                        local unit
+                                        while true do
+                                            if difference == 0 then
+                                                unit = (item.Root.Position - humanoidRootPart.Position).Unit
+                                                if item.IsBot then
+                                                    local difference = 48 - (25 + 23)
+                                                    while true do
+                                                        if difference == (0 + 0) then
+                                                            if tgsMiscModule and tgsMiscModule.RemoteEvent then
+                                                                pcall(function()
+                                                                    tgsMiscModule
+                                                                        .RemoteEvent("StreakTracker_BotPunch")
+                                                                        :FireServer()
+                                                                end)
+                                                            end
+                                                            if punchSystemModule and punchSystemModule.FirePunchHit then
+                                                                pcall(function()
+                                                                    punchSystemModule.FirePunchHit(nil, unit, false)
+                                                                end)
+                                                            end
+                                                            break
+                                                        end
+                                                    end
+                                                elseif punchSystemModule and punchSystemModule.FirePunchHit then
+                                                    pcall(function()
+                                                        punchSystemModule.FirePunchHit(item.Player, unit, false)
+                                                    end)
+                                                end
+                                                break
+                                            end
+                                        end
+                                    end
+                                    break
+                                end
+                            end
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+end)
+task.spawn(function()
+    while task.wait(1898.1 - (260 + 1638)) do
+        if hitBotsData.AutoBlock and blockSystemModule then
+            local difference = 1886 - (927 + 959)
+            local humanoidRootPartContainer
+            while true do
+                if difference == 0 then
+                    humanoidRootPartContainer = localValuePlayer.Character
+                    if humanoidRootPartContainer then
+                        local humanoidRootPart = humanoidRootPartContainer:FindFirstChild("HumanoidRootPart")
+                        if humanoidRootPart then
+                            local data = handleData(humanoidRootPart)
+                            local flag = false
+                            for index, item in ipairs(data) do
+                                local magnitude = (item.Root.Position - humanoidRootPart.Position).Magnitude
+                                if magnitude <= hitBotsData.BlockRadius then
+                                    flag = true
+                                    break
+                                end
+                            end
+                            if flag then
+                                pcall(function()
+                                    blockSystemModule.SetBlocking(true)
+                                end)
+                            else
+                                pcall(function()
+                                    blockSystemModule.SetBlocking(false)
+                                end)
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+        end
+    end
+end)
+task.spawn(function()
+    while task.wait(440.05 - (382 + 58)) do
+        if hitBotsData.AntiRagdoll and localValuePlayer.Character then
+            local difference = 0 - 0
+            local humanoid
+            while true do
+                if difference == (0 + 0) then
+                    humanoid = localValuePlayer.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                        humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+                        local state = humanoid:GetState()
+                        if
+                            (state == Enum.HumanoidStateType.Ragdoll)
+                            or (state == Enum.HumanoidStateType.FallingDown)
+                            or humanoid.PlatformStand
+                            or humanoid.Sit
+                        then
+                            local difference = 0 - 0
+                            while true do
+                                if difference == (2 - 1) then
+                                    humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+                                    break
+                                end
+                                if difference == 0 then
+                                    humanoid.PlatformStand = false
+                                    humanoid.Sit = false
+                                    difference = 2 - 1
+                                end
+                            end
+                        end
+                    end
+                    break
+                end
+            end
+        end
+    end
+end)
+task.spawn(function()
+    while task.wait(1205.2 - (902 + 303)) do
+        if hitBotsData.SpeedHack and localValuePlayer.Character then
+            local number = 0
+            local humanoid
+            while true do
+                if number == (0 - 0) then
+                    humanoid = localValuePlayer.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.WalkSpeed = hitBotsData.WalkSpeed
+                    end
+                    break
+                end
+            end
+        end
+    end
+end)
