@@ -1,0 +1,139 @@
+-- SCRIPT: INFINITE LENGTH + GOD MODE + DIED (SÓ 3 BOTÕES)
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "Don't break the obby"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 260, 0, 220)
+frame.Position = UDim2.new(0, 20, 0, 20)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 14)
+corner.Parent = frame
+
+-- Título (arrastável)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Don't break the obby"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.Parent = frame
+
+-- ESTILO BOTÃO
+local function createBtn(text, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.Position = UDim2.new(0.05, 0, posY, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 15
+    btn.Parent = frame
+    local c = Instance.new("UICorner", btn); c.CornerRadius = UDim.new(0, 10)
+    return btn
+end
+
+-- 3 BOTÕES
+local infBtn = createBtn("InfiniteLength: OFF", 0.25)
+local godBtn = createBtn("God Mode: OFF", 0.48)
+local diedBtn = createBtn("Died: OFF", 0.71)
+
+-- VARIÁVEIS
+local infOn = false
+local godOn = false
+local diedOn = false
+local dragging = false
+local dragStart, startPos
+
+-- PEGAR STATEMENTS
+local function getStatements()
+    local success, result = pcall(function()
+        local charFolder = workspace:WaitForChild("Character", 10)
+        local character = charFolder:WaitForChild("Character", 10)
+        return character:WaitForChild("Statements", 10)
+    end)
+    return success and result or nil
+end
+
+-- INFINITE LENGTH
+infBtn.MouseButton1Click:Connect(function()
+    infOn = not infOn
+    local stmt = getStatements()
+    if stmt then
+        local val = stmt:FindFirstChild("InfiniteLength")
+        if val then val.Value = infOn end
+    end
+    infBtn.Text = "InfiniteLength: " .. (infOn and "ON" or "OFF")
+    infBtn.BackgroundColor3 = infOn and Color3.fromRGB(0, 220, 0) or Color3.fromRGB(220, 50, 50)
+end)
+
+-- GOD MODE
+godBtn.MouseButton1Click:Connect(function()
+    godOn = not godOn
+    local stmt = getStatements()
+    if stmt then
+        local val = stmt:FindFirstChild("Immortal")
+        if val then val.Value = godOn end
+    end
+    godBtn.Text = "God Mode: " .. (godOn and "ON" or "OFF")
+    godBtn.BackgroundColor3 = godOn and Color3.fromRGB(0, 220, 0) or Color3.fromRGB(220, 50, 50)
+end)
+
+-- DIED
+diedBtn.MouseButton1Click:Connect(function()
+    diedOn = not diedOn
+    local stmt = getStatements()
+    if stmt then
+        local val = stmt:FindFirstChild("Died")
+        if val then val.Value = diedOn end
+    end
+    diedBtn.Text = "Died: " .. (diedOn and "ON" or "OFF")
+    diedBtn.BackgroundColor3 = diedOn and Color3.fromRGB(0, 220, 0) or Color3.fromRGB(220, 50, 50)
+end)
+
+-- DRAG (PC + MOBILE)
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+title.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- LOOP: MANTÉM VALORES ATIVOS
+task.spawn(function()
+    while task.wait(1) do
+        local stmt = getStatements()
+        if stmt then
+            if infOn then local v = stmt:FindFirstChild("InfiniteLength"); if v and not v.Value then v.Value = true end end
+            if godOn then local v = stmt:FindFirstChild("Immortal"); if v and not v.Value then v.Value = true end end
+            if diedOn then local v = stmt:FindFirstChild("Died"); if v and not v.Value then v.Value = true end end
+        end
+    end
+end)
