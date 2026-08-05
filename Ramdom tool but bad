@@ -84,3 +84,28 @@ game:GetService("ReplicatedStorage"):WaitForChild("Attack"):FireServer()
         end
     end
 })
+
+local loopLeafblower = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop leafblower ",
+    Description = "need leaf blower",
+    Default = false,
+    Callback = function(state)
+        loopLeafblower = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopLeafblower do
+game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("leaf blower"):WaitForChild("RemoteEvent"):FireServer()
+                    wait(0.5)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
