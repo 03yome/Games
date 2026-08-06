@@ -1,0 +1,275 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local remoteFolder = ReplicatedStorage:WaitForChild("Events"):WaitForChild("Building")
+local buildBlockRE = remoteFolder:WaitForChild("BuildBlockRE")
+local blockFolder = ReplicatedStorage:WaitForChild("Asset"):WaitForChild("Block")
+
+local function initializeBuildSystem()
+	if player.PlayerGui:FindFirstChild("CustomBlockSelectorGui") then
+		player.PlayerGui.CustomBlockSelectorGui:Destroy()
+	end
+
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "CustomBlockSelectorGui"
+	screenGui.ResetOnSpawn = false
+	screenGui.Parent = player:WaitForChild("PlayerGui")
+
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0, 440, 0, 420)
+	mainFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
+	mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Parent = screenGui
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1, -40, 0, 35)
+	title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.TextSize = 16
+	title.Font = Enum.Font.SourceSansBold
+	title.Text = "  BẢNG ĐIỀU KHIỂN XÂY DỰNG (FIXED)"
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Parent = mainFrame
+
+	-- Kéo thả GUI
+	local dragging, dragInput, dragStart, startPos
+	title.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = mainFrame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			end)
+		end
+	end)
+	title.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+
+	-- Nút ẩn hiện
+	local toggleBtn = Instance.new("TextButton")
+	toggleBtn.Size = UDim2.new(0, 35, 0, 35)
+	toggleBtn.Position = UDim2.new(1, -35, 0, 0)
+	toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+	toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	toggleBtn.TextSize = 18
+	toggleBtn.Font = Enum.Font.SourceSansBold
+	toggleBtn.Text = "-"
+	toggleBtn.Parent = mainFrame
+
+	local contentHolder = Instance.new("Frame")
+	contentHolder.Size = UDim2.new(1, 0, 1, -35)
+	contentHolder.Position = UDim2.new(0, 0, 0, 35)
+	contentHolder.BackgroundTransparency = 1
+	contentHolder.Parent = mainFrame
+
+	local isVisible = true
+	toggleBtn.MouseButton1Click:Connect(function()
+		isVisible = not isVisible
+		for _, child in ipairs(contentHolder:GetChildren()) do
+			if child:IsA("GuiObject") then child.Visible = isVisible end
+		end
+		if isVisible then
+			toggleBtn.Text = "-"
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+			mainFrame.Size = UDim2.new(0, 440, 0, 420)
+		else
+			toggleBtn.Text = "+"
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+			mainFrame.Size = UDim2.new(0, 440, 0, 35)
+		end
+	end)
+
+	-- Cột trái: Màu RGB
+	local leftColumn = Instance.new("Frame")
+	leftColumn.Size = UDim2.new(0, 200, 1, -10)
+	leftColumn.Position = UDim2.new(0, 10, 0, 5)
+	leftColumn.BackgroundTransparency = 1
+	leftColumn.Parent = contentHolder
+
+	local colorTitle = Instance.new("TextLabel")
+	colorTitle.Size = UDim2.new(1, 0, 0, 25)
+	colorTitle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	colorTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	colorTitle.TextSize = 14
+	colorTitle.Font = Enum.Font.SourceSansBold
+	colorTitle.Text = "Chỉnh Màu & Xem Trước"
+	colorTitle.Parent = leftColumn
+
+	local colorPreview = Instance.new("Frame")
+	colorPreview.Size = UDim2.new(1, 0, 0, 80)
+	colorPreview.Position = UDim2.new(0, 0, 0, 35)
+	colorPreview.BackgroundColor3 = Color3.fromRGB(255, 137, 73)
+	colorPreview.BorderSizePixel = 0
+	colorPreview.Parent = leftColumn
+
+	local currentColor = Color3.fromRGB(255, 137, 73)
+
+	local function updateColor(newColor)
+		currentColor = newColor
+		colorPreview.BackgroundColor3 = newColor
+		local gearFolder = player:FindFirstChild("Gearfolder") or player:FindFirstChild("GearFolder")
+		if gearFolder then
+			local unlockCustom = gearFolder:FindFirstChild("UnlockCustomColor")
+			if unlockCustom and unlockCustom:IsA("BoolValue") then unlockCustom.Value = true end
+			local selectColor = gearFolder:FindFirstChild("SelectColor")
+			if selectColor and selectColor:IsA("Color3Value") then selectColor.Value = newColor end
+		end
+	end
+
+	local function createSlider(name, yPos, defaultVal)
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.new(0, 20, 0, 25)
+		label.Position = UDim2.new(0, 0, 0, yPos)
+		label.BackgroundTransparency = 1
+		label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		label.TextSize = 14
+		label.Text = name
+		label.Parent = leftColumn
+		
+		local box = Instance.new("TextBox")
+		box.Size = UDim2.new(1, -25, 0, 25)
+		box.Position = UDim2.new(0, 25, 0, yPos)
+		box.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		box.TextColor3 = Color3.fromRGB(255, 255, 255)
+		box.TextSize = 14
+		box.Text = tostring(defaultVal)
+		box.ClearTextOnFocus = false
+		box.Parent = leftColumn
+		
+		box.FocusLost:Connect(function()
+			local num = tonumber(box.Text)
+			if num then
+				num = math.clamp(math.round(num), 0, 255)
+				box.Text = tostring(num)
+			else
+				box.Text = tostring(defaultVal)
+			end
+			local r = tonumber(leftColumn:FindFirstChild("RBox") and leftColumn.RBox.Text) or 255
+			local g = tonumber(leftColumn:FindFirstChild("GBox") and leftColumn.GBox.Text) or 137
+			local b = tonumber(leftColumn:FindFirstChild("BBox") and leftColumn.BBox.Text) or 73
+			updateColor(Color3.fromRGB(r, g, b))
+		end)
+		return box
+	end
+
+	local rBox = createSlider("R:", 130, 255) rBox.Name = "RBox"
+	local gBox = createSlider("G:", 165, 137) gBox.Name = "GBox"
+	local bBox = createSlider("B:", 200, 73) bBox.Name = "BBox"
+
+	-- Cột phải: Danh sách Block
+	local rightColumn = Instance.new("ScrollingFrame")
+	rightColumn.Size = UDim2.new(0, 210, 1, -10)
+	rightColumn.Position = UDim2.new(0, 220, 0, 5)
+	rightColumn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+	rightColumn.BorderSizePixel = 0
+	rightColumn.CanvasSize = UDim2.new(0, 0, 0, 0)
+	rightColumn.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	rightColumn.ScrollingDirection = Enum.ScrollingDirection.Y
+	rightColumn.Parent = contentHolder
+
+	local blockTitle = Instance.new("TextLabel")
+	blockTitle.Size = UDim2.new(1, 0, 0, 25)
+	blockTitle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	blockTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	blockTitle.TextSize = 14
+	blockTitle.Font = Enum.Font.SourceSansBold
+	blockTitle.Text = "Danh Sách Block"
+	blockTitle.Parent = rightColumn
+
+	local uiList = Instance.new("UIListLayout")
+	uiList.Parent = rightColumn
+	uiList.SortOrder = Enum.SortOrder.LayoutOrder
+	uiList.Padding = UDim.new(0, 4)
+
+	local selectedBlockName = "wood"
+
+	for _, item in ipairs(blockFolder:GetChildren()) do
+		if item:IsA("Model") or item:IsA("BasePart") then
+			local btn = Instance.new("TextButton")
+			btn.Size = UDim2.new(1, 0, 0, 35)
+			btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            btn.TextSize = 14
+			btn.Font = Enum.Font.SourceSans
+			btn.Text = item.Name
+			btn.Parent = rightColumn
+			
+			btn.MouseButton1Click:Connect(function()
+				selectedBlockName = item.Name
+				for _, child in ipairs(rightColumn:GetChildren()) do
+					if child:IsA("TextButton") then child.BackgroundColor3 = Color3.fromRGB(60, 60, 60) end
+				end
+				btn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+			end)
+		end
+	end
+
+	-- Tạo Tool tối ưu không bị delay
+	if player.Backpack:FindFirstChild("CustomBuildTool") then
+		player.Backpack.CustomBuildTool:Destroy()
+	end
+
+	local tool = Instance.new("Tool")
+	tool.Name = "CustomBuildTool"
+	tool.RequiresHandle = false
+	tool.Parent = player.Backpack
+
+	tool.Activated:Connect(function()
+		local raycastParams = RaycastParams.new()
+		raycastParams.FilterDescendantsInstances = {player.Character}
+		raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+		
+		local unitRay = mouse.UnitRay
+		local raycastResult = workspace:Raycast(unitRay.Origin, unitRay.Direction * 300, raycastParams)
+		
+		if raycastResult and raycastResult.Instance then
+			local hitInstance = raycastResult.Instance
+			local hitPos = raycastResult.Position
+			local normal = raycastResult.Normal
+			
+			-- Tính toán vị trí bám lưới chuẩn theo kích thước block (Mặc định 3 đơn vị hoặc theo kích thước thực tế nhanh)
+			local gridSize = 3 
+			local targetAsset = blockFolder:FindFirstChild(selectedBlockName)
+			if targetAsset then
+				if targetAsset:IsA("BasePart") then
+					gridSize = targetAsset.Size.X
+				elseif targetAsset:IsA("Model") then
+					_, gridSize = targetAsset:GetBoundingBox()
+					gridSize = gridSize.X
+				end
+			end
+
+			local calcPos = hitPos + (normal * (gridSize / 2))
+			local finalPos = Vector3.new(
+				math.floor(calcPos.X / gridSize + 0.5) * gridSize,
+				math.floor(calcPos.Y / gridSize + 0.5) * gridSize,
+				math.floor(calcPos.Z / gridSize + 0.5) * gridSize
+			)
+			local finalCFrame = CFrame.new(finalPos)
+			
+			-- Gửi thẳng lên Server không qua bước clone rườm rà giúp loại bỏ hoàn toàn delay
+			buildBlockRE:FireServer(selectedBlockName, finalCFrame, currentColor, hitInstance)
+		end
+	end)
+end
+
+initializeBuildSystem()
+
+player.CharacterAdded:Connect(function(newCharacter)
+	task.wait(1)
+	initializeBuildSystem()
+end)
