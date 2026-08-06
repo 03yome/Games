@@ -1,0 +1,105 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+-- Tìm chính xác BuildBlockRE
+local buildBlockRE
+for _, v in ipairs(ReplicatedStorage:GetDescendants()) do
+	if v:IsA("RemoteEvent") and v.Name == "BuildBlockRE" then
+		buildBlockRE = v
+		break
+	end
+end
+
+if not buildBlockRE then
+	warn("[RemoteSpy] Không tìm thấy BuildBlockRE!")
+	return
+end
+
+print("[RemoteSpy] Đã theo dõi BuildBlockRE hoàn hảo (Không ảnh hưởng lúc xây)!")
+
+local recordedActions = {}
+
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+	local method = getnamecallmethod()
+	local args = {...}
+	
+	if self == buildBlockRE and method == "FireServer" then
+		local blockName = args[1]
+		local cframeVal = args[2]
+		local colorVal = args[3]
+		
+		if blockName and cframeVal then
+			table.insert(recordedActions, {
+				name = tostring(blockName),
+				cf = cframeVal,
+				color = colorVal
+			})
+		end
+	end
+	
+	return oldNamecall(self, ...)
+end)
+
+-- Tạo nút trên màn hình
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AutoCopySpyGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local exportBtn = Instance.new("TextButton")
+exportBtn.Size = UDim2.new(0, 220, 0, 45)
+exportBtn.Position = UDim2.new(0.01, 0, 0.85, 0)
+exportBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+exportBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+exportBtn.TextSize = 14
+exportBtn.Font = Enum.Font.SourceSansBold
+exportBtn.Text = "XUẤT & COPY CODE SIÊU TỐC"
+exportBtn.Parent = screenGui
+
+exportBtn.MouseButton1Click:Connect(function()
+	local codeLines = {}
+	table.insert(codeLines, "local ReplicatedStorage = game:GetService('ReplicatedStorage')")
+	table.insert(codeLines, "local buildBlockRE")
+	table.insert(codeLines, "for _, v in ipairs(ReplicatedStorage:GetDescendants()) do if v.Name == 'BuildBlockRE' then buildBlockRE = v break end end")
+	table.insert(codeLines, "task.spawn(function()")
+	table.insert(codeLines, "    if not buildBlockRE then warn('Thiếu BuildBlockRE!') return end")
+	table.insert(codeLines, "    local blocksData = {")
+	
+	-- Gom tất cả vào một bảng dữ liệu (Data Table) duy nhất để gửi/xử lý mượt mà, không bị cộng dồn delay
+	for _, action in ipairs(recordedActions) do
+		local cf = action.cf
+		local cfString = string.format("CFrame.new(%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f)", cf:GetComponents())
+		local colorVal = action.color
+		local colorString = "nil"
+		if typeof(colorVal) == "Color3" then
+			colorString = string.format("Color3.fromRGB(%d, %d, %d)", math.round(colorVal.R * 255), math.round(colorVal.G * 255), math.round(colorVal.B * 255))
+		end
+		
+		table.insert(codeLines, string.format('        {name = "%s", cf = %s, color = %s},', action.name, cfString, colorString))
+	end
+	
+	table.insert(codeLines, "    }")
+	table.insert(codeLines, "    -- Xử lý chạy ngầm siêu tốc bằng task.defer để không bao giờ bị khựng khung hình hay nghẽn mạng ở cuối")
+	table.insert(codeLines, "    for _, data in ipairs(blocksData) do")
+	table.insert(codeLines, "        task.defer(function()")
+	table.insert(codeLines, "            buildBlockRE:FireServer(data.name, data.cf, data.color)")
+	table.insert(codeLines, "        end)")
+	table.insert(codeLines, "    end")
+	table.insert(codeLines, "end)")
+	
+	local finalCode = table.concat(codeLines, "\n")
+	
+	if setclipboard then
+		setclipboard(finalCode)
+		exportBtn.Text = "ĐÃ COPY CODE SIÊU TỐC!"
+		exportBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+		task.wait(2)
+		exportBtn.Text = "XUẤT & COPY CODE SIÊU TỐC"
+		exportBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+	else
+		print(finalCode)
+		exportBtn.Text = "XEM CONSOLE (F9)!"
+	end
+end)
