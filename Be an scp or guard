@@ -1,0 +1,616 @@
+-- Rayfield UI Library Integration
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Be an SCP or Guard",
+    LoadingTitle = "GHOST UI Loader",
+    LoadingSubtitle = "by YouTube:@qweqrwtA",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = nil,
+        FileName = "SCPOrGuardConfig"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "noinvite",
+        RememberJoins = true
+    },
+    KeySystem = false,
+})
+
+-- Tabs
+local MainTab = Window:CreateTab("Main", 4483362458)
+local EspTab = Window:CreateTab("Esp", 4483362458)
+local PlayersTab = Window:CreateTab("Players", 4483362458)
+
+-- Services & Core Variables
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Teams = game:GetService("Teams")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Weapon Stats & Rapid Fire Variables
+local WeaponStats = require(game.ReplicatedStorage.WeaponStats)
+local OriginalFirerates = {}
+
+-- Bring Guard Variables
+local GuardRadius = 12
+local GuardConnection = nil
+local GuardCharConnection = nil
+local IsBringingGuards = false
+
+-- Bring SCP Variables
+local SCPTeam = Teams:FindFirstChild("SCP")
+local SCPRadius = 15
+local SCPConnection = nil
+local SCPCharConnection = nil
+local IsBringingSCP = false
+
+-- Hitbox Variables
+local SCPHitboxEnabled = false
+local SCPHitboxSize = 15
+local OriginalSCPHitboxes = {}
+
+local GuardHitboxEnabled = false
+local GuardHitboxSize = 15
+local OriginalGuardHitboxes = {}
+local GuardTeamsConfig = { MTF = true, Guard = true }
+
+-- ESP Variables
+local ESPSCPEnabled = false
+local ESPGuardEnabled = false
+local ESPTeamConfigs = { MTF = true, Guard = true }
+
+-- Player Modifications Variables
+local CurrentWalkSpeed = nil
+local CurrentJumpPower = nil
+
+-- Infinite Jump Variables
+local InfJumpEnabled = false
+local InfJumpConnection = nil
+
+-- Noclip Variables
+local NoclipEnabled = false
+local NoclipConnection = nil
+
+-- Main Tab Elements
+MainTab:CreateToggle({
+    Name = "Rapid Fire",
+    CurrentValue = false,
+    Flag = "RapidFire",
+    Callback = function(Value)
+        print(Value)
+        if Value then
+            for k, v in pairs(WeaponStats) do
+                if v.Firerate then
+                    OriginalFirerates[k] = v.Firerate
+                    v.Firerate = 0
+                end
+            end
+            return
+        end
+
+        for k, v in pairs(OriginalFirerates) do
+            if WeaponStats[k] then
+                WeaponStats[k].Firerate = v
+            end
+        end
+    end,
+})
+
+local function GetGuards()
+    local GuardList = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Team then
+            local TeamName = player.Team.Name
+            if TeamName == "MTF" or TeamName == "Guard" then
+                table.insert(GuardList, player)
+            end
+        end
+    end
+    return GuardList
+end
+
+local function UpdateGuardBring(targetPosition)
+    local guards = GetGuards()
+    local guardCount = #guards
+    if guardCount == 0 then return end
+    local angleStep = 2 * math.pi / guardCount
+    for i, player in ipairs(guards) do
+        local Character = player.Character
+        if Character then Character = Character:FindFirstChild("HumanoidRootPart") end
+        if Character then
+            local angle = (i - 1) * angleStep
+            local offsetX = math.cos(angle) * GuardRadius
+            local offsetZ = math.sin(angle) * GuardRadius
+            local targetVector = Vector3.new(targetPosition.X + offsetX, targetPosition.Y, targetPosition.Z + offsetZ)
+            Character.CFrame = CFrame.new(targetVector, targetPosition)
+        end
+    end
+end
+
+local function StartGuardBring()
+    if GuardConnection then GuardConnection:Disconnect() end
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart", 5)
+    if not HumanoidRootPart then return end
+    local lastPos = HumanoidRootPart.Position
+    UpdateGuardBring(lastPos)
+    GuardConnection = RunService.RenderStepped:Connect(function()
+        local CurrentChar = LocalPlayer.Character
+        if CurrentChar then CurrentChar = CurrentChar:FindFirstChild("HumanoidRootPart") end
+        if not CurrentChar or not lastPos then return end
+        local currentPos = CurrentChar.Position
+        local guards = GetGuards()
+        local guardCount = #guards
+        if guardCount == 0 then return end
+        if (currentPos - lastPos).Magnitude > GuardRadius then
+            lastPos = currentPos
+            UpdateGuardBring(lastPos)
+            return
+        end
+        local angleStep = 2 * math.pi / guardCount
+        for i, player in ipairs(guards) do
+            local TargetChar = player.Character
+            local RootPart = TargetChar and TargetChar:FindFirstChild("HumanoidRootPart")
+            local Humanoid = TargetChar and TargetChar:FindFirstChildOfClass("Humanoid")
+            if RootPart and Humanoid and Humanoid.Health > 0 then
+                RootPart.Velocity = Vector3.new(0, 0, 0)
+                RootPart.RotVelocity = Vector3.new(0, 0, 0)
+                local angle = (i - 1) * angleStep
+                local offsetX = math.cos(angle) * GuardRadius
+                local offsetZ = math.sin(angle) * GuardRadius
+                local targetVector = Vector3.new(lastPos.X + offsetX, lastPos.Y, lastPos.Z + offsetZ)
+                RootPart.CFrame = CFrame.new(targetVector, lastPos)
+            end
+        end
+    end)
+end
+
+MainTab:CreateToggle({
+    Name = "Bring All Guard V2",
+    CurrentValue = false,
+    Flag = "BringGuardV2",
+    Callback = function(Value)
+        print(Value)
+        IsBringingGuards = Value
+        if Value then
+            StartGuardBring()
+            if not GuardCharConnection then
+                GuardCharConnection = LocalPlayer.CharacterAdded:Connect(function()
+                    task.wait(0.5)
+                    if IsBringingGuards then StartGuardBring() end
+                end)
+            end
+        else
+            if GuardConnection then GuardConnection:Disconnect() end
+            if GuardCharConnection then GuardCharConnection:Disconnect() end
+        end
+    end,
+})
+
+local function GetSCPPlayers()
+    local SCPList = {}
+    if not SCPTeam then return SCPList end
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Team == SCPTeam and player ~= LocalPlayer then
+            table.insert(SCPList, player)
+        end
+    end
+    return SCPList
+end
+
+local function StartSCPBring()
+    if SCPConnection then SCPConnection:Disconnect() end
+    SCPConnection = RunService.RenderStepped:Connect(function()
+        local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if not Character then return end
+        local CharacterPosition = Character.Position
+        local scpPlayers = GetSCPPlayers()
+        local scpCount = #scpPlayers
+        if scpCount == 0 then return end
+        local angleStep = 2 * math.pi / scpCount
+        for i, player in ipairs(scpPlayers) do
+            local TargetChar = player.Character
+            local RootPart = TargetChar and TargetChar:FindFirstChild("HumanoidRootPart")
+            local Humanoid = TargetChar and TargetChar:FindFirstChildOfClass("Humanoid")
+            if RootPart and Humanoid and Humanoid.Health > 0 then
+                RootPart.Velocity = Vector3.new(0, 0, 0)
+                RootPart.RotVelocity = Vector3.new(0, 0, 0)
+                local angle = (i - 1) * angleStep
+                local offsetX = math.cos(angle) * SCPRadius
+                local offsetZ = math.sin(angle) * SCPRadius
+                local targetVector = Vector3.new(CharacterPosition.X + offsetX, CharacterPosition.Y, CharacterPosition.Z + offsetZ)
+                RootPart.CFrame = CFrame.new(targetVector, CharacterPosition)
+            end
+        end
+    end)
+end
+
+MainTab:CreateToggle({
+    Name = "Bring All SCP V2",
+    CurrentValue = false,
+    Flag = "BringSCPV2",
+    Callback = function(Value)
+        print(Value)
+        IsBringingSCP = Value
+        if Value then
+            if not SCPTeam then
+                warn("Khong tim thay Team SCP!")
+                return
+            end
+            StartSCPBring()
+            if not SCPCharConnection then
+                SCPCharConnection = LocalPlayer.CharacterAdded:Connect(function()
+                    task.wait(0.5)
+                    if IsBringingSCP then StartSCPBring() end
+                end)
+            end
+            print("Executor: Da kich hoat mang team SCP lien tuc theo ban!")
+            return
+        end
+        if SCPConnection then SCPConnection:Disconnect() end
+        if SCPCharConnection then SCPCharConnection:Disconnect() end
+        print("Executor: Da tat mang team SCP.")
+    end,
+})
+
+local function ResetSCPHitboxes()
+    for player, originalData in pairs(OriginalSCPHitboxes) do
+        local Character = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if Character and originalData then
+            Character.Size = originalData.Size
+            Character.Transparency = originalData.Transparency
+            Character.Material = originalData.Material
+            Character.BrickColor = originalData.BrickColor
+            Character.CanCollide = originalData.CanCollide
+        end
+    end
+    table.clear(OriginalSCPHitboxes)
+end
+
+local function ResetGuardHitboxes()
+    for player, originalData in pairs(OriginalGuardHitboxes) do
+        local Character = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if Character and originalData then
+            Character.Size = originalData.Size
+            Character.Transparency = originalData.Transparency
+            Character.Material = originalData.Material
+            Character.BrickColor = originalData.BrickColor
+            Character.CanCollide = originalData.CanCollide
+        end
+    end
+    table.clear(OriginalGuardHitboxes)
+end
+
+local function SetupHitboxPlayer(player)
+    player.CharacterAdded:Connect(function()
+        OriginalSCPHitboxes[player] = nil
+        OriginalGuardHitboxes[player] = nil
+    end)
+end
+for _, player in ipairs(Players:GetPlayers()) do SetupHitboxPlayer(player) end
+Players.PlayerAdded:Connect(SetupHitboxPlayer)
+
+MainTab:CreateInput({
+    Name = "Hitbox All SCP",
+    PlaceholderText = "Size value...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        print(Text)
+        local num = tonumber(Text)
+        if num and num > 0 then
+            SCPHitboxSize = num
+            SCPHitboxEnabled = true
+            return
+        end
+        SCPHitboxEnabled = false
+        ResetSCPHitboxes()
+    end,
+})
+
+MainTab:CreateInput({
+    Name = "Hitbox All Guard",
+    PlaceholderText = "Size value...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        print(Text)
+        local num = tonumber(Text)
+        if num and num > 0 then
+            GuardHitboxSize = num
+            GuardHitboxEnabled = true
+            return
+        end
+        GuardHitboxEnabled = false
+        ResetGuardHitboxes()
+    end,
+})
+
+RunService.RenderStepped:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local Character = player.Character
+            local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+            local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+            if RootPart and Humanoid and Humanoid.Health > 0 and player.Team then
+                if SCPHitboxEnabled and player.Team.Name == "SCP" then
+                    if not OriginalSCPHitboxes[player] then
+                        OriginalSCPHitboxes[player] = {
+                            Size = RootPart.Size,
+                            Transparency = RootPart.Transparency,
+                            Material = RootPart.Material,
+                            BrickColor = RootPart.BrickColor,
+                            CanCollide = RootPart.CanCollide
+                        }
+                    end
+                    RootPart.Size = Vector3.new(SCPHitboxSize, SCPHitboxSize, SCPHitboxSize)
+                    RootPart.Transparency = 0.8
+                    RootPart.Material = Enum.Material.Neon
+                    RootPart.BrickColor = BrickColor.new("Really blue")
+                    RootPart.CanCollide = false
+                elseif GuardHitboxEnabled and GuardTeamsConfig[player.Team.Name] then
+                    if not OriginalGuardHitboxes[player] then
+                        OriginalGuardHitboxes[player] = {
+                            Size = RootPart.Size,
+                            Transparency = RootPart.Transparency,
+                            Material = RootPart.Material,
+                            BrickColor = RootPart.BrickColor,
+                            CanCollide = RootPart.CanCollide
+                        }
+                    end
+                    RootPart.Size = Vector3.new(GuardHitboxSize, GuardHitboxSize, GuardHitboxSize)
+                    RootPart.Transparency = 0.8
+                    RootPart.Material = Enum.Material.Neon
+                    RootPart.BrickColor = BrickColor.new("Lime green")
+                    RootPart.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+-- Esp Tab Elements
+local function UpdateESP(player, color)
+    local Character = player.Character
+    if not Character then return end
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    local ESP_Solid = Character:FindFirstChild("ESP_Solid")
+    if not Humanoid or Humanoid.Health <= 0 then
+        if ESP_Solid then ESP_Solid:Destroy() end
+        return
+    end
+    if not ESP_Solid or not ESP_Solid:IsA("Highlight") then
+        if ESP_Solid then ESP_Solid:Destroy() end
+        ESP_Solid = Instance.new("Highlight")
+        ESP_Solid.Name = "ESP_Solid"
+        ESP_Solid.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        ESP_Solid.Parent = Character
+    end
+    ESP_Solid.FillColor = color
+    ESP_Solid.FillTransparency = 0.9
+    ESP_Solid.OutlineColor = color
+    ESP_Solid.OutlineTransparency = 0
+    ESP_Solid.Adornee = Character
+end
+
+local function RemoveESP(player)
+    local Character = player.Character
+    if Character then
+        local ESP_Solid = Character:FindFirstChild("ESP_Solid")
+        if ESP_Solid then ESP_Solid:Destroy() end
+    end
+end
+Players.PlayerRemoving:Connect(RemoveESP)
+
+EspTab:CreateToggle({
+    Name = "Esp SCP",
+    CurrentValue = false,
+    Flag = "EspSCP",
+    Callback = function(Value)
+        print(Value)
+        ESPSCPEnabled = Value
+        if not Value then
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player.Team and player.Team.Name == "SCP" then
+                    RemoveESP(player)
+                end
+            end
+        end
+    end,
+})
+
+EspTab:CreateToggle({
+    Name = "Esp Guard",
+    CurrentValue = false,
+    Flag = "EspGuard",
+    Callback = function(Value)
+        print(Value)
+        ESPGuardEnabled = Value
+        if not Value then
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player.Team and ESPTeamConfigs[player.Team.Name] then
+                    RemoveESP(player)
+                end
+            end
+        end
+    end,
+})
+
+RunService.RenderStepped:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if player.Team then
+                if ESPSCPEnabled and player.Team.Name == "SCP" then
+                    UpdateESP(player, Color3.fromRGB(255, 0, 0))
+                elseif ESPGuardEnabled and ESPTeamConfigs[player.Team.Name] then
+                    UpdateESP(player, Color3.fromRGB(0, 255, 0))
+                else
+                    RemoveESP(player)
+                end
+            else
+                RemoveESP(player)
+            end
+        end
+    end
+end)
+
+-- Players Tab Elements
+RunService.RenderStepped:Connect(function()
+    local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if Character then
+        if CurrentWalkSpeed then Character.WalkSpeed = CurrentWalkSpeed end
+        if CurrentJumpPower then
+            if not Character.UseJumpPower then Character.UseJumpPower = true end
+            Character.JumpPower = CurrentJumpPower
+        end
+    end
+end)
+
+PlayersTab:CreateInput({
+    Name = "Enter Speed Value",
+    PlaceholderText = "Speed...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        print(Text)
+        local num = tonumber(Text)
+        CurrentWalkSpeed = num
+        if not num or not (num > 0) then
+            local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if Character then Character.WalkSpeed = 16 end
+        end
+    end,
+})
+
+PlayersTab:CreateInput({
+    Name = "Enter Jump Value",
+    PlaceholderText = "Jump...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        print(Text)
+        local num = tonumber(Text)
+        CurrentJumpPower = num
+        if not num or not (num > 0) then
+            local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if Character then Character.JumpPower = 50 end
+        end
+    end,
+})
+
+local function StartInfJump()
+    if InfJumpConnection then InfJumpConnection:Disconnect() end
+    InfJumpConnection = UserInputService.JumpRequest:Connect(function()
+        if not InfJumpEnabled then return end
+        local Character = LocalPlayer.Character
+        local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+        if RootPart and Humanoid then
+            RootPart.Velocity = Vector3.new(RootPart.Velocity.X, Humanoid.JumpPower, RootPart.Velocity.Z)
+        end
+    end)
+end
+
+local function StopInfJump()
+    if InfJumpConnection then
+        InfJumpConnection:Disconnect()
+        InfJumpConnection = nil
+    end
+end
+
+PlayersTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        print(Value)
+        InfJumpEnabled = Value
+        if Value then
+            StartInfJump()
+            return
+        end
+        StopInfJump()
+    end,
+})
+
+LocalPlayer.CharacterAdded:Connect(function()
+    if InfJumpEnabled then
+        task.wait(0.1)
+        StartInfJump()
+    end
+end)
+
+local function StartNoclip()
+    if NoclipConnection then NoclipConnection:Disconnect() end
+    NoclipConnection = RunService.Stepped:Connect(function()
+        if not NoclipEnabled then
+            if NoclipConnection then
+                NoclipConnection:Disconnect()
+                NoclipConnection = nil
+            end
+            return
+        end
+        local Character = LocalPlayer.Character
+        if Character then
+            for _, child in ipairs(Character:GetChildren()) do
+                if child:IsA("BasePart") and child.CanCollide then
+                    child.CanCollide = false
+                end
+            end
+        end
+    end)
+end
+
+local function StopNoclip()
+    if NoclipConnection then
+        NoclipConnection:Disconnect()
+        NoclipConnection = nil
+    end
+    local Character = LocalPlayer.Character
+    if Character then
+        for _, child in ipairs(Character:GetChildren()) do
+            if child:IsA("BasePart") then
+                local isCorePart = child.Name == "HumanoidRootPart" or child.Name == "UpperTorso" or child.Name == "LowerTorso" or child.Name == "Torso"
+                if isCorePart then
+                    child.CanCollide = true
+                end
+            end
+        end
+    end
+end
+
+PlayersTab:CreateToggle({
+    Name = "Noclip",
+    CurrentValue = false,
+    Flag = "Noclip",
+    Callback = function(Value)
+        print(Value)
+        NoclipEnabled = Value
+        if Value then
+            StartNoclip()
+            return
+        end
+        StopNoclip()
+    end,
+})
+
+LocalPlayer.CharacterAdded:Connect(function()
+    if NoclipEnabled then
+        task.wait(0.2)
+        StartNoclip()
+    end
+end)
+
+PlayersTab:CreateButton({
+    Name = "fly gui",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+        print("Hello")
+    end,
+})
+
+MainTab:CreateButton({
+    Name = "YouTube:@bypass:03y_o",
+    Callback = function()
+        print("Open YouTube")
+    end,
+})
