@@ -1,0 +1,31 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+local function removeBlackholeTags()
+    local character = localPlayer.Character
+    if character then
+        if character:HasTag("PulledByBlackhole") then
+            character:RemoveTag("PulledByBlackhole")
+        end
+    end
+end
+
+local function disableBlackholeState()
+    local success, blackholeStateFolder = pcall(function()
+        return ReplicatedStorage:FindFirstChild("Scripts") 
+            and ReplicatedStorage.Scripts.State:FindFirstChild("BlackholeState") 
+            and require(ReplicatedStorage.Scripts.State.BlackholeState).waitForFolder()
+    end)
+
+    if success and blackholeStateFolder then
+        if blackholeStateFolder:GetAttribute("IsActive") == true then
+            blackholeStateFolder:SetAttribute("IsActive", false)
+        end
+    end
+end
+
+game:GetService("RunService").Stepped:Connect(function()
+    removeBlackholeTags()
+    pcall(disableBlackholeState)
+end)
