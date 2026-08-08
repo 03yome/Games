@@ -1,0 +1,877 @@
+-- SAGG SCRIPT - King Tower
+-- Được tạo bởi: discord.gg/syncrypt
+
+task.wait(2)
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character
+if not character then
+    character = localPlayer.CharacterAdded:Wait()
+end
+
+local humanoid = character:WaitForChild("Humanoid")
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Kiểm tra PlaceId (Chỉ cho phép chạy trên King Tower)[cite: 1]
+if math.floor((game.PlaceId + game.PlaceId) / 2 + 0.5) ~= 83556772114521 then
+    pcall(function()
+        localPlayer:Kick("This script is only for King Tower.")
+    end)
+    pcall(function()
+        local existingGui = CoreGui:FindFirstChild("SAGG SCRIPT")
+        if existingGui then
+            existingGui:Destroy()
+        end
+    end)
+    return
+end
+
+local isAutoPathRunning = false
+local moveSpeed = 20
+local waypointsList = {
+	{Position = Vector3.new(-944.269, 4.214, -809.644), Method = "Linear Glide"},
+	{Position = Vector3.new(-950.847, 9.002, -810.034), Method = "Linear Glide"},
+	{Position = Vector3.new(-959.599, 25.017, -810.323), Method = "Linear Glide"},
+	{Position = Vector3.new(-977.378, 28.517, -810.673), Method = "Linear Glide"},
+	{Position = Vector3.new(-989.209, 31.764, -811.516), Method = "Linear Glide"},
+	{Position = Vector3.new(-991.208, 31.767, -821.136), Method = "Linear Glide"},
+	{Position = Vector3.new(-990.934, 31.767, -836.414), Method = "Linear Glide"},
+	{Position = Vector3.new(-990.298, 48.017, -848.872), Method = "Linear Glide"},
+	{Position = Vector3.new(-998.884, 55.956, -847.14), Method = "Linear Glide"},
+	{Position = Vector3.new(-998.884, 49.017, -847.14), Method = "Linear Glide"},
+	{Position = Vector3.new(-1011.038, 57.08, -852.159), Method = "Linear Glide"},
+	{Position = Vector3.new(-1011.038, 50.017, -852.159), Method = "Linear Glide"},
+	{Position = Vector3.new(-1023.209, 57.627, -846.766), Method = "Linear Glide"},
+	{Position = Vector3.new(-1023.209, 51.017, -846.766), Method = "Linear Glide"},
+	{Position = Vector3.new(-1035.791, 56.632, -847.876), Method = "Linear Glide"},
+	{Position = Vector3.new(-1034.709, 64.551, -856.13), Method = "Linear Glide"},
+	{Position = Vector3.new(-1035.021, 67.801, -874.146), Method = "Linear Glide"},
+	{Position = Vector3.new(-1034.698, 69.301, -889.621), Method = "Linear Glide"},
+	{Position = Vector3.new(-1020.549, 74.372, -885.373), Method = "Linear Glide"},
+	{Position = Vector3.new(-1019.941, 78.62, -897.093), Method = "Linear Glide"},
+	{Position = Vector3.new(-1011.451, 82.619, -897.507), Method = "Linear Glide"},
+	{Position = Vector3.new(-1015.31, 85.856, -907.341), Method = "Linear Glide"},
+	{Position = Vector3.new(-1022.26, 102.235, -910.664), Method = "Linear Glide"},
+	{Position = Vector3.new(-1029.724, 102.235, -911.458), Method = "Linear Glide"},
+	{Position = Vector3.new(-1054.282, 108.293, -911.91), Method = "Linear Glide"},
+	{Position = Vector3.new(-1054.282, 102.234, -911.91), Method = "Linear Glide"},
+	{Position = Vector3.new(-1084.303, 108.382, -911.992), Method = "Linear Glide"},
+	{Position = Vector3.new(-1084.303, 102.235, -911.992), Method = "Linear Glide"},
+	{Position = Vector3.new(-1101.038, 114.297, -922.172), Method = "Linear Glide"},
+	{Position = Vector3.new(-1114.013, 126.652, -926.632), Method = "Linear Glide"},
+	{Position = Vector3.new(-1125.368, 130.985, -951.298), Method = "Linear Glide"},
+	{Position = Vector3.new(-1126.079, 133.985, -969.747), Method = "Linear Glide"},
+	{Position = Vector3.new(-1126.26, 139.985, -987.326), Method = "Linear Glide"},
+	{Position = Vector3.new(-1139.571, 151.985, -988.354), Method = "Linear Glide"},
+	{Position = Vector3.new(-1145.134, 151.735, -988.638), Method = "Linear Glide"},
+	{Position = Vector3.new(-1146.504, 151.735, -954.974), Method = "Linear Glide"},
+	{Position = Vector3.new(-1145.856, 165.602, -930.402), Method = "Linear Glide"},
+	{Position = Vector3.new(-1146.396, 159.361, -931.335), Method = "Linear Glide"},
+	{Position = Vector3.new(-1145.859, 171.781, -917.709), Method = "Linear Glide"},
+	{Position = Vector3.new(-1145.859, 166.218, -917.709), Method = "Linear Glide"},
+	{Position = Vector3.new(-1146.004, 179.603, -904.719), Method = "Linear Glide"},
+	{Position = Vector3.new(-1146.004, 172.754, -904.719), Method = "Linear Glide"},
+	{Position = Vector3.new(-1146.698, 178.477, -888.786), Method = "Linear Glide"},
+	{Position = Vector3.new(-1141.893, 193.727, -860.936), Method = "Linear Glide"},
+	{Position = Vector3.new(-1150.581, 200.977, -849.154), Method = "Linear Glide"},
+	{Position = Vector3.new(-1150.402, 208.477, -859.396), Method = "Linear Glide"},
+	{Position = Vector3.new(-1150.753, 213.727, -844.91), Method = "Linear Glide"},
+	{Position = Vector3.new(-1155.533, 216.723, -845.43), Method = "Linear Glide"},
+	{Position = Vector3.new(-1210.866, 216.723, -845.273), Method = "Linear Glide"},
+	{Position = Vector3.new(-1239.382, 225.666, -840.051), Method = "Linear Glide"},
+	{Position = Vector3.new(-1239.382, 218.477, -840.051), Method = "Linear Glide"},
+	{Position = Vector3.new(-1274.282, 238.027, -840.836), Method = "Linear Glide"},
+	{Position = Vector3.new(-1274.282, 232.572, -840.836), Method = "Linear Glide"},
+	{Position = Vector3.new(-1293.386, 242.025, -846.221), Method = "Linear Glide"},
+	{Position = Vector3.new(-1293.386, 235.125, -846.221), Method = "Linear Glide"},
+	{Position = Vector3.new(-1319.993, 249.474, -848.315), Method = "Linear Glide"},
+	{Position = Vector3.new(-1322.447, 242.625, -849.007), Method = "Linear Glide"},
+	{Position = Vector3.new(-1349.549, 252.636, -833.811), Method = "Linear Glide"},
+	{Position = Vector3.new(-1382.947, 261.533, -834.021), Method = "Linear Glide"}
+}
+
+local scriptTitle = "SAGG SCRIPT"
+local existingGui = CoreGui:FindFirstChild(scriptTitle)
+if existingGui then
+    existingGui:Destroy()
+end
+
+-- Tạo giao diện chính (UI)[cite: 1, 2]
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = scriptTitle
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = CoreGui
+
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0, 110, 0, 36)
+openButton.Position = UDim2.new(0, 10, 0.5, 0)
+openButton.BackgroundColor3 = Color3.fromRGB(100, 40, 220)
+openButton.Text = "▶ " .. scriptTitle
+openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+openButton.TextSize = 13
+openButton.Font = Enum.Font.GothamBold
+openButton.BorderSizePixel = 0
+openButton.Visible = true
+openButton.Parent = screenGui
+Instance.new("UICorner", openButton).CornerRadius = UDim.new(1, 0)
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 280, 0, 420)
+mainFrame.Position = UDim2.new(0.5, -140, 0.5, -210)
+mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 38)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 14)
+
+local mainStroke = Instance.new("UIStroke", mainFrame)
+mainStroke.Color = Color3.fromRGB(100, 60, 220)
+mainStroke.Thickness = 1.5
+
+local topBar = Instance.new("Frame")
+topBar.Size = UDim2.new(1, 0, 0, 38)
+topBar.BackgroundColor3 = Color3.fromRGB(100, 40, 200)
+topBar.BorderSizePixel = 0
+topBar.Parent = mainFrame
+Instance.new("UICorner", topBar).CornerRadius = UDim.new(0, 14)
+
+local topBarBackgroundFiller = Instance.new("Frame")
+topBarBackgroundFiller.Size = UDim2.new(1, 0, 0.5, 0)
+topBarBackgroundFiller.Position = UDim2.new(0, 0, 0.5, 0)
+topBarBackgroundFiller.BackgroundColor3 = Color3.fromRGB(100, 40, 200)
+topBarBackgroundFiller.BorderSizePixel = 0
+topBarBackgroundFiller.Parent = topBar
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, -50, 1, 0)
+titleLabel.Position = UDim2.new(0, 14, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = scriptTitle
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 15
+titleLabel.Font = Enum.Font.GothamBlack
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = topBar
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 24, 0, 24)
+closeButton.Position = UDim2.new(1, -32, 0.5, -12)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+closeButton.Text = "✕"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 12
+closeButton.Font = Enum.Font.GothamBold
+closeButton.BorderSizePixel = 0
+closeButton.Parent = topBar
+Instance.new("UICorner", closeButton).CornerRadius = UDim.new(1, 0)
+
+local tabButtonsContainer = Instance.new("Frame")
+tabButtonsContainer.Size = UDim2.new(1, -12, 0, 32)
+tabButtonsContainer.Position = UDim2.new(0, 6, 0, 44)
+tabButtonsContainer.BackgroundColor3 = Color3.fromRGB(10, 10, 22)
+tabButtonsContainer.BorderSizePixel = 0
+tabButtonsContainer.ClipsDescendants = true
+tabButtonsContainer.Parent = mainFrame
+Instance.new("UICorner", tabButtonsContainer).CornerRadius = UDim.new(0, 8)
+
+local tabLayout = Instance.new("UIListLayout")
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
+tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+tabLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+tabLayout.Padding = UDim.new(0, 3)
+tabLayout.Parent = tabButtonsContainer
+
+local tabContentContainer = Instance.new("Frame")
+tabContentContainer.Size = UDim2.new(1, -12, 1, -90)
+tabContentContainer.Position = UDim2.new(0, 6, 0, 82)
+tabContentContainer.BackgroundTransparency = 1
+tabContentContainer.Parent = mainFrame
+
+local tabButtonsList = {}
+local tabFramesList = {}
+
+local function switchTab(targetIndex)
+    for index, frame in ipairs(tabFramesList) do
+        frame.Visible = (index == targetIndex)
+    end
+    for index, button in ipairs(tabButtonsList) do
+        if index == targetIndex then
+            TweenService:Create(button, TweenInfo.new(0.15), {
+				BackgroundColor3 = Color3.fromRGB(100, 40, 200),
+				TextColor3 = Color3.fromRGB(255, 255, 255)
+			}):Play()
+        else
+            TweenService:Create(button, TweenInfo.new(0.15), {
+				BackgroundColor3 = Color3.fromRGB(10, 10, 22),
+				TextColor3 = Color3.fromRGB(120, 120, 160)
+			}):Play()
+        end
+    end
+end
+
+for i = 1, 3 do
+    local currentIndex = i
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(0.3, 0, 0, 24)
+
+    if currentIndex == 1 then
+        tabButton.BackgroundColor3 = Color3.fromRGB(100, 40, 200)
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    else
+        tabButton.BackgroundColor3 = Color3.fromRGB(10, 10, 22)
+        tabButton.TextColor3 = Color3.fromRGB(120, 120, 160)
+    end
+
+    tabButton.Text = ({"Path", "Speed", "EXTRA STUFF"})[currentIndex]
+    tabButton.TextSize = 10
+    tabButton.Font = Enum.Font.GothamBold
+    tabButton.BorderSizePixel = 0
+    tabButton.Parent = tabButtonsContainer
+    Instance.new("UICorner", tabButton).CornerRadius = UDim.new(0, 6)
+    table.insert(tabButtonsList, tabButton)
+
+    local scrollingFrame
+    if currentIndex == 3 then
+        scrollingFrame = Instance.new("ScrollingFrame")
+        scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+        scrollingFrame.BackgroundTransparency = 1
+        scrollingFrame.ScrollBarThickness = 6
+        scrollingFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+        scrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+        scrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(100, 60, 220)
+    else
+        scrollingFrame = Instance.new("Frame")
+        scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
+        scrollingFrame.BackgroundTransparency = 1
+    end
+
+    scrollingFrame.Visible = (currentIndex == 1)
+    scrollingFrame.Parent = tabContentContainer
+    table.insert(tabFramesList, scrollingFrame)
+
+    tabButton.MouseButton1Click:Connect(function()
+        switchTab(currentIndex)
+    end)
+end
+
+-- Tab 1: Path
+local pathTab = tabFramesList[1]
+local pathLayout = Instance.new("UIListLayout")
+pathLayout.Parent = pathTab
+pathLayout.Padding = UDim.new(0, 12)
+pathLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+pathLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local autoPathTitle = Instance.new("TextLabel")
+autoPathTitle.Size = UDim2.new(1, -24, 0, 28)
+autoPathTitle.BackgroundTransparency = 1
+autoPathTitle.Text = "AUTO PATH (Linear Glide)"
+autoPathTitle.TextColor3 = Color3.fromRGB(150, 150, 180)
+autoPathTitle.TextSize = 11
+autoPathTitle.Font = Enum.Font.GothamBold
+autoPathTitle.LayoutOrder = 1
+autoPathTitle.Parent = pathTab
+
+local autoPathToggleButton = Instance.new("TextButton")
+autoPathToggleButton.Size = UDim2.new(1, -24, 0, 42)
+autoPathToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+autoPathToggleButton.Text = "AUTO : OFF"
+autoPathToggleButton.TextColor3 = Color3.fromRGB(200, 200, 220)
+autoPathToggleButton.TextSize = 14
+autoPathToggleButton.Font = Enum.Font.GothamBold
+autoPathToggleButton.BorderSizePixel = 0
+autoPathToggleButton.LayoutOrder = 2
+autoPathToggleButton.Parent = pathTab
+Instance.new("UICorner", autoPathToggleButton).CornerRadius = UDim.new(0, 8)
+local autoPathStroke = Instance.new("UIStroke", autoPathToggleButton)
+autoPathStroke.Color = Color3.fromRGB(60, 40, 140)
+
+local autoPathStatusLabel = Instance.new("TextLabel")
+autoPathStatusLabel.Size = UDim2.new(1, -24, 0, 28)
+autoPathStatusLabel.BackgroundTransparency = 1
+autoPathStatusLabel.Text = "Status: Idle"
+autoPathStatusLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
+autoPathStatusLabel.TextSize = 10
+autoPathStatusLabel.Font = Enum.Font.GothamBold
+autoPathStatusLabel.LayoutOrder = 3
+autoPathStatusLabel.Parent = pathTab
+
+-- Tab 2: Speed
+local speedTab = tabFramesList[2]
+local speedLayout = Instance.new("UIListLayout")
+speedLayout.Parent = speedTab
+speedLayout.Padding = UDim.new(0, 12)
+speedLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+speedLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local speedTitle = Instance.new("TextLabel")
+speedTitle.Size = UDim2.new(1, -24, 0, 28)
+speedTitle.BackgroundTransparency = 1
+speedTitle.Text = "MOVE SPEED (20 - 300)"
+speedTitle.TextColor3 = Color3.fromRGB(150, 150, 180)
+speedTitle.TextSize = 11
+speedTitle.Font = Enum.Font.GothamBold
+speedTitle.LayoutOrder = 1
+speedTitle.Parent = speedTab
+
+local speedControlFrame = Instance.new("Frame")
+speedControlFrame.Size = UDim2.new(1, -24, 0, 42)
+speedControlFrame.BackgroundTransparency = 1
+speedControlFrame.LayoutOrder = 2
+speedControlFrame.Parent = speedTab
+
+local decreaseSpeedButton = Instance.new("TextButton")
+decreaseSpeedButton.Size = UDim2.new(0.22, 0, 1, 0)
+decreaseSpeedButton.BackgroundColor3 = Color3.fromRGB(170, 50, 50)
+decreaseSpeedButton.Text = "-"
+decreaseSpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+decreaseSpeedButton.TextSize = 22
+decreaseSpeedButton.Font = Enum.Font.GothamBold
+decreaseSpeedButton.BorderSizePixel = 0
+decreaseSpeedButton.Parent = speedControlFrame
+Instance.new("UICorner", decreaseSpeedButton).CornerRadius = UDim.new(0, 8)
+
+local speedTextBox = Instance.new("TextBox")
+speedTextBox.Size = UDim2.new(0.48, 0, 1, 0)
+speedTextBox.Position = UDim2.new(0.26, 0, 0, 0)
+speedTextBox.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+speedTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedTextBox.TextSize = 16
+speedTextBox.Font = Enum.Font.GothamBold
+speedTextBox.Text = tostring(moveSpeed)
+speedTextBox.PlaceholderText = "Speed"
+speedTextBox.Parent = speedControlFrame
+Instance.new("UICorner", speedTextBox).CornerRadius = UDim.new(0, 8)
+Instance.new("UIStroke", speedTextBox).Color = Color3.fromRGB(60, 40, 140)
+
+local increaseSpeedButton = Instance.new("TextButton")
+increaseSpeedButton.Size = UDim2.new(0.22, 0, 1, 0)
+increaseSpeedButton.Position = UDim2.new(0.78, 0, 0, 0)
+increaseSpeedButton.BackgroundColor3 = Color3.fromRGB(50, 170, 50)
+increaseSpeedButton.Text = "+"
+increaseSpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+increaseSpeedButton.TextSize = 22
+increaseSpeedButton.Font = Enum.Font.GothamBold
+increaseSpeedButton.BorderSizePixel = 0
+increaseSpeedButton.Parent = speedControlFrame
+Instance.new("UICorner", increaseSpeedButton).CornerRadius = UDim.new(0, 8)
+
+-- Tab 3: Extra Stuff
+local extraTab = tabFramesList[3]
+local extraLayout = Instance.new("UIListLayout")
+extraLayout.Parent = extraTab
+extraLayout.Padding = UDim.new(0, 12)
+extraLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+extraLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function createMenuButton(parent, text, layoutOrder)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -24, 0, 42)
+    button.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(200, 200, 220)
+    button.TextSize = 13
+    button.Font = Enum.Font.GothamBold
+    button.BorderSizePixel = 0
+    button.LayoutOrder = layoutOrder
+    button.Parent = parent
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+
+    local stroke = Instance.new("UIStroke", button)
+    stroke.Color = Color3.fromRGB(60, 40, 140)
+    return button, stroke
+end
+
+local function createMenuLabel(parent, text, layoutOrder)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -24, 0, 24)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(150, 150, 180)
+    label.TextSize = 11
+    label.Font = Enum.Font.GothamBold
+    label.LayoutOrder = layoutOrder
+    label.Parent = parent
+    return label
+end
+
+-- Kill Brick Protection Logic
+createMenuLabel(extraTab, "KILL BRICK PROTECTION", 1)
+local protectionToggleButton, protectionStroke = createMenuButton(extraTab, "PROTECTION : OFF", 2)
+local protectedKillBricks = {}
+local isProtectionEnabled = false
+
+local function clearKillBrickProtection()
+    for _, data in pairs(protectedKillBricks) do
+        local partParent = data.Part and data.Part.Parent
+        if partParent then
+            data.Part.CanTouch = true
+            data.Part.Color = data.OldColor
+            data.Part.Material = data.OldMaterial
+        end
+    end
+    table.clear(protectedKillBricks)
+end
+
+local function applyKillBrickProtection()
+    clearKillBrickProtection()
+    for _, descendant in pairs(workspace:GetDescendants()) do
+        if descendant:IsA("BasePart") and descendant.Name == "KillBrick" and not descendant:IsA("SpawnLocation") then
+            table.insert(protectedKillBricks, {
+				Part = descendant,
+				OldColor = descendant.Color,
+				OldMaterial = descendant.Material
+			})
+            descendant.CanTouch = false
+            descendant.Color = Color3.fromRGB(255, 0, 0)
+            descendant.Material = Enum.Material.Neon
+        end
+    end
+end
+
+protectionToggleButton.MouseButton1Click:Connect(function()
+    isProtectionEnabled = not isProtectionEnabled
+    if isProtectionEnabled then
+        protectionToggleButton.Text = "PROTECTION : ON"
+        protectionToggleButton.BackgroundColor3 = Color3.fromRGB(50, 80, 50)
+        protectionStroke.Color = Color3.fromRGB(80, 200, 80)
+        applyKillBrickProtection()
+        return
+    end
+    protectionToggleButton.Text = "PROTECTION : OFF"
+    protectionToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+    protectionStroke.Color = Color3.fromRGB(60, 40, 140)
+    clearKillBrickProtection()
+end)
+
+-- Instant Clone TP Bypass Logic
+createMenuLabel(extraTab, "INSTANT CLONE TP BYPASS", 3)
+local openCloneToolButton, _ = createMenuButton(extraTab, "OPEN CLONE TOOL", 4)
+local cloneToolGui
+
+openCloneToolButton.MouseButton1Click:Connect(function()
+    if cloneToolGui and cloneToolGui.Parent then
+        cloneToolGui.Enabled = not cloneToolGui.Enabled
+        return
+    end
+
+    cloneToolGui = Instance.new("ScreenGui")
+    cloneToolGui.Name = "SAGG_CloneTP_GUI"
+    cloneToolGui.ResetOnSpawn = false
+    cloneToolGui.Parent = localPlayer:WaitForChild("PlayerGui")
+
+    local cloneFrame = Instance.new("Frame")
+    cloneFrame.Size = UDim2.new(0, 240, 0, 140)
+    cloneFrame.Position = UDim2.new(0.5, -120, 0.35, -70)
+    cloneFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 38)
+    cloneFrame.BorderSizePixel = 0
+    cloneFrame.Active = true
+    cloneFrame.Draggable = true
+    cloneFrame.Parent = cloneToolGui
+    Instance.new("UICorner", cloneFrame).CornerRadius = UDim.new(0, 12)
+
+    local cloneStroke = Instance.new("UIStroke", cloneFrame)
+    cloneStroke.Color = Color3.fromRGB(100, 60, 220)
+    cloneStroke.Thickness = 1.5
+
+    local cloneTitleLabel = Instance.new("TextLabel")
+    cloneTitleLabel.Size = UDim2.new(1, -20, 0, 28)
+    cloneTitleLabel.Position = UDim2.new(0, 10, 0, 8)
+    cloneTitleLabel.BackgroundTransparency = 1
+    cloneTitleLabel.Text = "SAGG INSTANT CLONE TP BYPASS"
+    cloneTitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    cloneTitleLabel.TextSize = 12
+    cloneTitleLabel.Font = Enum.Font.GothamBlack
+    cloneTitleLabel.Parent = cloneFrame
+
+    local cloneToggleButton = Instance.new("TextButton")
+    cloneToggleButton.Size = UDim2.new(0.9, 0, 0, 32)
+    cloneToggleButton.Position = UDim2.new(0.05, 0, 0, 42)
+    cloneToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+    cloneToggleButton.Text = "CLONE TP : OFF"
+    cloneToggleButton.TextColor3 = Color3.fromRGB(200, 200, 220)
+    cloneToggleButton.Font = Enum.Font.GothamBold
+    cloneToggleButton.TextSize = 13
+    cloneToggleButton.Parent = cloneFrame
+    Instance.new("UICorner", cloneToggleButton).CornerRadius = UDim.new(0, 8)
+
+    local cloneToggleStroke = Instance.new("UIStroke", cloneToggleButton)
+    cloneToggleStroke.Color = Color3.fromRGB(60, 40, 140)
+
+    local cloneDescLabel = Instance.new("TextLabel")
+    cloneDescLabel.Size = UDim2.new(0.9, 0, 0, 40)
+    cloneDescLabel.Position = UDim2.new(0.05, 0, 0, 80)
+    cloneDescLabel.BackgroundTransparency = 1
+    cloneDescLabel.Text = "When ON, others see you stuck in place (box & ball) but you can move and teleport freely."
+    cloneDescLabel.TextColor3 = Color3.fromRGB(150, 150, 180)
+    cloneDescLabel.TextSize = 9
+    cloneDescLabel.Font = Enum.Font.Gotham
+    cloneDescLabel.TextWrapped = true
+    cloneDescLabel.Parent = cloneFrame
+
+    local isCloneTpEnabled = false
+    local cloneBox, glowBall
+    local originalTransparencies = {}
+
+    local function setCharacterTransparency(isHidden)
+        local targetCharacter = localPlayer.Character
+        if not targetCharacter then return end
+        if isHidden then
+            for _, descendant in ipairs(targetCharacter:GetDescendants()) do
+                if (descendant:IsA("BasePart") or descendant:IsA("Decal")) and descendant.Name ~= "FlyBox" and descendant.Name ~= "GlowBall" then
+                    originalTransparencies[descendant] = descendant.Transparency
+                    descendant.Transparency = 1
+                end
+            end
+            return
+        end
+        for part, transparency in pairs(originalTransparencies) do
+            if part and part.Parent then
+                part.Transparency = transparency
+            end
+        end
+        table.clear(originalTransparencies)
+    end
+
+    local function createCloneVisuals()
+        local targetCharacter = localPlayer.Character
+        local rootPart = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+        if not rootPart then return end
+
+        if cloneBox then cloneBox:Destroy() end
+        if glowBall then glowBall:Destroy() end
+
+        cloneBox = Instance.new("Part")
+        cloneBox.Name = "FlyBox"
+        cloneBox.Size = Vector3.new(4, 6, 4)
+        cloneBox.CFrame = rootPart.CFrame
+        cloneBox.Anchored = true
+        cloneBox.CanCollide = false
+        cloneBox.Material = Enum.Material.ForceField
+        cloneBox.Color = Color3.fromRGB(255, 0, 0)
+        cloneBox.Transparency = 0.5
+        cloneBox.Parent = workspace
+
+        glowBall = Instance.new("Part")
+        glowBall.Name = "GlowBall"
+        glowBall.Shape = Enum.PartType.Ball
+        glowBall.Size = Vector3.new(3, 3, 3)
+        glowBall.CFrame = rootPart.CFrame
+        glowBall.Anchored = true
+        glowBall.CanCollide = false
+        glowBall.Material = Enum.Material.Neon
+        glowBall.Color = Color3.fromRGB(100, 60, 220)
+        glowBall.Transparency = 0.2
+        glowBall.Parent = workspace
+
+        local pointLight = Instance.new("PointLight")
+        pointLight.Color = glowBall.Color
+        pointLight.Range = 10
+        pointLight.Brightness = 2
+        pointLight.Parent = glowBall
+    end
+
+    cloneToggleButton.MouseButton1Click:Connect(function()
+        isCloneTpEnabled = not isCloneTpEnabled
+        if isCloneTpEnabled then
+            cloneToggleButton.Text = "CLONE TP : ON"
+            cloneToggleButton.BackgroundColor3 = Color3.fromRGB(50, 80, 50)
+            cloneToggleStroke.Color = Color3.fromRGB(80, 200, 80)
+            setCharacterTransparency(true)
+            createCloneVisuals()
+            return
+        end
+
+        cloneToggleButton.Text = "CLONE TP : OFF"
+        cloneToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+        cloneToggleStroke.Color = Color3.fromRGB(60, 40, 140)
+
+        if localPlayer.Character then
+            for part, transparency in pairs(originalTransparencies) do
+                if part and part.Parent then
+                    part.Transparency = transparency
+                end
+            end
+            table.clear(originalTransparencies)
+        end
+        if cloneBox then cloneBox:Destroy() end
+        if glowBall then glowBall:Destroy() end
+    end)
+
+    RunService.RenderStepped:Connect(function()
+        local targetCharacter = localPlayer.Character
+        local rootPart = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+        local hum = targetCharacter and targetCharacter:FindFirstChild("Humanoid")
+
+        if isCloneTpEnabled and rootPart and hum and hum.Health > 0 then
+            rootPart.Anchored = true
+            local moveDirection = hum.MoveDirection
+            if moveDirection.Magnitude > 0 then
+                rootPart.CFrame = rootPart.CFrame + moveDirection * 0.8
+                return
+            end
+        elseif rootPart and hum and hum.Health > 0 then
+            rootPart.Anchored = false
+        end
+    end)
+
+    localPlayer.CharacterAdded:Connect(function()
+        if cloneBox then cloneBox:Destroy() end
+        if glowBall then glowBall:Destroy() end
+        table.clear(originalTransparencies)
+        cloneToggleButton.Text = "CLONE TP : OFF"
+        cloneToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+        cloneToggleStroke.Color = Color3.fromRGB(60, 40, 140)
+    end)
+end)
+
+-- Spin + Anti Ragdoll & Auto Aim Logic
+createMenuLabel(extraTab, "SPIN + ANTI RAGDOLL", 5)
+local spinToggleButton, spinStroke = createMenuButton(extraTab, "SPIN + ANTI RAGDOLL : OFF", 6)
+createMenuLabel(extraTab, "AUTO AIM + ANTI RAGDOLL", 7)
+local autoAimToggleButton, autoAimStroke = createMenuButton(extraTab, "AUTO AIM + ANTI RAGDOLL : OFF", 8)
+
+local isSpinEnabled = false
+local isAutoAimEnabled = false
+local spinAngle = 1.5707963267948966
+
+local function setRagdollState(isEnabled)
+    local targetCharacter = localPlayer.Character
+    local hum = targetCharacter and targetCharacter:FindFirstChild("Humanoid")
+    if not hum then return end
+    hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, not isEnabled)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, not isEnabled)
+end
+
+local function updateRagdollState()
+    setRagdollState(isSpinEnabled or isAutoAimEnabled)
+end
+
+local function getClosestPlayerRootPart()
+    local targetCharacter = localPlayer.Character
+    if not targetCharacter then return nil end
+    local rootPart = targetCharacter:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return nil end
+
+    local closestRootPart = nil
+    local shortestDistance = 1e999
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer and player.Character then
+            local enemyRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+            if enemyRootPart then
+                local distance = (rootPart.Position - enemyRootPart.Position).Magnitude
+                if distance < shortestDistance then
+                    closestRootPart = enemyRootPart
+                    shortestDistance = distance
+                end
+            end
+        end
+    end
+    return closestRootPart
+end
+
+RunService.RenderStepped:Connect(function()
+    local targetCharacter = localPlayer.Character
+    local rootPart = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+
+    if isAutoAimEnabled then
+        local targetRootPart = getClosestPlayerRootPart()
+        if targetRootPart then
+            local targetPosition = Vector3.new(targetRootPart.Position.X, rootPart.Position.Y, targetRootPart.Position.Z)
+            rootPart.CFrame = CFrame.new(rootPart.Position, targetPosition)
+            return
+        end
+    elseif isSpinEnabled then
+        rootPart.CFrame = rootPart.CFrame * CFrame.Angles(0, spinAngle, 0)
+    end
+end)
+
+spinToggleButton.MouseButton1Click:Connect(function()
+    isSpinEnabled = not isSpinEnabled
+    if isSpinEnabled then
+        spinToggleButton.Text = "SPIN + ANTI RAGDOLL : ON"
+        spinToggleButton.BackgroundColor3 = Color3.fromRGB(50, 80, 50)
+        spinStroke.Color = Color3.fromRGB(80, 200, 80)
+        if isAutoAimEnabled then
+            isAutoAimEnabled = false
+            autoAimToggleButton.Text = "AUTO AIM + ANTI RAGDOLL : OFF"
+            autoAimToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+            autoAimStroke.Color = Color3.fromRGB(60, 40, 140)
+        end
+    else
+        spinToggleButton.Text = "SPIN + ANTI RAGDOLL : OFF"
+        spinToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+        spinStroke.Color = Color3.fromRGB(60, 40, 140)
+    end
+    updateRagdollState()
+end)
+
+autoAimToggleButton.MouseButton1Click:Connect(function()
+    isAutoAimEnabled = not isAutoAimEnabled
+    if isAutoAimEnabled then
+        autoAimToggleButton.Text = "AUTO AIM + ANTI RAGDOLL : ON"
+        autoAimToggleButton.BackgroundColor3 = Color3.fromRGB(50, 80, 50)
+        autoAimStroke.Color = Color3.fromRGB(80, 200, 80)
+        if isSpinEnabled then
+            isSpinEnabled = false
+            spinToggleButton.Text = "SPIN + ANTI RAGDOLL : OFF"
+            spinToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+            spinStroke.Color = Color3.fromRGB(60, 40, 140)
+        end
+    else
+        autoAimToggleButton.Text = "AUTO AIM + ANTI RAGDOLL : OFF"
+        autoAimToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+        autoAimStroke.Color = Color3.fromRGB(60, 40, 140)
+    end
+    updateRagdollState()
+end)
+
+local function refreshSpeedTextBox()
+    speedTextBox.Text = tostring(math.floor(moveSpeed))
+end
+
+increaseSpeedButton.MouseButton1Click:Connect(function()
+    moveSpeed = math.min(moveSpeed + 5, 300)
+    refreshSpeedTextBox()
+end)
+
+decreaseSpeedButton.MouseButton1Click:Connect(function()
+    moveSpeed = math.max(moveSpeed - 5, 20)
+    refreshSpeedTextBox()
+end)
+
+speedTextBox.FocusLost:Connect(function()
+    local parsedNumber = tonumber(speedTextBox.Text)
+    if parsedNumber then
+        moveSpeed = math.clamp(parsedNumber, 20, 300)
+    end
+    refreshSpeedTextBox()
+end)
+
+local function glideToPosition(targetPosition)
+    local currentRootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not currentRootPart then return end
+
+    local attachment = Instance.new("Attachment")
+    attachment.Parent = currentRootPart
+
+    local linearVelocity = Instance.new("LinearVelocity")
+    linearVelocity.Parent = currentRootPart
+    linearVelocity.Attachment0 = attachment
+    linearVelocity.RelativeTo = Enum.ActuatorRelativeTo.World
+    linearVelocity.MaxForce = math.huge
+
+    while isAutoPathRunning do
+        local direction = targetPosition - currentRootPart.Position
+        local distance = direction.Magnitude
+        if distance > 0 then
+            direction = direction.Unit
+        end
+
+        linearVelocity.VectorVelocity = direction * moveSpeed
+        currentRootPart.CFrame = CFrame.lookAt(currentRootPart.Position, currentRootPart.Position + Vector3.new(direction.X, 0, direction.Z))
+        task.wait()
+
+        if distance < 4 then
+            break
+        end
+    end
+
+    linearVelocity:Destroy()
+    attachment:Destroy()
+end
+
+local function executeAutoPath()
+    for index, waypoint in ipairs(waypointsList) do
+        if not isAutoPathRunning then break end
+        autoPathStatusLabel.Text = "Progress: " .. index .. "/" .. #waypointsList
+        glideToPosition(waypoint.Position)
+        task.wait(0.05)
+    end
+
+    if isAutoPathRunning then
+        isAutoPathRunning = false
+        autoPathToggleButton.Text = "AUTO : OFF"
+        autoPathToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+        autoPathStroke.Color = Color3.fromRGB(60, 40, 140)
+        autoPathStatusLabel.Text = "Status: Completed"
+    end
+end
+
+autoPathToggleButton.MouseButton1Click:Connect(function()
+    isAutoPathRunning = not isAutoPathRunning
+    if isAutoPathRunning then
+        autoPathToggleButton.Text = "AUTO : ON"
+        autoPathToggleButton.BackgroundColor3 = Color3.fromRGB(50, 80, 50)
+        autoPathStroke.Color = Color3.fromRGB(80, 200, 80)
+        autoPathStatusLabel.Text = "Status: Running..."
+        task.spawn(executeAutoPath)
+        return
+    end
+
+    autoPathToggleButton.Text = "AUTO : OFF"
+    autoPathToggleButton.BackgroundColor3 = Color3.fromRGB(25, 25, 45)
+    autoPathStroke.Color = Color3.fromRGB(60, 40, 140)
+    autoPathStatusLabel.Text = "Status: Stopped"
+end)
+
+openButton.MouseButton1Click:Connect(function()
+    openButton.Visible = false
+    mainFrame.Visible = true
+    mainFrame.Size = UDim2.new(0, 0, 0, 0)
+    mainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+    TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back), {
+		Size = UDim2.new(0, 280, 0, 420),
+		Position = UDim2.new(0.5, -140, 0.5, -210)
+	}):Play()
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+    TweenService:Create(mainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+		Size = UDim2.new(0, 0, 0, 0),
+		Position = UDim2.new(0.5, 0, 0.5, 0)
+	}):Play()
+    task.wait(0.2)
+    mainFrame.Visible = false
+    openButton.Visible = true
+end)
+
+-- Kéo thả UI (Draggable)
+local isDragging = false
+local dragStartPos, frameStartPos
+
+topBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStartPos = input.Position
+        frameStartPos = mainFrame.Position
+    end
+end)
+
+topBar.InputChanged:Connect(function(input)
+    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStartPos
+        mainFrame.Position = UDim2.new(frameStartPos.X.Scale, frameStartPos.X.Offset + delta.X, frameStartPos.Y.Scale, frameStartPos.Y.Offset + delta.Y)
+    end
+end)
+
+topBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = false
+    end
+end)
+
+localPlayer.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    newCharacter:WaitForChild("Humanoid")
+    newCharacter:WaitForChild("HumanoidRootPart")
+    updateRagdollState()
+end)
