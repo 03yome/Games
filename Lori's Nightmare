@@ -1,0 +1,415 @@
+-- Khởi tạo Rayfield Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Lori's Nightmare",
+    LoadingTitle = "Lori's Nightmare Hub",
+    LoadingSubtitle = "crack by @romd3976",
+    ConfigurationSaving = {
+        Enabled = false,
+    },
+    KeySystem = false,
+})
+
+local Tab = Window:CreateTab("Main", 4483362458)
+
+-- Biến trạng thái
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local collectCoinEnabled = false
+local collectCoinConnections = {}
+local collectedItems = {}
+
+local autoMinigameEnabled = false
+local killAuraEnabled = false
+local espMachineEnabled = false
+getgenv().ESP_ENABLED = false
+local playerHighlights = {}
+
+-- Biến cho tính năng Auto Revive & NoClip
+local autoReviveEnabled = false
+local oldPosition = nil
+local noclipConnection = nil
+
+-- Hàm lấy HumanoidRootPart của LocalPlayer
+local function getHRP()
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+-- Hàm thu thập vật phẩm (Coin)
+local function fireItem(item)
+    if not collectCoinEnabled or not item or not item:IsA("BasePart") or not item.Parent or not item:IsDescendantOf(workspace) or collectedItems[item] then
+        return
+    end
+
+    local hrp = getHRP()
+    if not hrp or not hrp.Parent then return end
+
+    collectedItems[item] = true
+    pcall(function()
+        firetouchinterest(hrp, item, 0)
+        task.wait()
+        firetouchinterest(hrp, item, 1)
+    end)
+end
+
+local function setupItemsFolder(folder)
+    if not folder:IsA("Folder") or not folder.Name:find("Items") then return end
+
+    for _, v in ipairs(folder:GetDescendants()) do
+        if v:IsA("BasePart") then
+            task.spawn(fireItem, v)
+        end
+    end
+
+    table.insert(collectCoinConnections, folder.DescendantAdded:Connect(function(descendant)
+        if collectCoinEnabled and descendant:IsA("BasePart") then
+            task.spawn(fireItem, descendant)
+        end
+    end))
+end
+
+-- Tab Chức năng: Collect Coin
+Tab:CreateToggle({
+    Name = "Collect Coin",
+    CurrentValue = false,
+    Flag = "CollectCoin",
+    Callback = function(Value)
+        collectCoinEnabled = Value
+
+        if Value then
+            collectedItems = {}
+            local map = workspace:WaitForChild("Map", 5)
+            if map then
+                for _, descendant in ipairs(map:GetDescendants()) do
+                    if descendant:IsA("Folder") and descendant.Name:find("Items") then
+                        setupItemsFolder(descendant)
+                    end
+                end
+
+                table.insert(collectCoinConnections, map.DescendantAdded:Connect(function(descendant)
+                    if collectCoinEnabled and descendant:IsA("Folder") and descendant.Name:find("Items") then
+                        setupItemsFolder(descendant)
+                    end
+                end))
+            end
+        else
+            for _, conn in ipairs(collectCoinConnections) do
+                conn:Disconnect()
+            end
+            table.clear(collectCoinConnections)
+            table.clear(collectedItems)
+        end
+    end,
+})
+
+-- Tab Chức năng: Auto Play MiniGame
+Tab:CreateToggle({
+    Name = "Auto Play MiniGame",
+    CurrentValue = false,
+    Flag = "AutoMiniGame",
+    Callback = function(Value)
+        autoMinigameEnabled = Value
+    end,
+})
+
+-- Hook Metamethod để chặn sự kiện thất bại minigame
+local mt = getrawmetatable(game)
+setreadonly(mt, false)
+local oldNamecall = mt.__namecall
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if autoMinigameEnabled and method == "FireServer" and tostring(self):find("MachineMinigameFailedClick") then
+        return nil
+    end
+    return oldNamecall(self, ...)
+end)
+setreadonly(mt, true)
+
+-- Hàm tìm người chơi gần nhất cho Kill Aura
+local function getClosestPlayer()
+    local char = LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local shortestDist = 1e999
+    local closestTarget = nil
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local targetChar = player.Character
+            local targetHrp = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+            if targetHrp then
+                local dist = (hrp.Position - targetHrp.Position).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    closestTarget = player
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+Tab:CreateToggle({
+    Name = "Kill Aura",
+    CurrentValue = false,
+    Flag = "KillAura",
+    Callback = function(Value)
+        killAuraEnabled = Value
+    end,
+})
+
+task.spawn(function()
+    while true do
+        if killAuraEnabled then
+            local target = getClosestPlayer()
+            if target then
+                pcall(function()
+                    game:GetService("ReplicatedStorage").Util.Net:FindFirstChild("RE/PlayersHit"):FireServer({
+                        [target.Name] = true
+                    })
+                end)
+            end
+        end
+        task.wait()
+    end
+end)
+
+-- Chức năng Auto Revive (Cố định nhẹ bằng PlatformStand hoặc Velocity để tránh lỗi rớt map và không bị khóa cứng chân)
+Tab:CreateToggle({
+    Name = "Auto Revive",
+    CurrentValue = false,
+    Flag = "AutoRevive",
+    Callback = function(Value)
+        autoReviveEnabled = Value
+        local hrp = getHRP()
+
+        if Value then
+            if hrp then
+                oldPosition = hrp.CFrame
+            end
+            
+            -- Bật Noclip để tránh kẹt
+            noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+                if LocalPlayer.Character then
+                    for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            -- Tắt: Trả player lại chỗ cũ và tắt Noclip
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
+            end
+            if hrp then
+                hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                if oldPosition then 
+                    hrp.CFrame = oldPosition 
+                end
+            end
+            oldPosition = nil
+        end
+    end,
+})
+
+-- Vòng lặp xử lý Auto Revive (Teleport nhẹ nhàng, giữ Velocity bằng 0 tạm thời để đứng yên thay vì dùng Anchored)
+task.spawn(function()
+    while true do
+        if autoReviveEnabled then
+            pcall(function()
+                local targetPrompt = nil
+                local targetPlayer = nil
+
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character then
+                        local char = player.Character
+                        for _, desc in ipairs(char:GetDescendants()) do
+                            if desc:IsA("ProximityPrompt") then
+                                local actionText = string.lower(desc.ActionText or "")
+                                local objectText = string.lower(desc.ObjectText or "")
+                                local promptName = string.lower(desc.Name or "")
+                                
+                                if actionText:find("revive") or objectText:find("revive") or actionText:find("cứu") or objectText:find("cứu") or promptName:find("revive") then
+                                    targetPrompt = desc
+                                    targetPlayer = char
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    if targetPrompt then break end
+                end
+
+                local hrp = getHRP()
+                if targetPrompt and targetPlayer and hrp then
+                    local targetHrp = targetPlayer:FindFirstChild("HumanoidRootPart") or targetPlayer:FindFirstChild("Head")
+                    if targetHrp then
+                        -- Cố định nhẹ vị trí bằng cách gán CFrame liên tục dưới chân player mục tiêu và triệt tiêu vận tốc rơi
+                        hrp.CFrame = targetHrp.CFrame * CFrame.new(0, -3, 0)
+                        hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        
+                        -- Chỉnh prompt về 0 cooldown và spam fire
+                        targetPrompt.HoldDuration = 0
+                        fireproximityprompt(targetPrompt, 0)
+                    end
+                end
+            end)
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Các nút chức năng khác
+Tab:CreateButton({
+    Name = "Inf Respawn",
+    Callback = function()
+        pcall(function()
+            game:GetService("ReplicatedStorage").Util.Net:FindFirstChild("RE/ActivateCampingProtection"):FireServer()
+        end)
+    end,
+})
+
+Tab:CreateButton({
+    Name = "No CoolDown Ability",
+    Callback = function()
+        pcall(function()
+            for _, child in ipairs(game.ReplicatedStorage.Abilities:GetChildren()) do
+                local lib = require(child)
+                if rawget(lib, "Cooldown") then
+                    lib.Cooldown = 0
+                end
+            end
+        end)
+    end,
+})
+
+-- ESP Machine Setup
+local espFolder = Instance.new("Folder")
+espFolder.Name = "ESP_Container"
+espFolder.Parent = workspace
+local espConnections = {}
+
+local function clearMachineESP()
+    espFolder:ClearAllChildren()
+    for _, conn in ipairs(espConnections) do
+        conn:Disconnect()
+    end
+    table.clear(espConnections)
+end
+
+local function addMachineESP(machine)
+    local model = machine:FindFirstChild("Model")
+    if not model then return end
+    local screen = model:FindFirstChild("Screen")
+    if not screen or not screen:IsA("BasePart") then return end
+
+    if espFolder:FindFirstChild(machine.Name .. "_ESP") then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = machine.Name .. "_ESP"
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.OutlineColor = Color3.new(1, 1, 1)
+    highlight.Adornee = model
+    highlight.Parent = espFolder
+
+    local function updateColor()
+        if screen then
+            highlight.FillColor = screen.Color
+        end
+    end
+    updateColor()
+    table.insert(espConnections, screen:GetPropertyChangedSignal("Color"):Connect(updateColor))
+end
+
+local function initMachineESP()
+    local machines = workspace:FindFirstChild("Machines", true)
+    if not machines then return end
+
+    for _, child in ipairs(machines:GetChildren()) do
+        if child:IsA("Model") then
+            addMachineESP(child)
+        end
+    end
+
+    table.insert(espConnections, machines.ChildAdded:Connect(function(child)
+        if espMachineEnabled then
+            task.wait()
+            addMachineESP(child)
+        end
+    end))
+end
+
+Tab:CreateToggle({
+    Name = "ESP Machine",
+    CurrentValue = false,
+    Flag = "EspMachine",
+    Callback = function(Value)
+        espMachineEnabled = Value
+        clearMachineESP()
+        if Value then
+            task.wait()
+            initMachineESP()
+        end
+    end,
+})
+
+-- ESP Players + Monster
+local function addPlayerESP(char)
+    if playerHighlights[char] then return end
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESP"
+    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+    highlight.Adornee = char
+    highlight.Parent = char
+    playerHighlights[char] = highlight
+end
+
+local function clearPlayerESP()
+    for _, h in pairs(playerHighlights) do
+        if h then h:Destroy() end
+    end
+    table.clear(playerHighlights)
+end
+
+task.spawn(function()
+    while task.wait(0.5) do
+        if ESP_ENABLED then
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    addPlayerESP(player.Character)
+                end
+            end
+        end
+    end
+end)
+
+Tab:CreateToggle({
+    Name = "ESP Players + Monster",
+    CurrentValue = false,
+    Flag = "EspPlayers",
+    Callback = function(Value)
+        ESP_ENABLED = Value
+        if not Value then
+            clearPlayerESP()
+        end
+    end,
+})
+
+-- Nút thông tin/Credit
+Tab:CreateButton({
+    Name = "YouTube: @romd3976",
+    Callback = function()
+    end,
+})
