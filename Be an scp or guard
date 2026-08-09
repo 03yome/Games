@@ -1,616 +1,792 @@
--- Rayfield UI Library Integration
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
     Name = "Be an SCP or Guard",
-    LoadingTitle = "GHOST UI Loader",
-    LoadingSubtitle = "by YouTube:@qweqrwtA",
+    LoadingTitle = "Đang tải giao diện...",
+    LoadingSubtitle = "crack by 03y_o",
     ConfigurationSaving = {
         Enabled = false,
         FolderName = nil,
-        FileName = "SCPOrGuardConfig"
+        FileName = "BeAnSCPOrGuard"
     },
-    Discord = {
-        Enabled = false,
-        Invite = "noinvite",
-        RememberJoins = true
-    },
-    KeySystem = false,
+    KeySystem = false
 })
 
--- Tabs
 local MainTab = Window:CreateTab("Main", 4483362458)
 local EspTab = Window:CreateTab("Esp", 4483362458)
 local PlayersTab = Window:CreateTab("Players", 4483362458)
 
--- Services & Core Variables
+_G.AutoFarm = false
+_G.AutoFarmClosest = false
+
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Teams = game:GetService("Teams")
-local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local GunShot = ReplicatedStorage:WaitForChild("GunShot")
 
--- Weapon Stats & Rapid Fire Variables
-local WeaponStats = require(game.ReplicatedStorage.WeaponStats)
-local OriginalFirerates = {}
+local config1 = { FIRE_RATE = 0.01, PREDICTION_MULTIPLIER = 0.13 }
+local teamCheck1 = { Guard = {Guard = true, MTF = true}, MTF = {Guard = true, MTF = true}, SCP = {SCP = true} }
 
--- Bring Guard Variables
-local GuardRadius = 12
-local GuardConnection = nil
-local GuardCharConnection = nil
-local IsBringingGuards = false
+local function isValidTarget(target)
+    if not target or target == LocalPlayer then return false end
+    local team = LocalPlayer.Team and LocalPlayer.Team.Name
+    local targetTeam = target.Team and target.Team.Name
+    if not team or not targetTeam then return false end
+    local v119 = teamCheck1[team]
+    if v119 then return not v119[targetTeam] end
+    return team ~= targetTeam
+end
 
--- Bring SCP Variables
-local SCPTeam = Teams:FindFirstChild("SCP")
-local SCPRadius = 15
-local SCPConnection = nil
-local SCPCharConnection = nil
-local IsBringingSCP = false
-
--- Hitbox Variables
-local SCPHitboxEnabled = false
-local SCPHitboxSize = 15
-local OriginalSCPHitboxes = {}
-
-local GuardHitboxEnabled = false
-local GuardHitboxSize = 15
-local OriginalGuardHitboxes = {}
-local GuardTeamsConfig = { MTF = true, Guard = true }
-
--- ESP Variables
-local ESPSCPEnabled = false
-local ESPGuardEnabled = false
-local ESPTeamConfigs = { MTF = true, Guard = true }
-
--- Player Modifications Variables
-local CurrentWalkSpeed = nil
-local CurrentJumpPower = nil
-
--- Infinite Jump Variables
-local InfJumpEnabled = false
-local InfJumpConnection = nil
-
--- Noclip Variables
-local NoclipEnabled = false
-local NoclipConnection = nil
-
--- Main Tab Elements
-MainTab:CreateToggle({
-    Name = "Rapid Fire",
-    CurrentValue = false,
-    Flag = "RapidFire",
-    Callback = function(Value)
-        print(Value)
-        if Value then
-            for k, v in pairs(WeaponStats) do
-                if v.Firerate then
-                    OriginalFirerates[k] = v.Firerate
-                    v.Firerate = 0
-                end
-            end
-            return
-        end
-
-        for k, v in pairs(OriginalFirerates) do
-            if WeaponStats[k] then
-                WeaponStats[k].Firerate = v
-            end
-        end
-    end,
-})
-
-local function GetGuards()
-    local GuardList = {}
+local function getLowestHpTarget()
+    local targetChar
+    local lowestHp = 1e999
     for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Team then
-            local TeamName = player.Team.Name
-            if TeamName == "MTF" or TeamName == "Guard" then
-                table.insert(GuardList, player)
+        if isValidTarget(player) then
+            local char = player.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            local head = char and char:FindFirstChild("Head")
+            if hum and root and head and hum.Health > 0 and hum.Health < lowestHp then
+                lowestHp = hum.Health
+                targetChar = char
             end
         end
     end
-    return GuardList
+    return targetChar
 end
 
-local function UpdateGuardBring(targetPosition)
-    local guards = GetGuards()
-    local guardCount = #guards
-    if guardCount == 0 then return end
-    local angleStep = 2 * math.pi / guardCount
-    for i, player in ipairs(guards) do
-        local Character = player.Character
-        if Character then Character = Character:FindFirstChild("HumanoidRootPart") end
-        if Character then
-            local angle = (i - 1) * angleStep
-            local offsetX = math.cos(angle) * GuardRadius
-            local offsetZ = math.sin(angle) * GuardRadius
-            local targetVector = Vector3.new(targetPosition.X + offsetX, targetPosition.Y, targetPosition.Z + offsetZ)
-            Character.CFrame = CFrame.new(targetVector, targetPosition)
-        end
-    end
-end
-
-local function StartGuardBring()
-    if GuardConnection then GuardConnection:Disconnect() end
-    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart", 5)
-    if not HumanoidRootPart then return end
-    local lastPos = HumanoidRootPart.Position
-    UpdateGuardBring(lastPos)
-    GuardConnection = RunService.RenderStepped:Connect(function()
-        local CurrentChar = LocalPlayer.Character
-        if CurrentChar then CurrentChar = CurrentChar:FindFirstChild("HumanoidRootPart") end
-        if not CurrentChar or not lastPos then return end
-        local currentPos = CurrentChar.Position
-        local guards = GetGuards()
-        local guardCount = #guards
-        if guardCount == 0 then return end
-        if (currentPos - lastPos).Magnitude > GuardRadius then
-            lastPos = currentPos
-            UpdateGuardBring(lastPos)
-            return
-        end
-        local angleStep = 2 * math.pi / guardCount
-        for i, player in ipairs(guards) do
-            local TargetChar = player.Character
-            local RootPart = TargetChar and TargetChar:FindFirstChild("HumanoidRootPart")
-            local Humanoid = TargetChar and TargetChar:FindFirstChildOfClass("Humanoid")
-            if RootPart and Humanoid and Humanoid.Health > 0 then
-                RootPart.Velocity = Vector3.new(0, 0, 0)
-                RootPart.RotVelocity = Vector3.new(0, 0, 0)
-                local angle = (i - 1) * angleStep
-                local offsetX = math.cos(angle) * GuardRadius
-                local offsetZ = math.sin(angle) * GuardRadius
-                local targetVector = Vector3.new(lastPos.X + offsetX, lastPos.Y, lastPos.Z + offsetZ)
-                RootPart.CFrame = CFrame.new(targetVector, lastPos)
-            end
-        end
-    end)
-end
-
-MainTab:CreateToggle({
-    Name = "Bring All Guard V2",
-    CurrentValue = false,
-    Flag = "BringGuardV2",
-    Callback = function(Value)
-        print(Value)
-        IsBringingGuards = Value
-        if Value then
-            StartGuardBring()
-            if not GuardCharConnection then
-                GuardCharConnection = LocalPlayer.CharacterAdded:Connect(function()
-                    task.wait(0.5)
-                    if IsBringingGuards then StartGuardBring() end
-                end)
-            end
-        else
-            if GuardConnection then GuardConnection:Disconnect() end
-            if GuardCharConnection then GuardCharConnection:Disconnect() end
-        end
-    end,
-})
-
-local function GetSCPPlayers()
-    local SCPList = {}
-    if not SCPTeam then return SCPList end
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player.Team == SCPTeam and player ~= LocalPlayer then
-            table.insert(SCPList, player)
-        end
-    end
-    return SCPList
-end
-
-local function StartSCPBring()
-    if SCPConnection then SCPConnection:Disconnect() end
-    SCPConnection = RunService.RenderStepped:Connect(function()
-        local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if not Character then return end
-        local CharacterPosition = Character.Position
-        local scpPlayers = GetSCPPlayers()
-        local scpCount = #scpPlayers
-        if scpCount == 0 then return end
-        local angleStep = 2 * math.pi / scpCount
-        for i, player in ipairs(scpPlayers) do
-            local TargetChar = player.Character
-            local RootPart = TargetChar and TargetChar:FindFirstChild("HumanoidRootPart")
-            local Humanoid = TargetChar and TargetChar:FindFirstChildOfClass("Humanoid")
-            if RootPart and Humanoid and Humanoid.Health > 0 then
-                RootPart.Velocity = Vector3.new(0, 0, 0)
-                RootPart.RotVelocity = Vector3.new(0, 0, 0)
-                local angle = (i - 1) * angleStep
-                local offsetX = math.cos(angle) * SCPRadius
-                local offsetZ = math.sin(angle) * SCPRadius
-                local targetVector = Vector3.new(CharacterPosition.X + offsetX, CharacterPosition.Y, CharacterPosition.Z + offsetZ)
-                RootPart.CFrame = CFrame.new(targetVector, CharacterPosition)
-            end
-        end
-    end)
-end
-
-MainTab:CreateToggle({
-    Name = "Bring All SCP V2",
-    CurrentValue = false,
-    Flag = "BringSCPV2",
-    Callback = function(Value)
-        print(Value)
-        IsBringingSCP = Value
-        if Value then
-            if not SCPTeam then
-                warn("Khong tim thay Team SCP!")
-                return
-            end
-            StartSCPBring()
-            if not SCPCharConnection then
-                SCPCharConnection = LocalPlayer.CharacterAdded:Connect(function()
-                    task.wait(0.5)
-                    if IsBringingSCP then StartSCPBring() end
-                end)
-            end
-            print("Executor: Da kich hoat mang team SCP lien tuc theo ban!")
-            return
-        end
-        if SCPConnection then SCPConnection:Disconnect() end
-        if SCPCharConnection then SCPCharConnection:Disconnect() end
-        print("Executor: Da tat mang team SCP.")
-    end,
-})
-
-local function ResetSCPHitboxes()
-    for player, originalData in pairs(OriginalSCPHitboxes) do
-        local Character = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if Character and originalData then
-            Character.Size = originalData.Size
-            Character.Transparency = originalData.Transparency
-            Character.Material = originalData.Material
-            Character.BrickColor = originalData.BrickColor
-            Character.CanCollide = originalData.CanCollide
-        end
-    end
-    table.clear(OriginalSCPHitboxes)
-end
-
-local function ResetGuardHitboxes()
-    for player, originalData in pairs(OriginalGuardHitboxes) do
-        local Character = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if Character and originalData then
-            Character.Size = originalData.Size
-            Character.Transparency = originalData.Transparency
-            Character.Material = originalData.Material
-            Character.BrickColor = originalData.BrickColor
-            Character.CanCollide = originalData.CanCollide
-        end
-    end
-    table.clear(OriginalGuardHitboxes)
-end
-
-local function SetupHitboxPlayer(player)
-    player.CharacterAdded:Connect(function()
-        OriginalSCPHitboxes[player] = nil
-        OriginalGuardHitboxes[player] = nil
-    end)
-end
-for _, player in ipairs(Players:GetPlayers()) do SetupHitboxPlayer(player) end
-Players.PlayerAdded:Connect(SetupHitboxPlayer)
-
-MainTab:CreateInput({
-    Name = "Hitbox All SCP",
-    PlaceholderText = "Size value...",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-        print(Text)
-        local num = tonumber(Text)
-        if num and num > 0 then
-            SCPHitboxSize = num
-            SCPHitboxEnabled = true
-            return
-        end
-        SCPHitboxEnabled = false
-        ResetSCPHitboxes()
-    end,
-})
-
-MainTab:CreateInput({
-    Name = "Hitbox All Guard",
-    PlaceholderText = "Size value...",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(Text)
-        print(Text)
-        local num = tonumber(Text)
-        if num and num > 0 then
-            GuardHitboxSize = num
-            GuardHitboxEnabled = true
-            return
-        end
-        GuardHitboxEnabled = false
-        ResetGuardHitboxes()
-    end,
-})
-
-RunService.RenderStepped:Connect(function()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            local Character = player.Character
-            local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-            local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
-            if RootPart and Humanoid and Humanoid.Health > 0 and player.Team then
-                if SCPHitboxEnabled and player.Team.Name == "SCP" then
-                    if not OriginalSCPHitboxes[player] then
-                        OriginalSCPHitboxes[player] = {
-                            Size = RootPart.Size,
-                            Transparency = RootPart.Transparency,
-                            Material = RootPart.Material,
-                            BrickColor = RootPart.BrickColor,
-                            CanCollide = RootPart.CanCollide
-                        }
+task.spawn(function()
+    while true do
+        task.wait(config1.FIRE_RATE)
+        if _G.AutoFarm then
+            local char = LocalPlayer.Character
+            local tool = char and char:FindFirstChildOfClass("Tool")
+            if tool then
+                local target = getLowestHpTarget()
+                if target then
+                    local head = target:FindFirstChild("Head")
+                    local root = target:FindFirstChild("HumanoidRootPart")
+                    if head and root then
+                        local vel = root.AssemblyLinearVelocity
+                        local pos = head.Position + vel * config1.PREDICTION_MULTIPLIER
+                        local finalPos = pos + Vector3.new(0, 1, 0)
+                        local buf = buffer.create(25)
+                        buffer.writeu8(buf, 0, 1)
+                        buffer.writef32(buf, 1, finalPos.X)
+                        buffer.writef32(buf, 5, finalPos.Y)
+                        buffer.writef32(buf, 9, finalPos.Z)
+                        buffer.writef32(buf, 13, pos.X)
+                        buffer.writef32(buf, 17, pos.Y)
+                        buffer.writef32(buf, 21, pos.Z)
+                        GunShot:FireServer("shoot", buf, {Players:GetPlayerFromCharacter(target)}, {head})
                     end
-                    RootPart.Size = Vector3.new(SCPHitboxSize, SCPHitboxSize, SCPHitboxSize)
-                    RootPart.Transparency = 0.8
-                    RootPart.Material = Enum.Material.Neon
-                    RootPart.BrickColor = BrickColor.new("Really blue")
-                    RootPart.CanCollide = false
-                elseif GuardHitboxEnabled and GuardTeamsConfig[player.Team.Name] then
-                    if not OriginalGuardHitboxes[player] then
-                        OriginalGuardHitboxes[player] = {
-                            Size = RootPart.Size,
-                            Transparency = RootPart.Transparency,
-                            Material = RootPart.Material,
-                            BrickColor = RootPart.BrickColor,
-                            CanCollide = RootPart.CanCollide
-                        }
-                    end
-                    RootPart.Size = Vector3.new(GuardHitboxSize, GuardHitboxSize, GuardHitboxSize)
-                    RootPart.Transparency = 0.8
-                    RootPart.Material = Enum.Material.Neon
-                    RootPart.BrickColor = BrickColor.new("Lime green")
-                    RootPart.CanCollide = false
                 end
             end
         end
     end
 end)
 
--- Esp Tab Elements
-local function UpdateESP(player, color)
-    local Character = player.Character
-    if not Character then return end
-    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
-    local ESP_Solid = Character:FindFirstChild("ESP_Solid")
-    if not Humanoid or Humanoid.Health <= 0 then
-        if ESP_Solid then ESP_Solid:Destroy() end
-        return
+MainTab:CreateToggle({
+    Name = "Auto Kill (Lowest HP)",
+    CurrentValue = false,
+    Flag = "AutoKillLowestHP",
+    Callback = function(Value)
+        _G.AutoFarm = Value
+    end,
+})
+
+-- Logic Auto Kill (Closest Target)
+local function getClosestTarget()
+    local targetChar
+    local shortestDist = 1e999
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    for _, player in ipairs(Players:GetPlayers()) do
+        if isValidTarget(player) then
+            local pChar = player.Character
+            local hum = pChar and pChar:FindFirstChildOfClass("Humanoid")
+            local pRoot = pChar and pChar:FindFirstChild("HumanoidRootPart")
+            local head = pChar and pChar:FindFirstChild("Head")
+            if hum and pRoot and head and hum.Health > 0 then
+                local dist = (root.Position - pRoot.Position).Magnitude
+                if dist < shortestDist then
+                    shortestDist = dist
+                    targetChar = pChar
+                end
+            end
+        end
     end
-    if not ESP_Solid or not ESP_Solid:IsA("Highlight") then
-        if ESP_Solid then ESP_Solid:Destroy() end
-        ESP_Solid = Instance.new("Highlight")
-        ESP_Solid.Name = "ESP_Solid"
-        ESP_Solid.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        ESP_Solid.Parent = Character
-    end
-    ESP_Solid.FillColor = color
-    ESP_Solid.FillTransparency = 0.9
-    ESP_Solid.OutlineColor = color
-    ESP_Solid.OutlineTransparency = 0
-    ESP_Solid.Adornee = Character
+    return targetChar
 end
 
-local function RemoveESP(player)
-    local Character = player.Character
-    if Character then
-        local ESP_Solid = Character:FindFirstChild("ESP_Solid")
-        if ESP_Solid then ESP_Solid:Destroy() end
+task.spawn(function()
+    while true do
+        task.wait(config1.FIRE_RATE)
+        if _G.AutoFarmClosest then
+            local char = LocalPlayer.Character
+            local tool = char and char:FindFirstChildOfClass("Tool")
+            if tool then
+                local target = getClosestTarget()
+                if target then
+                    local head = target:FindFirstChild("Head")
+                    local root = target:FindFirstChild("HumanoidRootPart")
+                    if head and root then
+                        local vel = root.AssemblyLinearVelocity
+                        local pos = head.Position + vel * config1.PREDICTION_MULTIPLIER
+                        local finalPos = pos + Vector3.new(0, 1, 0)
+                        local buf = buffer.create(25)
+                        buffer.writeu8(buf, 0, 1)
+                        buffer.writef32(buf, 1, finalPos.X)
+                        buffer.writef32(buf, 5, finalPos.Y)
+                        buffer.writef32(buf, 9, finalPos.Z)
+                        buffer.writef32(buf, 13, pos.X)
+                        buffer.writef32(buf, 17, pos.Y)
+                        buffer.writef32(buf, 21, pos.Z)
+                        GunShot:FireServer("shoot", buf, {Players:GetPlayerFromCharacter(target)}, {head})
+                    end
+                end
+            end
+        end
     end
+end)
+
+MainTab:CreateToggle({
+    Name = "Auto Kill (Closest Target)",
+    CurrentValue = false,
+    Flag = "AutoKillClosest",
+    Callback = function(Value)
+        _G.AutoFarmClosest = Value
+    end,
+})
+
+-- KHÔI PHỤC HOÀN CHỈNH: Giao diện GUI Auto Kill Target phụ (tích hợp chuẩn logic gốc)
+MainTab:CreateButton({
+    Name = "Gui Auto Kill Target",
+    Callback = function()
+        local t9 = {
+            FireRate = 0.01,
+            PredictionMultiplier = 0.13,
+            MasterSwitch = false,
+            ViewListOnly = false,
+            SelectedUsername = nil,
+            HasManualTarget = false,
+            IsMinimized = false,
+            IsDestroyed = false
+        }
+        
+        local function getTargetList()
+            local t10 = {}
+            if t9.IsDestroyed then return t10 end
+            for _, player in ipairs(Players:GetPlayers()) do
+                local isValid = false
+                if player and player ~= LocalPlayer then
+                    local team = LocalPlayer.Team
+                    local pTeam = player.Team
+                    if team and pTeam then
+                        isValid = if team.Name ~= "SCP" then pTeam.Name == "SCP" else pTeam.Name ~= "SCP"
+                    end
+                end
+                if isValid then
+                    local char = player.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    if hum and hum.Health > 0 then
+                        local teamName = player.Team.Name
+                        local isSpecialName = char and char.Name ~= player.Name and not char.Name:find("Player")
+                        if isSpecialName then
+                            teamName = char.Name
+                        elseif hum.DisplayName and hum.DisplayName ~= player.DisplayName then
+                            teamName = hum.DisplayName
+                        end
+                        table.insert(t10, {
+                            Text = string.format("[%s] %s", teamName, player.Name),
+                            Username = player.Name
+                        })
+                    end
+                end
+            end
+            return t10
+        end
+
+        local function getManualOrAutoTarget()
+            if t9.HasManualTarget then
+                if t9.SelectedUsername then
+                    local targetPlayer = Players:FindFirstChild(t9.SelectedUsername)
+                    if targetPlayer and targetPlayer ~= LocalPlayer then
+                        local team = LocalPlayer.Team
+                        local pTeam = targetPlayer.Team
+                        local isValid = team and pTeam and (if team.Name ~= "SCP" then pTeam.Name == "SCP" else pTeam.Name ~= "SCP")
+                        if isValid then
+                            local char = targetPlayer.Character
+                            local hum = char and char:FindFirstChildOfClass("Humanoid")
+                            if hum and hum.Health > 0 then
+                                return char
+                            end
+                        end
+                    end
+                end
+                return nil
+            end
+            if not t9.ViewListOnly then
+                for _, player in ipairs(Players:GetPlayers()) do
+                    local isValid = false
+                    if player and player ~= LocalPlayer then
+                        local team = LocalPlayer.Team
+                        local pTeam = player.Team
+                        if team and pTeam then
+                            isValid = if team.Name ~= "SCP" then pTeam.Name == "SCP" else pTeam.Name ~= "SCP"
+                        end
+                    end
+                    if isValid then
+                        local char = player.Character
+                        local hum = char and char:FindFirstChildOfClass("Humanoid")
+                        if hum and hum.Health > 0 then
+                            return char
+                        end
+                    end
+                end
+            end
+            return nil
+        end
+
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "FastAutoShootGUI"
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+        local Frame = Instance.new("Frame")
+        Frame.Name = "MainFrame"
+        Frame.Size = UDim2.new(0, 250, 0, 320)
+        Frame.Position = UDim2.new(0.1, 0, 0.3, 0)
+        Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        Frame.BorderSizePixel = 0
+        Frame.Active = true
+        Frame.Draggable = true
+        Frame.ClipsDescendants = true
+        Frame.Parent = ScreenGui
+
+        local UICorner = Instance.new("UICorner", Frame)
+        UICorner.CornerRadius = UDim.new(0, 8)
+
+        local TextLabel = Instance.new("TextLabel")
+        TextLabel.Size = UDim2.new(1, 0, 0, 35)
+        TextLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        TextLabel.Text = "   Auto Kill Target | By qweqrwtA"
+        TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel.Font = Enum.Font.SourceSansBold
+        TextLabel.TextSize = 13
+        TextLabel.Parent = Frame
+        Instance.new("UICorner", TextLabel).CornerRadius = UDim.new(0, 8)
+
+        local MinButton = Instance.new("TextButton")
+        MinButton.Size = UDim2.new(0, 25, 0, 25)
+        MinButton.Position = UDim2.new(1, -60, 0, 5)
+        MinButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        MinButton.Font = Enum.Font.SourceSansBold
+        MinButton.Text = "-"
+        MinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        MinButton.TextSize = 16
+        MinButton.Parent = Frame
+        Instance.new("UICorner", MinButton).CornerRadius = UDim.new(0, 4)
+
+        local CloseButton = Instance.new("TextButton")
+        CloseButton.Size = UDim2.new(0, 25, 0, 25)
+        CloseButton.Position = UDim2.new(1, -30, 0, 5)
+        CloseButton.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
+        CloseButton.Font = Enum.Font.SourceSansBold
+        CloseButton.Text = "X"
+        CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        CloseButton.TextSize = 12
+        CloseButton.Parent = Frame
+        Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 4)
+
+        local Container = Instance.new("Frame")
+        Container.Size = UDim2.new(1, 0, 1, -35)
+        Container.Position = UDim2.new(0, 0, 0, 35)
+        Container.BackgroundTransparency = 1
+        Container.Parent = Frame
+
+        local MasterBtn = Instance.new("TextButton")
+        MasterBtn.Size = UDim2.new(0, 220, 0, 35)
+        MasterBtn.Position = UDim2.new(0, 15, 0, 15)
+        MasterBtn.BackgroundColor3 = Color3.fromRGB(80, 20, 20)
+        MasterBtn.Font = Enum.Font.SourceSansBold
+        MasterBtn.Text = "Kích Hoạt Auto Shoot: OFF"
+        MasterBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        MasterBtn.TextSize = 13
+        MasterBtn.Parent = Container
+        Instance.new("UICorner", MasterBtn).CornerRadius = UDim.new(0, 6)
+
+        local SpectateBtn = Instance.new("TextButton")
+        SpectateBtn.Size = UDim2.new(0, 220, 0, 35)
+        SpectateBtn.Position = UDim2.new(0, 15, 0, 60)
+        SpectateBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        SpectateBtn.Font = Enum.Font.SourceSansBold
+        SpectateBtn.Text = "Spectate: OFF"
+        SpectateBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        SpectateBtn.TextSize = 13
+        SpectateBtn.Parent = Container
+        Instance.new("UICorner", SpectateBtn).CornerRadius = UDim.new(0, 6)
+
+        local ScrollingFrame = Instance.new("ScrollingFrame")
+        ScrollingFrame.Size = UDim2.new(0, 220, 0, 150)
+        ScrollingFrame.Position = UDim2.new(0, 15, 0, 110)
+        ScrollingFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+        ScrollingFrame.BorderSizePixel = 0
+        ScrollingFrame.ScrollBarThickness = 4
+        ScrollingFrame.Parent = Container
+        Instance.new("UICorner", ScrollingFrame).CornerRadius = UDim.new(0, 6)
+
+        local UIListLayout = Instance.new("UIListLayout")
+        UIListLayout.Padding = UDim.new(0, 4)
+        UIListLayout.Parent = ScrollingFrame
+
+        local CoreGui = game:GetService("CoreGui")
+        if CoreGui:FindFirstChild("FastAutoShootGUI") then
+            CoreGui:FindFirstChild("FastAutoShootGUI"):Destroy()
+        end
+        ScreenGui.Parent = CoreGui
+
+        local function refreshList()
+            if t9.IsDestroyed then return end
+            for _, child in ipairs(ScrollingFrame:GetChildren()) do
+                if child:IsA("TextButton") or child:IsA("TextLabel") then
+                    child:Destroy()
+                end
+            end
+            local targets = getTargetList()
+            if #targets == 0 then
+                local emptyLbl = Instance.new("TextLabel")
+                emptyLbl.Size = UDim2.new(1, 0, 0, 25)
+                emptyLbl.BackgroundTransparency = 1
+                emptyLbl.Text = "Không có mục tiêu nào hợp lệ"
+                emptyLbl.TextColor3 = Color3.fromRGB(150, 150, 150)
+                emptyLbl.Font = Enum.Font.SourceSansItalic
+                emptyLbl.TextSize = 12
+                emptyLbl.Parent = ScrollingFrame
+                return
+            end
+            for _, v in ipairs(targets) do
+                local btn = Instance.new("TextButton")
+                btn.Size = UDim2.new(1, -6, 0, 25)
+                local isSelected = t9.HasManualTarget and t9.SelectedUsername == v.Username
+                if isSelected then
+                    btn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+                    btn.Text = "🎯 " .. v.Text
+                    btn.Font = Enum.Font.SourceSansBold
+                else
+                    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                    btn.Text = v.Text
+                    btn.Font = Enum.Font.SourceSans
+                end
+                btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                btn.TextSize = 12
+                btn.Parent = ScrollingFrame
+                Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+
+                btn.MouseButton1Click:Connect(function()
+                    if t9.SelectedUsername == v.Username and t9.HasManualTarget then
+                        t9.SelectedUsername = nil
+                        t9.HasManualTarget = false
+                    else
+                        t9.SelectedUsername = v.Username
+                        t9.HasManualTarget = true
+                    end
+                    refreshList()
+                end)
+            end
+            ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 5)
+        end
+
+        local function updateCameraSpectate()
+            if t9.IsDestroyed then return end
+            if t9.ViewListOnly and t9.SelectedUsername then
+                local targetPlayer = Players:FindFirstChild(t9.SelectedUsername)
+                if targetPlayer and targetPlayer ~= LocalPlayer then
+                    local char = targetPlayer.Character
+                    local hum = char and char:FindFirstChildOfClass("Humanoid")
+                    if hum and hum.Health > 0 then
+                        CurrentCamera.CameraSubject = hum
+                        return
+                    end
+                end
+            end
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                CurrentCamera.CameraSubject = hum
+            end
+        end
+
+        MasterBtn.MouseButton1Click:Connect(function()
+            t9.MasterSwitch = not t9.MasterSwitch
+            if t9.MasterSwitch then
+                MasterBtn.Text = "Auto Kill: ON"
+                MasterBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 60)
+            else
+                MasterBtn.Text = "Auto Kill: OFF"
+                MasterBtn.BackgroundColor3 = Color3.fromRGB(80, 20, 20)
+            end
+        end)
+
+        SpectateBtn.MouseButton1Click:Connect(function()
+            t9.ViewListOnly = not t9.ViewListOnly
+            if t9.ViewListOnly then
+                SpectateBtn.Text = "View: ON"
+                SpectateBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+            else
+                SpectateBtn.Text = "View: OFF"
+                SpectateBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            end
+            updateCameraSpectate()
+            refreshList()
+        end)
+
+        MinButton.MouseButton1Click:Connect(function()
+            t9.IsMinimized = not t9.IsMinimized
+            local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            if t9.IsMinimized then
+                Container.Visible = false
+                TweenService:Create(Frame, tweenInfo, {Size = UDim2.new(0, 250, 0, 35)}):Play()
+                MinButton.Text = "+"
+            else
+                local tween = TweenService:Create(Frame, tweenInfo, {Size = UDim2.new(0, 250, 0, 320)})
+                tween:Play()
+                tween.Completed:Connect(function()
+                    Container.Visible = true
+                end)
+                MinButton.Text = "-"
+            end
+        end)
+
+        CloseButton.MouseButton1Click:Connect(function()
+            t9.IsDestroyed = true
+            updateCameraSpectate()
+            ScreenGui:Destroy()
+        end)
+
+        refreshList()
+        Players.PlayerAdded:Connect(refreshList)
+        Players.PlayerRemoving:Connect(refreshList)
+
+        task.spawn(function()
+            while not t9.IsDestroyed do
+                task.wait(0.5)
+                refreshList()
+            end
+        end)
+
+        RunService.RenderStepped:Connect(function()
+            if t9.IsDestroyed then return end
+            updateCameraSpectate()
+        end)
+
+        task.spawn(function()
+            while not t9.IsDestroyed do
+                task.wait(t9.FireRate)
+                if t9.MasterSwitch then
+                    local char = LocalPlayer.Character
+                    local tool = char and char:FindFirstChildOfClass("Tool")
+                    local team = LocalPlayer.Team
+                    local isSCP = team and team.Name == "SCP"
+                    if tool or isSCP then
+                        local targetChar = getManualOrAutoTarget()
+                        if targetChar then
+                            local head = targetChar:FindFirstChild("Head")
+                            local root = targetChar:FindFirstChild("HumanoidRootPart")
+                            if head and root then
+                                local vel = root.AssemblyLinearVelocity
+                                local pos = head.Position + vel * t9.PredictionMultiplier
+                                local finalPos = pos + Vector3.new(0, 1, 0)
+                                local buf = buffer.create(25)
+                                buffer.writeu8(buf, 0, 1)
+                                buffer.writef32(buf, 1, finalPos.X)
+                                buffer.writef32(buf, 5, finalPos.Y)
+                                buffer.writef32(buf, 9, finalPos.Z)
+                                buffer.writef32(buf, 13, pos.X)
+                                buffer.writef32(buf, 17, pos.Y)
+                                buffer.writef32(buf, 21, pos.Z)
+                                GunShot:FireServer("shoot", buf, {Players:GetPlayerFromCharacter(targetChar)}, {head})
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end,
+})
+
+-- Bring All Guard V2
+local bringGuardActive = false
+local bringGuardConn, bringGuardCharConn
+local function getGuards()
+    local list = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Team then
+            local name = player.Team.Name
+            if name == "MTF" or name == "Guard" then
+                table.insert(list, player)
+            end
+        end
+    end
+    return list
 end
-Players.PlayerRemoving:Connect(RemoveESP)
+
+MainTab:CreateToggle({
+    Name = "Bring All Guard V2",
+    CurrentValue = false,
+    Callback = function(Value)
+        bringGuardActive = Value
+        if Value then
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local root = char:WaitForChild("HumanoidRootPart", 5)
+            if not root then return end
+            bringGuardConn = RunService.RenderStepped:Connect(function()
+                local guards = getGuards()
+                if #guards == 0 then return end
+                local angleStep = 2 * math.pi / #guards
+                for i, p in ipairs(guards) do
+                    local pChar = p.Character
+                    local pRoot = pChar and pChar:FindFirstChild("HumanoidRootPart")
+                    local pHum = pChar and pChar:FindFirstChildOfClass("Humanoid")
+                    if pRoot and pHum and pHum.Health > 0 then
+                        pRoot.Velocity = Vector3.zero
+                        pRoot.RotVelocity = Vector3.zero
+                        local angle = (i - 1) * angleStep
+                        local offset = Vector3.new(math.cos(angle) * 12, 0, math.sin(angle) * 12)
+                        pRoot.CFrame = CFrame.new(root.Position + offset, root.Position)
+                    end
+                end
+            end)
+        else
+            if bringGuardConn then bringGuardConn:Disconnect() end
+        end
+    end,
+})
+
+-- Bring All SCP V2
+local bringSCPActive = false
+local bringSCPConn
+MainTab:CreateToggle({
+    Name = "Bring All SCP V2",
+    CurrentValue = false,
+    Callback = function(Value)
+        bringSCPActive = Value
+        local scpTeam = game:GetService("Teams"):FindFirstChild("SCP")
+        if Value then
+            if not scpTeam then return end
+            bringSCPConn = RunService.RenderStepped:Connect(function()
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if not root then return end
+                local list = {}
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p.Team == scpTeam and p ~= LocalPlayer then
+                        table.insert(list, p)
+                    end
+                end
+                if #list == 0 then return end
+                local angleStep = 2 * math.pi / #list
+                for i, p in ipairs(list) do
+                    local pChar = p.Character
+                    local pRoot = pChar and pChar:FindFirstChild("HumanoidRootPart")
+                    local pHum = pChar and pChar:FindFirstChildOfClass("Humanoid")
+                    if pRoot and pHum and pHum.Health > 0 then
+                        pRoot.Velocity = Vector3.zero
+                        pRoot.RotVelocity = Vector3.zero
+                        local angle = (i - 1) * angleStep
+                        local offset = Vector3.new(math.cos(angle) * 15, 0, math.sin(angle) * 15)
+                        pRoot.CFrame = CFrame.new(root.Position + offset, root.Position)
+                    end
+                end
+            end)
+        else
+            if bringSCPConn then bringSCPConn:Disconnect() end
+        end
+    end,
+})
+
+MainTab:CreateButton({
+    Name = "YouTube: @qweqrwtA",
+    Callback = function()
+        print("Open YouTube")
+    end,
+})
+
+-- ESP Tab
+local espSCP = false
+local espGuard = false
+
+local function updateEsp(player, color)
+    local char = player.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hl = char:FindFirstChild("ESP_Solid")
+    if not hum or hum.Health <= 0 then
+        if hl then hl:Destroy() end
+        return
+    end
+    if not hl then
+        hl = Instance.new("Highlight")
+        hl.Name = "ESP_Solid"
+        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        hl.Parent = char
+    end
+    hl.FillColor = color
+    hl.FillTransparency = 0.9
+    hl.OutlineColor = color
+    hl.OutlineTransparency = 0
+    hl.Adornee = char
+end
 
 EspTab:CreateToggle({
     Name = "Esp SCP",
     CurrentValue = false,
-    Flag = "EspSCP",
     Callback = function(Value)
-        print(Value)
-        ESPSCPEnabled = Value
-        if not Value then
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player.Team and player.Team.Name == "SCP" then
-                    RemoveESP(player)
-                end
-            end
-        end
+        espSCP = Value
     end,
 })
 
 EspTab:CreateToggle({
     Name = "Esp Guard",
     CurrentValue = false,
-    Flag = "EspGuard",
     Callback = function(Value)
-        print(Value)
-        ESPGuardEnabled = Value
-        if not Value then
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player.Team and ESPTeamConfigs[player.Team.Name] then
-                    RemoveESP(player)
+        espGuard = Value
+    end,
+})
+
+RunService.RenderStepped:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Team then
+            local teamName = player.Team.Name
+            if espSCP and teamName == "SCP" then
+                updateEsp(player, Color3.fromRGB(255, 0, 0))
+            elseif espGuard and (teamName == "MTF" or teamName == "Guard") then
+                updateEsp(player, Color3.fromRGB(0, 255, 0))
+            else
+                local char = player.Character
+                local hl = char and char:FindFirstChild("ESP_Solid")
+                if hl then hl:Destroy() end
+            end
+        end
+    end
+end)
+
+-- Players Tab
+PlayersTab:CreateInput({
+    Name = "Hitbox All SCP",
+    PlaceholderText = "Nhập kích thước...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local num = tonumber(Text)
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Team and player.Team.Name == "SCP" and player.Character then
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                if hrp and num then
+                    hrp.Size = Vector3.new(num, num, num)
+                    hrp.Transparency = 0.8
+                    hrp.CanCollide = false
                 end
             end
         end
     end,
 })
 
-RunService.RenderStepped:Connect(function()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            if player.Team then
-                if ESPSCPEnabled and player.Team.Name == "SCP" then
-                    UpdateESP(player, Color3.fromRGB(255, 0, 0))
-                elseif ESPGuardEnabled and ESPTeamConfigs[player.Team.Name] then
-                    UpdateESP(player, Color3.fromRGB(0, 255, 0))
-                else
-                    RemoveESP(player)
+PlayersTab:CreateInput({
+    Name = "Hitbox All Guard",
+    PlaceholderText = "Nhập kích thước...",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local num = tonumber(Text)
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Team and (player.Team.Name == "MTF" or player.Team.Name == "Guard") and player.Character then
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                if hrp and num then
+                    hrp.Size = Vector3.new(num, num, num)
+                    hrp.Transparency = 0.8
+                    hrp.CanCollide = false
                 end
-            else
-                RemoveESP(player)
             end
         end
-    end
-end)
-
--- Players Tab Elements
-RunService.RenderStepped:Connect(function()
-    local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if Character then
-        if CurrentWalkSpeed then Character.WalkSpeed = CurrentWalkSpeed end
-        if CurrentJumpPower then
-            if not Character.UseJumpPower then Character.UseJumpPower = true end
-            Character.JumpPower = CurrentJumpPower
-        end
-    end
-end)
+    end,
+})
 
 PlayersTab:CreateInput({
     Name = "Enter Speed Value",
-    PlaceholderText = "Speed...",
+    PlaceholderText = "Tốc độ chạy...",
     RemoveTextAfterFocusLost = false,
     Callback = function(Text)
-        print(Text)
         local num = tonumber(Text)
-        CurrentWalkSpeed = num
-        if not num or not (num > 0) then
-            local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            if Character then Character.WalkSpeed = 16 end
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.WalkSpeed = num or 16
         end
     end,
 })
 
 PlayersTab:CreateInput({
     Name = "Enter Jump Value",
-    PlaceholderText = "Jump...",
+    PlaceholderText = "Sức nhảy...",
     RemoveTextAfterFocusLost = false,
     Callback = function(Text)
-        print(Text)
         local num = tonumber(Text)
-        CurrentJumpPower = num
-        if not num or not (num > 0) then
-            local Character = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            if Character then Character.JumpPower = 50 end
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = num or 50
         end
     end,
 })
 
-local function StartInfJump()
-    if InfJumpConnection then InfJumpConnection:Disconnect() end
-    InfJumpConnection = UserInputService.JumpRequest:Connect(function()
-        if not InfJumpEnabled then return end
-        local Character = LocalPlayer.Character
-        local RootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-        local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
-        if RootPart and Humanoid then
-            RootPart.Velocity = Vector3.new(RootPart.Velocity.X, Humanoid.JumpPower, RootPart.Velocity.Z)
+local infJump = false
+game:GetService("UserInputService").JumpRequest:Connect(function()
+    if infJump then
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
         end
-    end)
-end
-
-local function StopInfJump()
-    if InfJumpConnection then
-        InfJumpConnection:Disconnect()
-        InfJumpConnection = nil
     end
-end
+end)
 
 PlayersTab:CreateToggle({
     Name = "Infinite Jump",
     CurrentValue = false,
-    Flag = "InfiniteJump",
     Callback = function(Value)
-        print(Value)
-        InfJumpEnabled = Value
-        if Value then
-            StartInfJump()
-            return
-        end
-        StopInfJump()
+        infJump = Value
     end,
 })
 
-LocalPlayer.CharacterAdded:Connect(function()
-    if InfJumpEnabled then
-        task.wait(0.1)
-        StartInfJump()
-    end
-end)
-
-local function StartNoclip()
-    if NoclipConnection then NoclipConnection:Disconnect() end
-    NoclipConnection = RunService.Stepped:Connect(function()
-        if not NoclipEnabled then
-            if NoclipConnection then
-                NoclipConnection:Disconnect()
-                NoclipConnection = nil
-            end
-            return
-        end
-        local Character = LocalPlayer.Character
-        if Character then
-            for _, child in ipairs(Character:GetChildren()) do
-                if child:IsA("BasePart") and child.CanCollide then
-                    child.CanCollide = false
-                end
-            end
-        end
-    end)
-end
-
-local function StopNoclip()
-    if NoclipConnection then
-        NoclipConnection:Disconnect()
-        NoclipConnection = nil
-    end
-    local Character = LocalPlayer.Character
-    if Character then
-        for _, child in ipairs(Character:GetChildren()) do
-            if child:IsA("BasePart") then
-                local isCorePart = child.Name == "HumanoidRootPart" or child.Name == "UpperTorso" or child.Name == "LowerTorso" or child.Name == "Torso"
-                if isCorePart then
-                    child.CanCollide = true
-                end
-            end
-        end
-    end
-end
-
+local noclipConn
 PlayersTab:CreateToggle({
     Name = "Noclip",
     CurrentValue = false,
-    Flag = "Noclip",
     Callback = function(Value)
-        print(Value)
-        NoclipEnabled = Value
         if Value then
-            StartNoclip()
-            return
+            noclipConn = RunService.Stepped:Connect(function()
+                local char = LocalPlayer.Character
+                if char then
+                    for _, child in ipairs(char:GetChildren()) do
+                        if child:IsA("BasePart") then
+                            child.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        else
+            if noclipConn then noclipConn:Disconnect() end
         end
-        StopNoclip()
     end,
 })
-
-LocalPlayer.CharacterAdded:Connect(function()
-    if NoclipEnabled then
-        task.wait(0.2)
-        StartNoclip()
-    end
-end)
 
 PlayersTab:CreateButton({
-    Name = "fly gui",
+    Name = "Fly GUI",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
-        print("Hello")
     end,
 })
 
-MainTab:CreateButton({
-    Name = "YouTube:@bypass:03y_o",
-    Callback = function()
-        print("Open YouTube")
-    end,
-})
+Rayfield:LoadConfiguration()
