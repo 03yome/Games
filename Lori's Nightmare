@@ -407,9 +407,24 @@ Tab:CreateToggle({
     end,
 })
 
--- Nút thông tin/Credit
+local Tab = Window:CreateTab("Morph", nil)
+
 Tab:CreateButton({
-    Name = "YouTube: @romd3976",
+    Name = "Lori",
     Callback = function()
+local args = {
+	"Lori"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Util"):WaitForChild("Net"):WaitForChild("RE/ChangeSurvivor"):FireServer(unpack(args))
+    end,
+})
+
+Tab:CreateButton({
+    Name = "Pincat",
+    Callback = function()
+local args = {
+	"Pincat"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Util"):WaitForChild("Net"):WaitForChild("RE/ChangeSurvivor"):FireServer(unpack(args))
     end,
 })
