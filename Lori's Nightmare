@@ -276,60 +276,6 @@ Tab:CreateButton({
     end,
 })
 
-for i = 1, 7 do
-   Tab:CreateToggle({
-      Name = "📺 TELEPORT TO VHStv " .. i,
-      CurrentValue = false,
-      Flag = "VHStvToggle" .. i,
-      Callback = function(Value)
-         if Value then
-            local players = game:GetService("Players")
-            local tvFound = nil
-            local map = workspace:FindFirstChild("Map")
-            
-            if map then
-               for _, zone in pairs(map:GetChildren()) do
-                  local machines = zone:FindFirstChild("Machines")
-                  if machines then
-                     local tv = machines:FindFirstChild("VHStv" .. i)
-                     if tv then
-                        tvFound = tv
-                        break
-                     end
-                  end
-               end
-            end
-            
-            if not tvFound then
-               tvFound = workspace:FindFirstChild("VHStv" .. i, true)
-            end
-
-            if tvFound and players.LocalPlayer.Character then 
-               local screenPart = tvFound:FindFirstChild("Model") and tvFound.Model:FindFirstChild("Screen")
-               local pp = screenPart and screenPart:FindFirstChild("PP")
-               
-               if screenPart then
-                  players.LocalPlayer.Character:PivotTo(screenPart.CFrame + Vector3.new(0, 3, 0))
-                  Rayfield:Notify({Title = "Teleport", Content = "TP to VHStv " .. i, Duration = 2})
-                  
-                  if pp and pp:IsA("ProximityPrompt") then
-                     pcall(function()
-                        pp.HoldDuration = 0
-                        fireproximityprompt(pp, 0)
-                     end)
-                  end
-               else
-                  players.LocalPlayer.Character:PivotTo(tvFound:GetPivot() + Vector3.new(0, 3, 0))
-                  Rayfield:Notify({Title = "Teleport", Content = "TP to VHStv " .. i, Duration = 2})
-               end
-            else
-               Rayfield:Notify({Title = "Error", Content = "Không tìm thấy VHStv " .. i, Duration = 2})
-            end
-         end
-      end,
-   })
-end
-
 Tab:CreateButton({
     Name = "No CoolDown Ability",
     Callback = function()
@@ -459,6 +405,86 @@ Tab:CreateToggle({
             clearPlayerESP()
         end
     end,
+})
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Lori Ultra v3.0",
+   LoadingTitle = "Loading interface...",
+   LoadingSubtitle = "by Red",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "LoriUltraConfig",
+      FileName = "Config"
+   },
+   KeySystem = false,
+})
+
+local Tab = Window:CreateTab("Main", 4483362458)
+
+local autoRunVHStv = false
+
+Tab:CreateToggle({
+   Name = "📺 AUTO TELEPORT & INTERACT ALL VHStv",
+   CurrentValue = false,
+   Flag = "AutoVHStvToggle",
+   Callback = function(Value)
+      autoRunVHStv = Value
+      if autoRunVHStv then
+         task.spawn(function()
+            while autoRunVHStv do
+               local players = game:GetService("Players")
+               
+               for i = 1, 7 do
+                  if not autoRunVHStv then break end
+                  
+                  local tvFound = nil
+                  local map = workspace:FindFirstChild("Map")
+                  
+                  if map then
+                     for _, zone in pairs(map:GetChildren()) do
+                        local machines = zone:FindFirstChild("Machines")
+                        if machines then
+                           local tv = machines:FindFirstChild("VHStv" .. i)
+                           if tv then
+                              tvFound = tv
+                              break
+                           end
+                        end
+                     end
+                  end
+                  
+                  if not tvFound then
+                     tvFound = workspace:FindFirstChild("VHStv" .. i, true)
+                  end
+
+                  if tvFound and players.LocalPlayer.Character then 
+                     local screenPart = tvFound:FindFirstChild("Model") and tvFound.Model:FindFirstChild("Screen")
+                     local pp = screenPart and screenPart:FindFirstChild("PP")
+                     
+                     if screenPart then
+                        players.LocalPlayer.Character:PivotTo(screenPart.CFrame + Vector3.new(0, 3, 0))
+                        
+                        if pp and pp:IsA("ProximityPrompt") then
+                           pcall(function()
+                              pp.HoldDuration = 0
+                              fireproximityprompt(pp, 0)
+                           end)
+                        end
+                     else
+                        players.LocalPlayer.Character:PivotTo(tvFound:GetPivot() + Vector3.new(0, 3, 0))
+                     end
+                     
+                     task.wait(1)
+                  end
+               end
+               
+               task.wait(0.5)
+            end
+         end)
+      end
+   end,
 })
 
 local Tab = Window:CreateTab("Morph", nil)
