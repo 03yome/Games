@@ -1,0 +1,343 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+local targetBall = nil
+local ballHighlight = nil
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua"))()
+
+local Window = Library:CreateWindow({
+	Title = "Auto Parry Ultimate",
+	Footer = "Version 2.1 | crack: @romd3976",
+	NotifySide = "Right",
+	ShowCustomCursor = true
+})
+
+local mainTab = Window:AddTab("Main", "user")
+local settingsTab = Window:AddTab("Settings", "settings")
+local Tabs = {
+	Main = mainTab,
+	Settings = settingsTab
+}
+
+local parryLogicGroup = Tabs.Main:AddLeftGroupbox("Parry Logic")
+local dashAbilitiesGroup = Tabs.Main:AddRightGroupbox("Dash & Abilities")
+local creditsGroup = Tabs.Main:AddLeftGroupbox("Credits & Socials")
+local visualsGroup = Tabs.Main:AddRightGroupbox("Visuals")
+
+creditsGroup:AddLabel("Developer: @DRR_R2", true)
+creditsGroup:AddLabel("Cracker: @romd3976", true)
+creditsGroup:AddLabel("Telegram / YouTube / Discord", true)
+
+local executeBlockAction
+
+local function findBall()
+    local Ball = workspace:FindFirstChild("Ball")
+    if Ball then
+        return Ball
+    end
+
+    local getTagged = CollectionService:GetTagged("Ball") -- Hoặc dùng CollectionService nếu cần
+    for _, descendant in pairs(workspace:GetDescendants()) do
+        if descendant.Name == "Ball" and descendant:IsA("BasePart") then
+            return descendant
+        end
+    end
+
+    return nil
+end
+
+local function triggerAbilityEvent()
+    if not Library.Toggles.NoDashCooldown.Value then
+        return
+    end
+
+    if not LocalPlayer.Character then
+        return
+    end
+
+    ReplicatedStorage.Remotes.AbilityEvent:FireServer()
+end
+
+local function processParry()
+    if not Library.Toggles.ParryToggle.Value then
+        return
+    end
+
+    if not targetBall or not targetBall.Parent then
+        targetBall = findBall()
+    end
+
+    if targetBall and HumanoidRootPart then
+        local distance = (targetBall.Position - HumanoidRootPart.Position).Magnitude
+        local parryDistance = Library.Options.ParryDistance.Value
+
+        if Library.Toggles.LegitMode.Value then
+            parryDistance -= math.random(0, 30) / 10
+        end
+
+        local isAutoSpamActive = Library.Toggles.AutoSpam.Value
+        if isAutoSpamActive then
+            isAutoSpamActive = distance <= Library.Options.SpamDistance.Value
+        end
+
+        if isAutoSpamActive then
+            executeBlockAction()
+            return
+        end
+
+        if distance <= parryDistance then
+            executeBlockAction()
+        end
+    end
+end
+
+function executeBlockAction()
+    task.spawn(function()
+        if not Character or not Character.Parent then
+            Character = LocalPlayer.Character
+            if Character then
+                Character:WaitForChild("HumanoidRootPart")
+            end
+        end
+
+        if Library.Toggles.LegitMode.Value then
+            if math.random(1, 100) > 95 then
+                task.wait(0.08)
+            end
+            task.wait(math.random(2, 12) / 100)
+        end
+
+        local lookVector = Vector3.new(0, 0, -1)
+        if Character and Character.PrimaryPart then
+            lookVector = Character.PrimaryPart.CFrame.LookVector
+        end
+
+        local serverTime = workspace:GetServerTimeNow()
+        local blockRepeat = Library.Options.BlockRepeat.Value or 1
+        local blockDelay = Library.Options.BlockDelay.Value or 0.1
+
+        for _ = 1, blockRepeat do
+            pcall(function()
+                local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+                if remotes then
+                    local startBlockEvent = remotes:FindFirstChild("StartBlockEvent")
+                    if startBlockEvent then
+                        startBlockEvent:FireServer(serverTime)
+                    end
+
+                    local blockEvent = remotes:FindFirstChild("BlockEvent")
+                    if blockEvent and targetBall then
+                        blockEvent:FireServer(targetBall, lookVector)
+                        blockEvent:FireServer(targetBall, lookVector, "Block")
+                        blockEvent:FireServer(targetBall, lookVector, nil)
+                    end
+                end
+            end)
+
+            if blockRepeat > 1 then
+                task.wait(0.01)
+            end
+        end
+
+        pcall(function()
+            if Character then
+                Character:SetAttribute("Blocking", true)
+                task.wait(0.05)
+                Character:SetAttribute("Blocking", false)
+            end
+        end)
+        task.wait(blockDelay)
+    end)
+end
+
+local function executeDash()
+    if not Library.Toggles.NoDashCooldown.Value then
+        return
+    end
+
+    local currentCharacter = LocalPlayer.Character
+    if not currentCharacter then
+        return
+    end
+
+    local humanoid = currentCharacter:FindFirstChildOfClass("Humanoid")
+    local rootPart = currentCharacter:FindFirstChild("HumanoidRootPart")
+
+    if not humanoid or not rootPart then
+        return
+    end
+
+    humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+    task.spawn(function()
+        local endTime = tick() + 0.2
+        while endTime > tick() do
+            local moveDir = humanoid.MoveDirection
+            if moveDir.Magnitude <= 0 then
+                moveDir = rootPart.CFrame.LookVector
+            end
+            rootPart.Velocity = moveDir.Unit * 130
+            RunService.RenderStepped:Wait()
+        end
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, true)
+    end)
+
+    ReplicatedStorage.Remotes.ClientVisualEvent:Fire("Dash", currentCharacter)
+    ReplicatedStorage.Remotes.AbilityEvent:FireServer("Dash")
+end
+
+local function updateBallESP()
+    if not targetBall or not targetBall.Parent then
+        targetBall = findBall()
+    end
+
+    if Library.Toggles.BallESP.Value and targetBall then
+        if not ballHighlight or not ballHighlight.Parent then
+            ballHighlight = Instance.new("Highlight")
+            ballHighlight.Name = "BallHighlight"
+            ballHighlight.FillTransparency = 0.5
+            ballHighlight.OutlineTransparency = 0
+            ballHighlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        end
+
+        if Library.Options.EspFill then
+            ballHighlight.FillColor = Library.Options.EspFill.Value
+        end
+
+        if Library.Options.EspOutline then
+            ballHighlight.OutlineColor = Library.Options.EspOutline.Value
+        end
+
+        ballHighlight.Adornee = targetBall
+        ballHighlight.Parent = targetBall
+        ballHighlight.Enabled = true
+        return
+    end
+
+    if ballHighlight then
+        ballHighlight.Enabled = false
+    end
+end
+
+local function initializeLoops()
+    RunService.Heartbeat:Connect(function()
+        pcall(processParry)
+    end)
+    RunService.RenderStepped:Connect(function()
+        pcall(updateBallESP)
+    end)
+end
+
+parryLogicGroup:AddToggle("ParryToggle", {
+	Text = "Enable Auto Parry",
+	Default = false,
+	Callback = function(Value) end
+})
+
+parryLogicGroup:AddToggle("LegitMode", {
+	Text = "Advanced Legit Mode",
+	Default = false,
+	Callback = function(Value) end
+})
+
+parryLogicGroup:AddSlider("ParryDistance", {
+	Text = "Parry Distance",
+	Default = 15,
+	Min = 5,
+	Max = 100,
+	Rounding = 1,
+	Callback = function(Value) end
+})
+
+parryLogicGroup:AddDivider()
+
+parryLogicGroup:AddToggle("AutoSpam", {
+	Text = "Auto Spam",
+	Default = false,
+	Callback = function(Value) end
+})
+
+parryLogicGroup:AddSlider("SpamDistance", {
+	Text = "Spam Distance",
+	Default = 7,
+	Min = 3,
+	Max = 20,
+	Rounding = 1,
+	Callback = function(Value) end
+})
+
+dashAbilitiesGroup:AddToggle("NoDashCooldown", {
+	Text = "No Dash Cooldown",
+	Default = false,
+	Callback = function(Value) end
+})
+
+dashAbilitiesGroup:AddLabel("The 'No Dash Cooldown' feature is always active; even if the UI shows a cooldown, you can press dash repeatedly.", true)
+
+dashAbilitiesGroup:AddSlider("BlockRepeat", {
+	Text = "Block Repeat",
+	Default = 1,
+	Min = 1,
+	Max = 10,
+	Rounding = 0,
+	Callback = function(Value) end
+})
+
+dashAbilitiesGroup:AddSlider("BlockDelay", {
+	Text = "Block Cooldown",
+	Default = 0.3,
+	Min = 0.01,
+	Max = 1,
+	Rounding = 2,
+	Callback = function(Value) end
+})
+
+visualsGroup:AddToggle("BallESP", {
+	Text = "Ball ESP",
+	Default = false,
+	Callback = function(Value) end
+}):AddColorPicker("EspFill", {
+	Default = Color3.fromRGB(255, 0, 0)
+}):AddColorPicker("EspOutline", {
+	Default = Color3.fromRGB(255, 255, 255)
+})
+
+task.spawn(function()
+    local success, actionsContainer = pcall(function()
+        return LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Gui"):WaitForChild("ActionsContainer")
+    end)
+    
+    if success and actionsContainer then
+        local dashButton = actionsContainer:WaitForChild("DashButton", 5)
+        local abilityButton = actionsContainer:WaitForChild("AbilityButton", 5)
+
+        if dashButton then dashButton.Activated:Connect(executeDash) end
+        if abilityButton then abilityButton.Activated:Connect(triggerAbilityEvent) end
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+    Character = newCharacter
+    task.wait(0.5)
+    HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+    initializeLoops()
+end)
+
+initializeLoops()
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/game")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
