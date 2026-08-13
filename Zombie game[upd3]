@@ -2496,6 +2496,32 @@ fireclickdetector(workspace.Interaction.Ironsword.IronSword.ClickDetector)
    end,
 })
 
+local Button = Tab:CreateButton({
+   Name = "Taser MaxAmmo[20]",
+   Callback = function()
+local taserModule = game:GetService("ReplicatedStorage"):FindFirstChild("Modules", true) and game:GetService("ReplicatedStorage").Modules.Items:FindFirstChild("Taser")
+
+-- Nếu script nằm ở ModuleScript, ta tìm và hook/thay đổi trực tiếp
+local success, taser = pcall(function()
+    return require(game:GetService("ReplicatedStorage").Modules.Items.Taser)
+end)
+
+if success and type(taser) == "table" then
+    taser.MaxAmmo = 20
+    taser.AmmoPerReload = 20
+    print("Đã đổi MaxAmmo của Taser thành 20 thành công!")
+else
+    -- Cách thay thế: quét qua các gói dữ liệu đang chạy nếu module yêu cầu
+    for _, v in ipairs(getgc(true)) do
+        if type(v) == "table" and rawget(v, "MaxAmmo") and rawget(v, "ShotCooldown") then
+            v.MaxAmmo = 20
+            v.AmmoPerReload = 20
+        end
+    end
+end
+   end,
+})
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
