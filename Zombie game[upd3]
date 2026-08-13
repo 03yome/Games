@@ -2273,6 +2273,7 @@ end)
    end,
 })
 
+-- Annoy all (Hit edition)
 local annoyHitEnabled = false
 
 Tab:CreateToggle({
@@ -2283,10 +2284,16 @@ Tab:CreateToggle({
         annoyHitEnabled = Value
         local event = rStor.Remotes.ZombieRelated.PlayerAttack
         local eventC = 0
-        local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
         
-        if not lplr:FindFirstChild("Attack", true) or char:FindFirstChild("Attack", true) then 
-            Attack.Parent = lplr:WaitForChild("Backpack") 
+        -- Đảm bảo Attack được clone an toàn tránh lỗi nil instance
+        local attackSuccess, Attack = pcall(function()
+            return game:GetService("ReplicatedStorage").Attack:Clone()
+        end)
+        
+        if attackSuccess and Attack then
+            if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then 
+                Attack.Parent = lplr:WaitForChild("Backpack") 
+            end
         end
 
         if Value then
@@ -2294,13 +2301,16 @@ Tab:CreateToggle({
                 while annoyHitEnabled do
                     if find.Weapons(true) then
                         for _, v in living:GetChildren() do
+                            if not annoyHitEnabled then break end
                             if lplr.Character ~= v then
                                 local hum = v:FindFirstChildWhichIsA("Humanoid")
                                 if hum and hum.Health > 0 and hum.RootPart then
                                     if eventC < 100 then
                                         coroutine.wrap(function()
                                             eventC += 1
-                                            event:InvokeServer(hum.RootPart)
+                                            pcall(function()
+                                                event:InvokeServer(hum.RootPart)
+                                            end)
                                             eventC -= 1
                                         end)()
                                     end
@@ -2315,6 +2325,7 @@ Tab:CreateToggle({
     end,
 })
 
+-- Annoy all (Acid edition)
 local annoyAcidEnabled = false
 
 Tab:CreateToggle({
@@ -2327,7 +2338,10 @@ Tab:CreateToggle({
             task.spawn(function()
                 while annoyAcidEnabled do
                     for i = 1, 50 do
-                        game:GetService("ReplicatedStorage").Remotes.ZombieRelated.TouchedAcid:FireServer("")
+                        if not annoyAcidEnabled then break end
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Remotes.ZombieRelated.TouchedAcid:FireServer("")
+                        end)
                     end
                     task.wait(0.3)
                 end
