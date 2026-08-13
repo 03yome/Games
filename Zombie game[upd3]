@@ -2440,6 +2440,47 @@ end)
    end,
 })
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Biến lưu trạng thái của Auto Heal
+local autoHealEnabled = false
+local healConnection = nil
+
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Heal",
+   CurrentValue = false,
+   Flag = "AutoHealFlag",
+   Callback = function(Value)
+      autoHealEnabled = Value
+      
+      if autoHealEnabled then
+         healConnection = task.spawn(function()
+            while autoHealEnabled do
+               pcall(function()
+                  local medkitsFolder = workspace:FindFirstChild("Scripted") and workspace.Scripted:FindFirstChild("Medkits")
+                  
+                  if medkitsFolder then
+                     for _, child in ipairs(medkitsFolder:GetChildren()) do
+                        if child.Name == "Medkit Prop" then
+                           local prompt = child:FindFirstChild("Handle") and child.Handle:FindFirstChildOfClass("ProximityPrompt")
+                           
+                           if prompt then
+                              prompt.HoldDuration = 0
+                              fireproximityprompt(prompt)
+                           end
+                        end
+                     end
+                  end
+               end)
+               task.wait(0.5)
+            end
+         end)
+      else
+         autoHealEnabled = false
+      end
+   end,
+})
 
 Rayfield:Notify({
    Title = "Hello",
