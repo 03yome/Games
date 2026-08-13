@@ -2273,58 +2273,6 @@ end)
    end,
 })
 
--- Annoy all (Hit edition)
-local annoyHitEnabled = false
-
-Tab:CreateToggle({
-    Name = "Annoy all (Hit edition)",
-    CurrentValue = false,
-    Flag = "AnnoyHitEdition",
-    Callback = function(Value)
-        annoyHitEnabled = Value
-        local event = rStor.Remotes.ZombieRelated.PlayerAttack
-        local eventC = 0
-        
-        -- Đảm bảo Attack được clone an toàn tránh lỗi nil instance
-        local attackSuccess, Attack = pcall(function()
-            return game:GetService("ReplicatedStorage").Attack:Clone()
-        end)
-        
-        if attackSuccess and Attack then
-            if not lplr:FindFirstChild("Attack", true) and not char:FindFirstChild("Attack", true) then 
-                Attack.Parent = lplr:WaitForChild("Backpack") 
-            end
-        end
-
-        if Value then
-            task.spawn(function()
-                while annoyHitEnabled do
-                    if find.Weapons(true) then
-                        for _, v in living:GetChildren() do
-                            if not annoyHitEnabled then break end
-                            if lplr.Character ~= v then
-                                local hum = v:FindFirstChildWhichIsA("Humanoid")
-                                if hum and hum.Health > 0 and hum.RootPart then
-                                    if eventC < 100 then
-                                        coroutine.wrap(function()
-                                            eventC += 1
-                                            pcall(function()
-                                                event:InvokeServer(hum.RootPart)
-                                            end)
-                                            eventC -= 1
-                                        end)()
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    task.wait()
-                end
-            end)
-        end
-    end,
-})
-
 -- Annoy all (Acid edition)
 local annoyAcidEnabled = false
 
