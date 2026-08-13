@@ -2273,11 +2273,14 @@ end)
    end,
 })
 
+local annoyHitEnabled = false
+
 Tab:CreateToggle({
     Name = "Annoy all (Hit edition)",
     CurrentValue = false,
     Flag = "AnnoyHitEdition",
     Callback = function(Value)
+        annoyHitEnabled = Value
         local event = rStor.Remotes.ZombieRelated.PlayerAttack
         local eventC = 0
         local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
@@ -2288,8 +2291,7 @@ Tab:CreateToggle({
 
         if Value then
             task.spawn(function()
-                while Value do
-                    if not _G.AnnoyHitEnabled then break end -- Dùng để ngắt vòng lặp khi tắt toggle nếu cần
+                while annoyHitEnabled do
                     if find.Weapons(true) then
                         for _, v in living:GetChildren() do
                             if lplr.Character ~= v then
@@ -2313,14 +2315,17 @@ Tab:CreateToggle({
     end,
 })
 
+local annoyAcidEnabled = false
+
 Tab:CreateToggle({
     Name = "Annoy all (Acid edition)",
     CurrentValue = false,
     Flag = "AnnoyAcidEdition",
     Callback = function(Value)
+        annoyAcidEnabled = Value
         if Value then
             task.spawn(function()
-                while Value do
+                while annoyAcidEnabled do
                     for i = 1, 50 do
                         game:GetService("ReplicatedStorage").Remotes.ZombieRelated.TouchedAcid:FireServer("")
                     end
