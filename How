@@ -1,0 +1,2281 @@
+local TeamBarriers = {
+    "ZombieSIGN",
+    "ZombieDoor",
+    "ZombieDoor2",
+    "ZombieDoor3",
+    "NoZombie"
+}
+
+pcall(function()
+    NetworkClient:SetOutgoingKBPSLimit(tonumber("-inf"))
+end)
+
+local function rejoin()
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+end
+-----------------------------
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "V1 Script make by @romd3976",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "Zombie game [upd3]",
+   LoadingSubtitle = "Script By romd3976",
+   Theme = "DarkBlue", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = Vietnamvodich, 
+      FileName = "ควย" -- "Cock" (slang)
+   },
+
+   Discord = {
+      Enabled = false, 
+      Invite = "noinvitelink", 
+      RememberJoins = true 
+   },
+
+   KeySystem = false, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "My rolbox profile 'romd3976'",
+      Subtitle = "Key",
+      Note = "Key is on the YT", -- Use this to tell the user how to get a key
+      FileName = "Key", 
+      SaveKey = true, 
+      GrabKeyFromSite = false,
+      Key = {"222554"} 
+   }
+})
+
+local Tab = Window:CreateTab("Main", nil)
+local Section = Tab:CreateSection("Acid aura")
+-----------------------------------------------------------------------------------------------
+-- Starting values
+local radius = 200
+local numShots = 500
+local maxRadius = 200
+local maxNumShots = 10000
+
+-- Toggle to enable/disable the script
+local enabled = false
+
+local canShoot = true  -- Add a flag to control the shooting rate
+
+local function updateScriptPosition()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()  -- Wait for character to load
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")  -- Wait for HumanoidRootPart to load
+
+    for i = 1, numShots do
+        if not enabled then
+            break  -- Exit the loop if the script is disabled
+        end
+        
+        -- Randomly generate x, y, z offset within a range
+        local randomOffset = Vector3.new(
+            math.random(-radius, radius),  -- Random x within range
+            math.random(-radius, radius),  -- Random y within range (optional for height)
+            math.random(-radius, radius)   -- Random z within range
+        )
+        
+        local targetPosition = humanoidRootPart.Position + randomOffset
+
+        local args = {
+            [1] = targetPosition,
+            [2] = targetPosition + Vector3.new(0, 0, 0)
+        }
+
+        -- Fire the Remote
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("AcidSpit"):FireServer(unpack(args))
+
+        task.wait(0)  -- Adjust this value to make the shots faster (lower value = faster)
+    end
+end
+
+local function toggle()
+    enabled = not enabled
+    if enabled then
+        print("Esas")
+        -- แจ้งเตือนเมื่อเปิด
+        Rayfield:Notify({
+            Title = "Script Enabled",
+            Content = "The script is now running.",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    else
+        print("coff!")
+        -- แจ้งเตือนเมื่อปิด
+        Rayfield:Notify({
+            Title = "Script Disabled",
+            Content = "The script has been disabled.",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- Loop to update and shoot (continually checks if enabled)
+task.spawn(function()
+    while true do
+        if enabled then
+            updateScriptPosition()
+        end
+        task.wait(0)  -- Wait for 2 seconds before next action (can adjust as needed)
+    end
+end)
+
+-- Listen for character respawn (to ensure the script works after death)
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    print("CE")
+    if enabled then
+        updateScriptPosition()  -- Call the function again when character respawns
+    end
+end)
+
+-- UI Elements for radius and numShots
+local Slider = Tab:CreateSlider({
+    Name = "Radius",
+    Range = {0, maxRadius},
+    Increment = 10,
+    Suffix = "Range",
+    CurrentValue = radius,
+    Flag = "Slider1", 
+    Callback = function(Value)
+        radius = Value
+        print("etoe: " .. radius)
+    end,
+})
+
+local SliderNumShots = Tab:CreateSlider({
+    Name = "Number of Shots",
+    Range = {0, maxNumShots},
+    Increment = 10,
+    Suffix = "Shots",
+    CurrentValue = numShots,
+    Flag = "Slider2", 
+    Callback = function(Value)
+        numShots = Value
+        print("rtor: " .. numShots)
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+    Name = "Acid aura",
+    CurrentValue = enabled,
+    Flag = "Toggle1", 
+    Callback = function(Value)
+        enabled = Value
+        if enabled then
+            print("runnin!")
+            -- แจ้งเตือนเมื่อเปิด
+            Rayfield:Notify({
+                Title = "Script Activated",
+                Content = "The script is running!",
+                Duration = 6.5,
+                Image = 4483362458,
+            })
+        else
+            print("coff7")
+            -- แจ้งเตือนเมื่อปิด
+            Rayfield:Notify({
+                Title = "Script Deactivated",
+                Content = "The script has been turned off!",
+                Duration = 6.5,
+                Image = 4483362458,
+            })
+        end
+    end,
+})
+
+-----------------------------------------------------------------------------------------------
+local Section = Tab:CreateSection("Idk But its acid")
+-----------------------------------------------------------------------------------------------
+-- Starting values
+local radius = 3
+local numShots = 10
+local maxRadius = 1000
+local maxNumShots = 10000
+
+-- Slider for range
+local RadiusSlider = Tab:CreateSlider({
+    Name = "Control Range",
+    Range = {1, maxRadius},
+    Increment = 1,
+    Suffix = "Range",
+    CurrentValue = radius,
+    Flag = "RadiusSlider",
+    Callback = function(Value)
+        radius = Value
+    end,
+})
+
+-- Slider for number of shots
+local ShotsSlider = Tab:CreateSlider({
+    Name = "Number of Shots",
+    Range = {1, maxNumShots},
+    Increment = 1,
+    Suffix = "Shots",
+    CurrentValue = numShots,
+    Flag = "ShotsSlider",
+    Callback = function(Value)
+        numShots = Value
+    end,
+})
+
+local enabled = false
+
+local function updateScriptPosition()
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    local angleStep = math.pi * 2 / numShots
+    for i = 0, numShots - 1 do
+        local angle = angleStep * i
+        local offset = Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
+        local targetPosition = humanoidRootPart.Position + offset
+
+        local args = {
+            [1] = targetPosition,
+            [2] = targetPosition + Vector3.new(0, 0, 0)
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("AcidSpit"):FireServer(unpack(args))
+    end
+end
+
+-- Toggle to enable/disable script
+local Toggle = Tab:CreateToggle({
+    Name = "Toggle Script",
+    CurrentValue = false,
+    Flag = "Toggle1", -- A flag to uniquely identify this toggle
+    Callback = function(Value)
+        enabled = Value
+        if enabled then
+            Rayfield:Notify({
+                Title = "Script Activated",
+                Content = "The script is running!",
+                Duration = 3
+            })
+        else
+            Rayfield:Notify({
+                Title = "Script Deactivated",
+                Content = "The script has been turned off!",
+                Duration = 3
+            })
+        end
+    end,
+})
+
+-- Loop to update and shoot
+task.spawn(function()
+    while true do
+        if enabled then
+            updateScriptPosition()
+        end
+        task.wait(2)
+    end
+end)
+
+------------------------------------------------------------------------
+local Section = Tab:CreateSection("Idk funtion Ver.2") -- "I don't know the function, I don't want to name it round two"
+------------------------------------------------------------------------
+
+-- ฟังก์ชันการตั้งค่า Sniper
+local function equipSniper()
+    local args = {
+        [1] = "Sniper"
+    }
+
+    local success, message = pcall(function()
+        -- รันคำสั่ง Remote เพื่อติดตั้ง Sniper
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+    end)
+
+    if success then
+        print("Sniper")
+
+        -- รอให้ Sniper เข้ามาใน Backpack
+        local player = game.Players.LocalPlayer
+        local sniper = player.Backpack:WaitForChild("Sniper", 5)  -- รอไม่เกิน 5 วินาทีให้ Sniper มาใน Backpack
+
+        if sniper then
+            -- ย้าย Sniper ไปที่ตัวละคร
+            sniper.Parent = player.Character
+            sniper.Handle.CFrame = player.Character.HumanoidRootPart.CFrame  -- ทำการย้ายให้ตรงกับตำแหน่งของตัวละคร
+
+            print("SniperMOVE")
+        else
+            print("ไม่รู้เจอ Sniper")
+        end
+    else
+        print("Error Sniper: " .. message)
+    end
+end
+--------------------------------------------------------------
+-- ฟังก์ชันการโจมตีสิ่งที่ชื่อว่า Zombie, Boss หรือ Summon
+local function attackZombieBossSummonObjects()
+    local player = game.Players.LocalPlayer
+
+    -- ลูปตรวจสอบทุกๆ object ใน LivingThings
+    for _, object in pairs(workspace.LivingThings:GetChildren()) do
+        -- ตรวจสอบว่า object มีคำว่า "Zombie", "Boss", หรือ "Summon" ในชื่อ
+        if (string.match(object.Name, "Zombie") or string.match(object.Name, "Boss") or string.match(object.Name, "Summon")) then
+            -- ตรวจสอบว่า object มี HumanoidRootPart
+            if object:FindFirstChild("HumanoidRootPart") then
+                -- คำนวณระยะห่างระหว่าง player กับ object
+                local distance = (player.Character.HumanoidRootPart.Position - object.HumanoidRootPart.Position).magnitude
+
+                -- ถ้าระยะห่างน้อยกว่า 50 หน่วย (สามารถปรับระยะห่างได้)
+                if distance < 200 then
+                    print("ATTACK หำเสียบหี: " .. object.Name)
+
+                    -- ส่งคำสั่งยิงไปที่ object
+                    local args = {
+                        [1] = "GUN_DAMAGE",
+                        [2] = object
+                    }
+
+                    -- ส่งคำสั่งไปยัง remote
+                    game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+                    -- หน่วงเวลา 0.1 วินาทีก่อนยิงครั้งที่สอง
+                    wait(0.1)
+
+                    -- ส่งคำสั่งยิงอีกครั้ง
+                    game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+                end
+            end
+        end
+    end
+end
+--------------------------------------------------------------------
+-- ฟังก์ชันสำหรับการเปิด/ปิด Toggle
+local enabled = false
+local function toggle()
+    enabled = not enabled
+    if enabled then
+        Rayfield:Notify({
+            Title = "Script Activated",
+            Content = "The script is running!",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+
+        -- เรียกฟังก์ชัน Sniper ก่อน
+        equipSniper()
+
+        -- จากนั้นเริ่มการโจมตี NPC
+        task.spawn(function()
+            while enabled do
+                attackZombieBossSummonObjects()  -- เรียกฟังก์ชันโจมตี
+                wait(0.1)  -- หน่วงเวลา 0.1 วินาที
+            end
+        end)
+    else
+        Rayfield:Notify({
+            Title = "Script Deactivated",
+            Content = "The script has been turned off!",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- ปุ่ม UI สำหรับเปิด/ปิดสคริปต์
+local Toggle = Tab:CreateToggle({
+    Name = "Kill all zombieNpc (Hold Sniper)",
+    CurrentValue = false,
+    Flag = "Toggle1",  -- Flag สำหรับการจัดการค่าต่างๆ
+    Callback = function(Value)
+        toggle()  -- เรียกฟังก์ชัน toggle
+    end,
+})
+
+-------------------------------------------------------------------------
+-- ฟังก์ชันการเลือก Sniper
+local function equipSniper()
+    local args = {
+        [1] = "Sniper"
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+    -- รอ Sniper อยู่ใน Backpack และย้ายไปที่ตัวละคร
+    local player = game.Players.LocalPlayer
+    local backpack = player.Backpack
+    local sniper = backpack:WaitForChild("Sniper")
+
+    sniper.Parent = player.Character  -- ย้าย Sniper ไปที่ตัวละครของผู้เล่น
+end
+
+-- ฟังก์ชันการโจมตีผู้เล่นในทีม Zombie
+local function attackNearbyPlayers()
+    local player = game.Players.LocalPlayer
+    local closestPlayer = nil
+    local shortestDistance = math.huge  -- ค่าเริ่มต้นระยะทางที่ไม่จำกัด
+    local zombieTeam = game.Teams:FindFirstChild("Zombie")  -- ตรวจสอบทีมที่ชื่อ "Zombie" ในเกม
+
+    -- ลูปตรวจสอบผู้เล่นทุกคนในเกม
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        -- ตรวจสอบว่าผู้เล่นไม่ใช่ตัวเอง
+        if otherPlayer ~= player then
+            local character = otherPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                -- คำนวณระยะทางระหว่างตัวเราและผู้เล่น
+                local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
+
+                -- ตรวจสอบว่าผู้เล่นอยู่ในทีม Zombie หรือไม่
+                if otherPlayer.Team == zombieTeam then
+                    -- ถ้าผู้เล่นอยู่ในทีม Zombie และเป็นผู้เล่นที่ใกล้ที่สุด
+                    if distance < shortestDistance then
+                        shortestDistance = distance
+                        closestPlayer = otherPlayer
+                    end
+                end
+            end
+        end
+    end
+
+    -- ถ้ามีผู้เล่นในทีม Zombie ใกล้ที่สุด, โจมตี
+    if closestPlayer then
+        print("ATTACK หำเสียดาก: " .. closestPlayer.Name)  -- พิมพ์ชื่อผู้เล่นที่กำลังโจมตี
+        local args = {
+            [1] = "GUN_DAMAGE",
+            [2] = closestPlayer.Character -- ส่งคำสั่งไปยังตัวละครของผู้เล่นใกล้ที่สุด
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+    end
+end
+
+-- ตัวแปรเพื่อเปิด/ปิดฟังก์ชัน
+local enabled = false
+
+-- ฟังก์ชันสำหรับการเปิด/ปิด Toggle
+local function toggle()
+    enabled = not enabled
+    if enabled then
+        -- แจ้งเตือนเมื่อเปิดใช้งาน
+        Rayfield:Notify({
+            Title = "Script Activated",
+            Content = "The script is running!",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+
+        -- เรียกฟังก์ชันเลือก Sniper ก่อน
+        equipSniper()
+
+        -- เริ่มรันฟังก์ชันโจมตี
+        task.spawn(function()
+            while true do
+                if enabled then
+                    attackNearbyPlayers()  -- เรียกฟังก์ชันโจมตี
+                end
+                wait(0.1)  -- หน่วงเวลา 0.1 วินาที
+            end
+        end)
+
+    else
+        -- แจ้งเตือนเมื่อปิดใช้งาน
+        Rayfield:Notify({
+            Title = "Script Deactivated",
+            Content = "The script has been turned off",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- ปุ่ม UI สำหรับเปิด/ปิดสคริปต์
+local Toggle = Tab:CreateToggle({
+    Name = "Kill all zombie player (Hold Sniper)",
+    CurrentValue = false,
+    Flag = "Toggle1",  -- Flag สำหรับการจัดการค่าต่างๆ
+    Callback = function(Value)
+        toggle()  -- เรียกฟังก์ชัน toggle
+    end,
+})
+
+----------------------------------------------------------------------
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local ZombieRelated = Remotes:WaitForChild("ZombieRelated")
+local PlayerAttack = ZombieRelated:WaitForChild("PlayerAttack")
+
+local attacking = false -- ตัวแปรสถานะการโจมตี
+
+-- ฟังก์ชันค้นหาผู้เล่นที่ใกล้ที่สุดในทีม Human
+local function getClosestHuman()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer -- ไม่ตรวจจับ LocalPlayer
+            and player.Team and player.Team.Name == "Human" 
+            and player.Character and player.Character:FindFirstChild("Head") then
+
+            local distance = (player.Character.Head.Position - Players.LocalPlayer.Character.Head.Position).Magnitude
+            if distance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = distance
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+-- สร้าง Toggle UI สำหรับเปิด/ปิดการโจมตี
+local Toggle = Tab:CreateToggle({
+    Name = "Inject aura",
+    CurrentValue = false,
+    Flag = "ToggleAttack",
+    Callback = function(Value)
+        attacking = Value -- เปลี่ยนสถานะการโจมตีตามค่าของ Toggle
+        if attacking then
+            print("เปริด")
+        else
+            print("ปิด")
+        end
+    end,
+})
+
+-- ลูปตรวจสอบและโจมตี
+task.spawn(function()
+    while true do
+        if attacking then
+            local target = getClosestHuman()
+
+            if target then
+                print("กำลังแทงรู Ass ของ:", target.Name)
+
+                while attacking and target and target.Team and target.Team.Name == "Human" 
+                    and target.Character and target.Character:FindFirstChild("Head") do
+                    
+                    -- คำนวณเป้าหมายใหม่
+                    local closestTarget = getClosestHuman()
+
+                    if closestTarget and closestTarget ~= target then
+                        print("เปลี่ยนหัว:", closestTarget.Name)
+                        target = closestTarget
+                    end
+
+                    -- รันคำสั่งโจมตี
+                    local args = {
+                        [1] = target.Character.Head
+                    }
+                    PlayerAttack:InvokeServer(unpack(args))
+                    print("กำลังแอ็คแท็กกะระแก็กกุ๊กกั๊ก:", target.Name)
+                end
+
+                print("เป้าหมาย", target.Name, "เปลี่ยนทรีมหรือไมร่ใชร่เปล้าหมาย")
+            else
+                print("หาคนใน Human ไม่เจอไอสัส")
+            end
+        end
+        task.wait(0) -- ตรวจสอบใหม่ทันที
+    end
+end)
+
+----------------------------------------------------------------------
+-- สถานะการเปิด/ปิด
+local enabled = false
+
+-- ฟังก์ชันหลักสำหรับโจมตีสิ่งมีชีวิตในระยะ
+local function damageNearbyEntities()
+    local livingThings = workspace:FindFirstChild("LivingThings")
+    if not livingThings then
+        warn("ไม่พบโฟลเดอร์ LivingThings ใน workspace!")
+        return
+    end
+
+    -- รับตัวละครและตำแหน่งของผู้เล่น
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local playerPosition = character:WaitForChild("HumanoidRootPart").Position
+
+    local args = {}
+    local anyEntitiesInRange = false
+
+    -- ตรวจสอบสิ่งมีชีวิตทั้งหมดใน LivingThings (เช่น ซอมบี้และผู้เล่นอื่น)
+    for _, obj in pairs(livingThings:GetChildren()) do
+        -- ข้ามถ้าเป็น "HumanNpc" หรือเป็น LocalPlayer
+        if obj.Name == "HumanNpc" or obj == player.Character then
+            continue
+        end
+
+        -- ตรวจสอบว่า obj มีส่วน Head และยังคงอยู่ในเกม
+        if obj:FindFirstChild("Head") and obj.Head.Parent then
+            local objectPosition = obj.Head.Position
+            if (playerPosition - objectPosition).Magnitude <= 5 then
+                table.insert(args, obj.Head)  -- เพิ่มในรายการเป้าหมาย
+                anyEntitiesInRange = true
+                print("ATTACK: " .. obj.Name)  -- พิมพ์ชื่อของเป้าหมายที่ถูกโจมตี
+            end
+        end
+    end
+
+    -- ตรวจสอบผู้เล่นอื่นทั้งหมด (ไม่ใช่ LocalPlayer)
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player then
+            local otherCharacter = otherPlayer.Character
+            if otherCharacter and otherCharacter:FindFirstChild("HumanoidRootPart") then
+                local otherPosition = otherCharacter.HumanoidRootPart.Position
+                if (playerPosition - otherPosition).Magnitude <= 5 then
+                    local head = otherCharacter:FindFirstChild("Head")
+                    if head then
+                        table.insert(args, head)  -- เพิ่มในรายการเป้าหมาย
+                        anyEntitiesInRange = true
+                        print("ATTACK: " .. otherPlayer.Name)  -- พิมพ์ชื่อผู้เล่นที่ถูกโจมตี
+                    end
+                end
+            end
+        end
+    end
+
+    -- ถ้ามีเป้าหมายที่โจมตีได้ ส่งความเสียหายไปทั้งหมด
+    if #args > 0 then
+        local success, errorMessage = pcall(function()
+            -- ส่งความเสียหายไปยังเป้าหมายทั้งหมด
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Melee"):WaitForChild("Damage"):InvokeServer(unpack(args))
+        end)
+        if not success then
+            warn("เกิดข้อผิดพลาดในการส่งข้อมูลไปยังเซิร์ฟเวอร์: " .. errorMessage)
+        end
+    end
+end
+
+-- ฟังก์ชันเปิด/ปิดจาก UI
+local function toggle()
+    if enabled then
+        Rayfield:Notify({
+            Title = "Script Activated",
+            Content = "The script is running!",
+            Duration = 3,
+            Image = 4483362458,
+        })
+    else
+        Rayfield:Notify({
+            Title = "Script Deactivated",
+            Content = "The script has been turned off!",
+            Duration = 3,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- ผูกการเปิด/ปิดกับปุ่ม UI
+Tab:CreateToggle({
+    Name = "Kill aura (Melee Weapons/Must be Human team)",
+    CurrentValue = false,
+    Flag = "DamageToggle", -- ธงสำหรับบันทึกสถานะ
+    Callback = function(Value)
+        enabled = Value
+        toggle()  -- แสดงการแจ้งเตือนเมื่อกดปุ่ม
+    end
+})
+
+-- ลูปการโจมตีทุก 0.1 วินาที ทำงานเฉพาะเมื่อ enabled เป็น true
+task.spawn(function()
+    while true do
+        if enabled then
+            damageNearbyEntities()  -- ทำงานฟังก์ชันโจมตีเป้าหมายทั้งหมด
+        end
+        task.wait(0.1) -- รอ 0.1 วินาทีก่อนทำงานใหม่
+    end
+end)
+-------------------------------------------------------------------
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local Remotes = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Guns")
+local ShopRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon")
+local NetworkClient = game:GetService("NetworkClient")
+local TeleportService = game:GetService("TeleportService")
+
+local restrictedPart = workspace.Map:GetChildren()[153] 
+local restrictedCFrame = restrictedPart.CFrame
+local restrictedSize = restrictedPart.Size
+
+local isAutoAttackEnabled = false 
+
+local Toggle = Tab:CreateToggle({ 
+   Name = "Raygun aura (When you are on human team you can attack other humans)",
+   CurrentValue = false,
+   Flag = "AutoAttackToggle",
+   Callback = function(Value)
+       isAutoAttackEnabled = Value
+   end,
+})
+
+local function isTargetInRestrictedArea(target)
+    if not target or not target.Character or not restrictedPart then return false end
+    local rootPart = target.Character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return false end
+
+    local relativePos = restrictedCFrame:PointToObjectSpace(rootPart.Position)
+    return math.abs(relativePos.X) <= restrictedSize.X / 2 and
+           math.abs(relativePos.Y) <= restrictedSize.Y / 2 and
+           math.abs(relativePos.Z) <= restrictedSize.Z / 2
+end
+
+-- **🔹 ตรวจสอบว่าเป้าหมายตายหรือยัง**
+local function isTargetDead(target)
+    if not target or not target.Character then return true end
+    local humanoid = target.Character:FindFirstChild("Humanoid")
+    return humanoid == nil or humanoid.Health <= 0
+end
+
+local function getClosestValidPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    local myCharacter = LocalPlayer.Character
+    if not myCharacter then return nil end
+
+    local myRoot = myCharacter:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return nil end
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            local enemyRoot = player.Character:FindFirstChild("HumanoidRootPart")
+            if enemyRoot and not isTargetInRestrictedArea(player) and not isTargetDead(player) then
+                local distance = (myRoot.Position - enemyRoot.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function attackTarget(target)
+    if not target or not target.Character then return end
+    local rootPart = target.Character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return end
+
+    -- **🔹 ถ้าเป้าหมายตายแล้ว ให้เปลี่ยนเป้าหมายทันที**
+    if isTargetDead(target) then
+        return
+    end
+
+    print("ATKING:", target.Name) 
+
+    local bulletArgs = {
+        [1] = {
+            [1] = LocalPlayer.Character.HumanoidRootPart.Position,
+            [2] = rootPart.Position
+        },
+        [2] = "Raygun"
+    }
+    Remotes:WaitForChild("ReplicateBullet"):FireServer(unpack(bulletArgs))
+
+    local damageArgs = {
+        [1] = rootPart
+    }
+    Remotes:WaitForChild("Damage"):FireServer(unpack(damageArgs))
+end
+
+task.spawn(function()
+    while true do
+        if isAutoAttackEnabled then
+            local target = getClosestValidPlayer()
+            if target then
+                attackTarget(target)
+            end
+        end
+        task.wait()
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if isAutoAttackEnabled then
+            Remotes:WaitForChild("Reload"):FireServer()
+        end
+        task.wait(0.01)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if isAutoAttackEnabled then
+            local character = LocalPlayer.Character
+            if character and not character:FindFirstChild("Raygun") then
+                local buyArgs = { [1] = "Raygun" }
+                ShopRemote:InvokeServer(unpack(buyArgs))
+
+                task.wait(0.01) 
+
+                local backpack = LocalPlayer:FindFirstChild("Backpack")
+                if backpack then
+                    local raygun = backpack:FindFirstChild("Raygun")
+                    if raygun then
+                        raygun.Parent = character
+                    end
+                end
+            end
+        end
+        task.wait(0.01)
+    end
+end)
+
+-------------------------------------------------------------------
+local Section = Tab:CreateSection("Idk funtion Ver.3")
+local Input = Tab:CreateInput({
+    Name = "Summon Count ⚠️WARNING⚠️ SHOULD NOT EXCEED 50",
+    CurrentValue = "",
+    PlaceholderText = "Enter number of zombies",
+    RemoveTextAfterFocusLost = false,
+    Flag = "Input1",
+    Callback = function(Text)
+        local number = tonumber(Text)
+        if number and number > 0 then
+            summonCount = number  -- Save inputted number globally
+            Rayfield:Notify({
+                Title = "Success",
+                Content = "Set summon count to " .. number,
+                Duration = 2,
+                Image = 4483362458,
+                Actions = { }
+            })
+        else
+            Rayfield:Notify({
+                Title = "Error",
+                Content = "Please enter a valid number!",
+                Duration = 2,
+                Image = 4483362458,
+                Actions = { }
+            })
+        end
+    end
+})
+
+local Button = Tab:CreateButton({
+    Name = "Summon Zombies",
+    Callback = function()
+        if summonCount > 0 then
+            for i = 1, summonCount do
+                game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("Necro"):WaitForChild("AbilityPlayer"):FireServer()
+                task.wait(0)
+            end
+            Rayfield:Notify({
+                Title = "Summoning...",
+                Content = "Summoned " .. summonCount .. " zombies!",
+                Duration = 2,
+                Image = 4483362458,
+                Actions = { }
+            })
+        else
+            Rayfield:Notify({
+                Title = "Error",
+                Content = "Please set a summon count first!",
+                Duration = 2,
+                Image = 4483362458,
+                Actions = { }
+            })
+        end
+    end
+})
+
+-------------------------------------------------------------
+local Section = Tab:CreateSection("Idk funtion Ver.4")
+local isProcessing = false  -- ตัวแปรเช็คว่าเรากำลังประมวลผลหรือไม่
+local remoteConnection = nil  -- ตัวแปรสำหรับเก็บการเชื่อมต่อ event
+
+local function createConnection()
+    -- ตรวจจับเมื่อ ReplicateBullet ทำงาน
+    remoteConnection = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Guns"):WaitForChild("ReplicateBullet").OnClientEvent:Connect(function(...)
+
+        -- ถ้าไม่กำลังประมวลผลการยิง Remote อยู่
+        if not isProcessing then
+            -- ตั้งสถานะเป็นกำลังประมวลผล
+            isProcessing = true
+            print("Fuck You")  -- เมื่อยิงไปที่ remote นี้ จะพิมพ์ว่า "เจอแล้ว"
+            
+            -- รันคำสั่งเพื่อเลือก Sniper
+            local args = {
+                [1] = "Sniper"
+            }
+
+            -- ส่งคำสั่งไปยัง server เพื่อให้เลือกอาวุธ Sniper
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+            -- หน่วงเวลา 0.1 วินาที เพื่อให้ Sniper ถูกเสกใหม่ใน Backpack
+            wait(0.1)
+
+            -- ตรวจจับ Sniper ที่ถูกเพิ่มเข้ามาใน Backpack ของ LocalPlayer
+            local player = game:GetService("Players").LocalPlayer
+            local backpack = player.Backpack
+
+            -- รอจนกว่า Sniper จะถูกเพิ่มเข้ามา
+            local sniper = backpack:WaitForChild("Sniper")
+
+            -- หน่วงเวลา 0.1 วินาที ก่อนย้าย Sniper
+            wait(0.1)
+
+            -- ย้าย Sniper ไปที่ LocalPlayer หรือตำแหน่งที่ต้องการ
+            sniper.Parent = player.Character  -- สามารถเปลี่ยนเป็นตำแหน่งที่คุณต้องการได้
+
+            print("Sniper")
+
+            -- ตั้งสถานะเป็นเสร็จสิ้นการประมวลผล
+            isProcessing = false
+        end
+    end)
+end
+--------------------------------------------------
+local Toggle = Tab:CreateToggle({
+    Name = "Bypass Cooldown Sniper(Deving)",  -- ชื่อ Toggle ที่จะแสดงใน UI
+    CurrentValue = false,  -- เริ่มต้น Toggle ปิด
+    Flag = "Toggle1",  -- Flag สำหรับการจัดการค่าต่างๆ ใน config file
+    Callback = function(Value)
+        if Value then
+            -- ถ้าเปิด Toggle
+            print("Fuck You")
+            
+            -- แสดง Notify เมื่อเปิด Toggle
+            Rayfield:Notify({
+                Title = "Script Activated",
+                Content = "Sniper Action Activated",
+                Duration = 3,  -- แสดง Notify 3 วินาที
+                Image = 4483362458,
+            })
+            
+            -- ถ้ายังไม่มีการเชื่อมต่อ event ก่อนหน้า
+            if remoteConnection == nil then
+                createConnection()  -- สร้างการเชื่อมต่อ
+            end
+        else
+            -- ถ้าปิด Toggle
+            print("Fuck You")
+            
+            -- แสดง Notify เมื่อปิด Toggle
+            Rayfield:Notify({
+                Title = "script Deactivated",
+                Content = "Sniper Action Deactivated",
+                Duration = 3,  -- แสดง Notify 3 วินาที
+                Image = 4483362458,
+            })
+            
+            -- เมื่อปิด Toggle ให้หยุดการทำงานของ Remote โดยการ disconnect
+            if remoteConnection then
+                remoteConnection:Disconnect()  -- หยุดการเชื่อมต่อ Event
+                remoteConnection = nil  -- รีเซ็ตการเชื่อมต่อ
+                print("เชื่อมต่อ Event ReplicateBulletไม่รู้หยุดควย")
+            end
+        end
+    end,
+})
+
+-- เมื่อเกิดใหม่ ให้รีเซ็ตการเชื่อมต่อและสร้างใหม่
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+    -- ปิดการเชื่อมต่อเก่า หากมี
+    if remoteConnection then
+        remoteConnection:Disconnect()  -- หยุดการเชื่อมต่อเก่า
+        remoteConnection = nil
+    end
+
+    -- สร้างการเชื่อมต่อใหม่หลังเกิดใหม่
+    wait(0.5)  -- หน่วงเวลาเล็กน้อย เพื่อให้แน่ใจว่า Character ถูกโหลดเสร็จ
+    if Toggle.CurrentValue then  -- ถ้า Toggle ยังเปิดอยู่
+        createConnection()  -- สร้างการเชื่อมต่อใหม่
+    end
+end)
+
+-----------------------------------------------------------------------
+local Section = Tab:CreateSection("Idk funtion Ver.5")
+-----------------------------------------------------------------------
+-- ตัวแปรหลัก
+local player = game.Players.LocalPlayer
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local livingThings = game.Workspace:WaitForChild("LivingThings")  -- โฟลเดอร์ LivingThings
+
+local enabled = false  -- ตัวแปรควบคุมสถานะการทำงานของสคริปต์
+
+-- ฟังก์ชันสำหรับสร้าง Part ที่ตำแหน่งและขนาดที่ต้องการ
+local function createPart()
+    local part = Instance.new("Part")  -- สร้าง Part ใหม่
+    part.Size = Vector3.new(2, 1, 1)  -- กำหนดขนาด
+    part.Position = Vector3.new(-53, -17.2714882, 170.868057)  -- กำหนดตำแหน่ง
+    part.CFrame = CFrame.new(-53, -17.2714882, 170.868057)  -- กำหนด CFrame
+    part.Anchored = true  -- ทำให้ Part ไม่เคลื่อนที่
+    part.Parent = game.Workspace  -- วาง Part ใน Workspace
+    print("Part ถูกสร้างเรียบร้อยแล้ว!")
+end
+
+-- ฟังก์ชันที่ตรวจสอบว่ามี Object ที่มีคำว่า "Summon" อยู่ใน workspace.LivingThings หรือไม่
+local function checkIfSummonExists()
+    for _, obj in pairs(livingThings:GetChildren()) do
+        if string.find(obj.Name, "Summon") then
+            return true
+        end
+    end
+    return false
+end
+
+-- ฟังก์ชันสำหรับการติดตั้ง Sniper
+local function equipSniper()
+    local args = {
+        [1] = "Sniper"
+    }
+
+    local success, message = pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+    end)
+
+    if success then
+        print("Sniper ถูกติดตั้งเรียบร้อยแล้ว!")
+
+        local sniper = player.Backpack:WaitForChild("Sniper", 5)  -- รอไม่เกิน 5 วินาทีให้ Sniper มาใน Backpack
+
+        if sniper then
+            sniper.Parent = player.Character
+            sniper.Handle.CFrame = player.Character.HumanoidRootPart.CFrame
+            print("Sniper ถูกย้ายไปที่ตัวละครแล้ว!")
+        else
+            print("ไม่พบ Sniper ใน Backpack")
+        end
+    else
+        print("เกิดข้อผิดพลาดในการติดตั้ง Sniper: " .. message)
+    end
+end
+
+-- ฟังก์ชันสำหรับการโจมตีสิ่งที่ชื่อว่า Zombie, Boss หรือ Summon
+local function attackZombieBossSummonObjects()
+    for _, object in pairs(livingThings:GetChildren()) do
+        if string.find(object.Name, "Zombie") or string.find(object.Name, "Boss") or string.find(object.Name, "Summon") then
+            if object:FindFirstChild("HumanoidRootPart") then
+                local distance = (player.Character.HumanoidRootPart.Position - object.HumanoidRootPart.Position).magnitude
+
+                if distance < 200 then
+                    print("กำลังยิงใส่: " .. object.Name)
+
+                    local args = {
+                        [1] = "GUN_DAMAGE",
+                        [2] = object
+                    }
+
+                    game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+                    wait(0.1)
+                    game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+                end
+            end
+        end
+    end
+end
+
+-- ฟังก์ชันการโจมตีผู้เล่นในทีม Zombie
+local function attackZombiePlayers()
+    local closestPlayer = nil
+    local shortestDistance = math.huge  -- ค่าเริ่มต้นระยะทางที่ไม่จำกัด
+    local zombieTeam = game.Teams:FindFirstChild("Zombie")  -- ตรวจสอบทีมที่ชื่อ "Zombie" ในเกม
+
+    -- ลูปตรวจสอบผู้เล่นทุกคนในเกม
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        -- ตรวจสอบว่าผู้เล่นไม่ใช่ตัวเอง
+        if otherPlayer ~= player then
+            local character = otherPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                -- คำนวณระยะทางระหว่างตัวเราและผู้เล่น
+                local distance = (player.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
+
+                -- ตรวจสอบว่าผู้เล่นอยู่ในทีม Zombie หรือไม่
+                if otherPlayer.Team == zombieTeam then
+                    -- ถ้าผู้เล่นอยู่ในทีม Zombie และเป็นผู้เล่นที่ใกล้ที่สุด
+                    if distance < shortestDistance then
+                        shortestDistance = distance
+                        closestPlayer = otherPlayer
+                    end
+                end
+            end
+        end
+    end
+
+    -- ถ้ามีผู้เล่นในทีม Zombie ใกล้ที่สุด, โจมตี
+    if closestPlayer then
+        print("ATTACK หำเสียดาก: " .. closestPlayer.Name)  -- พิมพ์ชื่อผู้เล่นที่กำลังโจมตี
+        local args = {
+            [1] = "GUN_DAMAGE",
+            [2] = closestPlayer.Character -- ส่งคำสั่งไปยังตัวละครของผู้เล่นใกล้ที่สุด
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+    end
+end
+
+-- ฟังก์ชันหลักสำหรับการทำงาน
+local function runScript()
+    createPart() -- สร้าง Part ก่อนเริ่มการทำงาน
+
+    equipSniper() -- ติดตั้ง Sniper
+
+    -- วาปไปยังตำแหน่งแรก
+    player.Character:SetPrimaryPartCFrame(CFrame.new(24.6698666, -13.1000013, 172.747742))
+
+    -- รัน Remote Ability 30 ครั้ง
+    local remotes = replicatedStorage:WaitForChild("Remotes"):WaitForChild("ZombieRelated"):WaitForChild("Necro"):WaitForChild("AbilityPlayer")
+    for i = 1, 30 do
+        if not enabled then return end
+        remotes:FireServer()
+        wait(0)
+    end
+
+    -- วาปไปยังตำแหน่งที่สอง
+    player.Character:SetPrimaryPartCFrame(CFrame.new(-53.1791, -13.7714891, 170.809448, 0.997564018, -1.94691321e-08, -0.0697569549, 2.16139568e-08, 1, 2.99923215e-08, 0.0697569549, -3.14269855e-08, 0.997564018))
+
+    -- วนตรวจสอบและโจมตี
+    while enabled do
+        attackZombieBossSummonObjects() -- โจมตีเป้าหมาย
+        attackZombiePlayers()  -- โจมตีผู้เล่นในทีม Zombie
+
+        if not checkIfSummonExists() then
+            print("ไม่มี Summon เหลืออยู่ กำลังย้อนกลับไปที่ขั้นตอนที่ 3...")
+            -- วาปกลับไปยังตำแหน่งแรก
+            player.Character:SetPrimaryPartCFrame(CFrame.new(24.6698666, -13.1000013, 172.747742))
+
+            -- รัน Remote Ability 30 ครั้ง
+            for i = 1, 30 do
+                if not enabled then return end
+                remotes:FireServer()
+                wait(0)
+            end
+
+            -- วาปไปยังตำแหน่งที่สองใหม่
+            player.Character:SetPrimaryPartCFrame(CFrame.new(-53.1791, -13.7714891, 170.809448, 0.997564018, -1.94691321e-08, -0.0697569549, 2.16139568e-08, 1, 2.99923215e-08, 0.0697569549, -3.14269855e-08, 0.997564018))
+
+        else
+            wait(0.5)  -- รอครึ่งวินาที ก่อนทำการโจมตีต่อ
+        end
+    end
+end
+
+-- ฟังก์ชันสำหรับการเปิด/ปิด Toggle
+local function toggle()
+    enabled = not enabled
+    if enabled then
+        Rayfield:Notify({
+            Title = "Activeted",
+            Content = "!",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+
+        task.spawn(runScript)
+    else
+        Rayfield:Notify({
+            Title = "Deactivated",
+            Content = "!",
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    end
+end
+
+-- ปุ่ม UI สำหรับเปิด/ปิดสคริปต์
+local Toggle = Tab:CreateToggle({
+    Name = "้Auto farm kills (Hold Sniper)",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        toggle()
+    end,
+})
+
+--------------------------------------------------------------------
+local Tab = Window:CreateTab("Item Giver🔫", nil) -- Title, Image
+local Section = Tab:CreateSection("Idk.1")
+--------------------------------------------------------------------
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Rainbow Potion",
+   CurrentValue = false,
+   Flag = "ToggleRainbowPotion", -- ให้ใช้ Flag ที่ไม่ซ้ำกับที่ใช้ในส่วนอื่น
+   Callback = function(Value)
+      if Value then
+         -- เมื่อเปิด toggle (Value เป็น true) ให้เริ่มทำงาน
+         print("เริ่มกด Rainbow Potion รัวๆ")
+         _G.RainbowPotionInProgress = true
+
+         -- เริ่มรันการกด Rainbow Potion รัวๆ
+         while _G.RainbowPotionInProgress do
+            -- ตรวจสอบว่า Object ที่ต้องการอยู่ใน Workspace หรือไม่
+            local rainbowPotion = workspace:WaitForChild("Interaction")
+               :WaitForChild("ToolGivers")
+               :WaitForChild("Rainbow Potion")
+               :WaitForChild("ClickDetector")
+               
+            -- ทำการคลิกที่ ClickDetector
+            fireclickdetector(rainbowPotion)
+            print("D= 1 a+ 1")
+
+            -- หน่วงเวลา 0.1 วินาทีระหว่างการกด
+            wait(0.1)
+         end
+      else
+         -- เมื่อปิด toggle (Value เป็น false) ให้หยุดการกด
+         print("หยุดการกดd= Potion")
+         _G.RainbowPotionInProgress = false
+      end
+   end,
+})
+
+--------------------------------------------------------------------
+local Toggle = Tab:CreateToggle({
+   Name = "Auto Antidote",
+   CurrentValue = false,
+   Flag = "ToggleAntidote", -- ให้ใช้ Flag ที่ไม่ซ้ำกับที่ใช้ในส่วนอื่น
+   Callback = function(Value)
+      if Value then
+         -- เมื่อเปิด toggle (Value เป็น true) ให้เริ่มทำงาน
+         print("เริ่มกด Antidote รัวๆ")
+         _G.AntidoteInProgress = true
+
+         -- เริ่มรันการกด Antidote รัวๆ
+         while _G.AntidoteInProgress do
+            -- ตรวจสอบว่า Object ที่ต้องการอยู่ใน Workspace หรือไม่
+            local antidote = workspace:WaitForChild("Interaction")
+               :WaitForChild("ToolGivers")
+               :WaitForChild("Antidote")
+               :WaitForChild("ClickDetector")
+               
+            -- ทำการคลิกที่ ClickDetector
+            fireclickdetector(antidote)
+            print("กด Antidote")
+
+            -- หน่วงเวลา 0.1 วินาทีระหว่างการกด
+            wait(0.1)
+         end
+      else
+         -- เมื่อปิด toggle (Value เป็น false) ให้หยุดการกด
+         print("หยุดการกด Antidote")
+         _G.AntidoteInProgress = false
+      end
+   end,
+})
+
+---------------------------------------------------------
+local Section = Tab:CreateSection("Spawn Cool Items")
+local Button = Tab:CreateButton({
+   Name = "1.Wooden Bat",
+   Callback = function()
+   local args = {
+    [1] = "Wooden Bat"
+    }
+
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "2.Katana",
+   Callback = function()
+   local args = {
+    [1] = "Katana"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "3.Frying Pan",
+   Callback = function()
+   local args = {
+    [1] = "Frying Pan"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "4.Fire Axe",
+   Callback = function()
+   local args = {
+    [1] = "Fire Axe"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "5.Machete",
+   Callback = function()
+   local args = {
+    [1] = "Machete"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "6.Pizza Sword",
+   Callback = function()
+   local args = {
+    [1] = "Pizza Sword"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "7.Crossbow",
+   Callback = function()
+   local args = {
+    [1] = "Crossbow"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "8.Shovel",
+   Callback = function()
+   local args = {
+    [1] = "Shovel"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "9.Classic Sword",
+   Callback = function()
+   local args = {
+    [1] = "Classic Sword"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "10.Bone Sword",
+   Callback = function()
+   local args = {
+    [1] = "Bone Sword"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "11.Charged Bat",
+   Callback = function()
+   local args = {
+    [1] = "Charged Bat"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "12.Firekatana",
+   Callback = function()
+   local args = {
+    [1] = "firekatana"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "13.Zombie Club",
+   Callback = function()
+   local args = {
+    [1] = "Zombie Club"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "14.Minecraft Sword",
+   Callback = function()
+   local args = {[1] = "REWARD_IRON"}game:GetService("ReplicatedStorage"):WaitForChild("NetworkEvents"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "15.Flaming Bat",
+   Callback = function()
+   local args= {
+    [1] = "Flaming Bat"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "16.Frozen Katana",
+   Callback = function()
+   local args = {
+    [1] = "Frozen Katana"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "18.Frozen Bat",
+   Callback = function()
+   local args = {
+    [1] = "Frozen Bat"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "19.Taser",
+   Callback = function()
+   local args = {
+    [1] = "Taser"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "20.Raygun",
+   Callback = function()
+   local args = {
+    [1] = "Raygun"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "21.Shotgun",
+   Callback = function()
+   local args = {
+    [1] = "Shotgun"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "22.Pistol",
+   Callback = function()
+   local args = {
+    [1] = "Pistol"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+local Button = Tab:CreateButton({
+   Name = "23.Sniper",
+   Callback = function()
+   local args = {
+    [1] = "Sniper"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "24.Bone sword",
+   Callback = function()
+   local args = {
+    [1] = "Bone Sword"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+--------------------
+local Button = Tab:CreateButton({
+   Name = "25.Taser",
+   Callback = function()
+   local args = {
+    [1] = "Taser"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "26.Stun baton",
+   Callback = function()
+   local args = {
+    [1] = "Stun Baton"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "27.Chainsaw",
+   Callback = function()
+   local args = {
+    [1] = "Chainsaw"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "28.Golf Club",
+   Callback = function()
+   local args = {
+    [1] = "Golf Club"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "29.Plunger",
+   Callback = function()
+   local args = {
+    [1] = "Plunger"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Shop"):WaitForChild("EquipWeapon"):InvokeServer(unpack(args))
+   end,
+})
+
+local Tab = Window:CreateTab("Items", nil)
+
+local Button = Tab:CreateButton({
+   Name = "Give all Signs",
+   Callback = function()
+-- executor compatibility
+local fireClick = fireclickdetector or click_detector or function() end
+local getChildren = getchildren or function(obj) return obj:GetChildren() end
+
+local lplr = game:GetService("Players").LocalPlayer
+local char = lplr.Character or lplr.CharacterAdded:Wait()
+local Teams = game:GetService("Teams")
+
+-- signs cần check
+local signsToCheck
+if lplr.Team == Teams.Human then
+    signsToCheck = {
+        "AntiZombieSign",
+        "AntiZombieSign2",
+        "AntiZombieSign3"
+    }
+else
+    signsToCheck = {
+        "AntiZombieSign",
+        "AntiZombieSign2",
+        "AntiZombieSign3",
+        "ZombieSign",
+        "ZombieSign2"
+    }
+end
+
+-- check đã có sign chưa
+for _, name in ipairs(signsToCheck) do
+    if lplr:FindFirstChild(name, true) or char:FindFirstChild(name, true) then
+        warn("You already have every sign.")
+        return
+    end
+end
+
+-- give signs
+local interaction = workspace:FindFirstChild("Interaction")
+if not interaction then return end
+
+local givers = interaction:FindFirstChild("ToolGivers")
+if givers then
+    for _, name in ipairs({
+        "AntiZombieSign",
+        "AntiZombieSign2",
+        "AntiZombieSign3"
+    }) do
+        local giver = givers:FindFirstChild(name)
+        if giver and giver:FindFirstChild("ClickDetector") then
+            fireClick(giver.ClickDetector, 0)
+        end
+    end
+end
+
+local zombieSign = interaction:FindFirstChild("ZombieSign")
+if zombieSign and zombieSign:FindFirstChild("ClickDetector") then
+    fireClick(zombieSign.ClickDetector, 0)
+end
+
+-- fallback legacy
+local children = getChildren(interaction)
+for _, idx in ipairs({15, 16}) do
+    local obj = children[idx]
+    if obj and obj:FindFirstChild("ClickDetector") then
+        fireClick(obj.ClickDetector, 0)
+        break
+    end
+end
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Rainbow Potion",
+   Callback = function()
+fireclickdetector(workspace.Interaction.ToolGivers["Rainbow Potion"].ClickDetector, 0)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Antidote",
+   Callback = function()
+fireclickdetector(workspace.Interaction.ToolGivers.Antidote.ClickDetector, 0)
+   end,
+})
+
+local Tab = Window:CreateTab("Setting⚙️", nil)
+local Section = Tab:CreateSection("Setting")
+
+local UserInputService = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+local whiteScreen = Instance.new("Frame")
+
+screenGui.Parent = player.PlayerGui
+whiteScreen.Size = UDim2.new(1, 0, 1, 0)  -- ครอบคลุมทั้งหน้าจอ
+whiteScreen.BackgroundColor3 = Color3.fromRGB(255, 255, 255)  -- สีขาว
+whiteScreen.BackgroundTransparency = 0  -- ไม่โปร่งใส
+whiteScreen.Visible = false  
+
+whiteScreen.Parent = screenGui
+
+local function toggleWhiteScreen()
+    whiteScreen.Visible = not whiteScreen.Visible  -- สลับการแสดงผล
+end
+
+-- ฟังก์ชันสำหรับแสดง Notify
+local function showNotify(title, content)
+    Rayfield:Notify({
+        Title = title,
+        Content = content,
+        Duration = 3,  -- ระยะเวลาแสดง Notify 3 วินาที
+        Image = 4483362458,
+    })
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent then  -- ตรวจสอบว่าเกมไม่ได้ใช้ปุ่มนี้อยู่
+        if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.P then
+            toggleWhiteScreen()  -- เรียกใช้ฟังก์ชันเมื่อกด P
+        end
+    end
+end)
+
+local Toggle = Tab:CreateToggle({
+    Name = "White screen (suitable for Server Crash/Auto farm)",  -- ชื่อ Toggle ที่จะแสดงใน UI
+    CurrentValue = false,  -- เริ่มต้น Toggle ปิด
+    Flag = "ToggleWhiteScreen",  -- Flag สำหรับการจัดการค่าต่างๆ ใน config file
+    Callback = function(Value)
+        if Value then
+            -- ถ้าเปิด Toggle
+            print("NNN")
+
+            showNotify("White Screen Actived", "White Screen Actived!")
+
+            toggleWhiteScreen()
+        else
+            print("Toggle")
+
+            showNotify("White Screen Deactived", "White Screen Deactived")
+
+            toggleWhiteScreen()
+        end
+    end,
+})
+
+local Tab = Window:CreateTab("Player", nil)
+local Section = Tab:CreateSection("Team")
+
+local Button = Tab:CreateButton({
+   Name = "Zombie",
+   Callback = function()
+ game.TextChatService.TextChannels.RBXGeneral:SendAsync(";zombie")
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Human",
+   Callback = function()
+local plr = game:GetService("Players").LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
+local hum = char:FindFirstChildOfClass("Humanoid")
+
+if hum then
+    hum:ChangeState(Enum.HumanoidStateType.Dead)
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Spitter",
+   Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lplr = Players.LocalPlayer
+
+local function GetHumRootPart(character)
+    if not character then return nil end
+    return character:FindFirstChild("HumanoidRootPart")
+end
+
+local character = lplr.Character
+if character then
+    local rootPart = GetHumRootPart(character)
+    if rootPart then
+        local oldCFrame = rootPart.CFrame
+
+        if character:FindFirstChild("ForceField") then
+            local shopkeeper = workspace:FindFirstChild("OutsideOfGame") 
+                and workspace.OutsideOfGame:FindFirstChild("Shopkeeper")
+                and workspace.OutsideOfGame.Shopkeeper:FindFirstChild("Head")
+
+            if shopkeeper then
+                rootPart.CFrame = CFrame.new(shopkeeper.Position)
+                task.wait(1)
+                for i = 1, 15 do
+                    ReplicatedStorage.Remotes.ZombieRelated.TouchedAcid:FireServer("")
+                end
+                task.wait(0.1)
+                
+                character = lplr.Character
+                local currentRoot = GetHumRootPart(character)
+                if currentRoot then
+                    currentRoot.CFrame = oldCFrame
+                end
+            end
+        else
+            for i = 1, 15 do
+                ReplicatedStorage.Remotes.ZombieRelated.TouchedAcid:FireServer("")
+            end
+        end
+    end
+end
+   end,
+})
+
+local Tab = Window:CreateTab("Server/client", nil)
+local Section = Tab:CreateSection("Server")
+
+local Button = Tab:CreateButton({
+   Name = "Hack Sniper",
+   Callback = function()
+-- services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local lplr = Players.LocalPlayer
+local char = lplr.Character or lplr.CharacterAdded:Wait()
+
+-- equip sniper
+ReplicatedStorage.Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+
+-- wait sniper
+local Sniper
+repeat
+    Sniper = lplr:FindFirstChild("Sniper", true) or char:FindFirstChild("Sniper", true)
+    task.wait()
+until Sniper and Sniper:FindFirstChild("LocalScript")
+
+-- hook script
+local scr = getsenv(Sniper.LocalScript)
+local shoot = debug.getupvalue(scr.FireGun, 5)
+local calc = debug.getupvalue(scr.FireGun, 6)
+local sound = Sniper.Handle["Sniper fire sound"]
+
+scr.FireGun = function(...)
+    local sc = sound:Clone()
+    sc.Playing = true
+    sc.Parent = Sniper.Handle
+    task.delay(sc.TimeLength, function()
+        sc:Destroy()
+    end)
+
+    shoot(Sniper.Flash2.Position, calc(...))
+end
+
+-- minigun logic
+local mouse = lplr:GetMouse()
+local buttonDown = false
+
+mouse.Button1Down:Connect(function()
+    if not buttonDown and Sniper.Parent == char then
+        buttonDown = true
+        repeat
+            coroutine.wrap(scr.FireGun)(mouse.X, mouse.Y)
+            task.wait()
+        until not buttonDown
+    end
+end)
+
+mouse.Button1Up:Connect(function()
+    buttonDown = false
+end)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Summon Zombie",
+   Callback = function()
+game:GetService("ReplicatedStorage").Remotes.ZombieRelated.Necro.AbilityPlayer:FireServer()
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "place landmines",
+   Callback = function()
+game:GetService("ReplicatedStorage").NetworkEvents.RemoteEvent:FireServer("PLACE_LANDMINE")
+   end,
+})
+
+local landmineLag = false
+local landmineRemote = ReplicatedStorage:FindFirstChild("Remotes", true)
+
+Tab:CreateToggle({
+    Name = "Lag Server (Landmine Edition)",
+    CurrentValue = false,
+    Flag = "LandmineLag",
+    Callback = function(Value)
+        landmineLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if landmineLag and landmineRemote then
+            for _ = 1, 24 do
+                task.spawn(function()
+                    for _ = 1, 24000 do
+                        landmineRemote:FireServer()
+                    end
+                end)
+            end
+        end
+    end
+end)
+
+local necroLag = false
+local necroRemote =
+    ReplicatedStorage.Remotes.ZombieRelated.Necro.AbilityPlayer
+
+Tab:CreateToggle({
+    Name = "Lag Server (Necro Edition)",
+    CurrentValue = false,
+    Flag = "NecroLag",
+    Callback = function(Value)
+        necroLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if necroLag then
+            for _ = 1, 24 do
+                task.spawn(function()
+                    for _ = 1, 24000 do
+                        necroRemote:FireServer()
+                    end
+                end)
+            end
+        end
+    end
+end)
+
+local acidLag = false
+local acidRemote =
+    ReplicatedStorage.Remotes.ZombieRelated.AcidSpit
+
+Tab:CreateToggle({
+    Name = "Lag Server (Acid Edition)",
+    CurrentValue = false,
+    Flag = "AcidLag",
+    Callback = function(Value)
+        acidLag = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait() do
+        if acidLag then
+            for x = -266, 378, 18 do
+                for z = -268, 378, 18 do
+                    acidRemote:FireServer(
+                        Vector3.new(x,255,z),
+                        Vector3.new()
+                    )
+                end
+            end
+        end
+    end
+end)
+
+local acidRain = false
+
+Tab:CreateToggle({
+    Name = "Acid Rain",
+    CurrentValue = false,
+    Flag = "AcidRain",
+    Callback = function(Value)
+        acidRain = Value
+        if not Value then
+            rejoin()
+        end
+    end,
+})
+
+task.spawn(function()
+    while task.wait(0.3) do
+        if acidRain then
+            for x = -266, 378, 18 do
+                for z = -268, 378, 18 do
+                    acidRemote:FireServer(
+                        Vector3.new(x,255,z),
+                        Vector3.new()
+                    )
+                end
+            end
+        end
+    end
+end)
+
+local Button = Tab:CreateButton({
+   Name = "Summon Acid",
+   Callback = function()
+local AcidRemote = game:GetService("ReplicatedStorage").Remotes.ZombieRelated.AcidSpit
+
+for coverX = -266, 378, 18 do
+    for coverZ = -268, 378, 18 do
+        AcidRemote:FireServer(
+            Vector3.new(coverX, 255, coverZ),
+            Vector3.new(0,0,0)
+        )
+    end
+end
+   end,
+})
+
+local event = game:GetService("ReplicatedStorage")
+    :WaitForChild("NetworkEvents")
+    :WaitForChild("RemoteEvent")
+
+local KillZombieLoop = false
+
+local Toggle = Tab:CreateToggle({
+    Name = "Kill Zombies",
+    CurrentValue = false,
+    Flag = "KillZombies",
+
+    Callback = function(Value)
+        KillZombieLoop = Value
+
+        if Value then
+            task.spawn(function()
+                while KillZombieLoop do
+                    if lplr.Team == Teams.Human then
+                        if find.Sniper(true) then
+                            getzombies()
+
+                            for i, v in pairs(zombieTbl) do
+                                if v and v:FindFirstChild("Humanoid") then
+                                    event:FireServer("GUN_DAMAGE", v)
+                                    table.remove(zombieTbl, i)
+                                end
+                            end
+                        else
+                            game:GetService("ReplicatedStorage")
+                                .Remotes.Shop.EquipWeapon:InvokeServer("Sniper")
+
+                            find.Sniper(true)
+                        end
+                    end
+
+                    task.wait(0.1)
+                end
+
+                table.clear(zombieTbl)
+            end)
+        end
+    end,
+})
+
+local Section = Tab:CreateSection("Client")
+
+local Button = Tab:CreateButton({
+   Name = "Remove Melee & Spitter cooldown",
+   Callback = function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local lplr = Players.LocalPlayer
+
+local rStor = ReplicatedStorage:FindFirstChild("Remotes") and ReplicatedStorage
+
+local MeleeFunctions = require(rStor.Modules.MeleeFunctions)
+local ShovelModule = require(rStor.Modules.Items.Shovel)
+local SpitModule = require(rStor.Modules.Items.Spit)
+
+local originalShovelNew = ShovelModule.new
+local originalFireGun = SpitModule.FireGun
+
+MeleeFunctions.AddCooldown = function() end
+MeleeFunctions.CheckForCooldown = function() return false end
+
+ShovelModule.new = function(...)
+    local shovelObject = originalShovelNew(...)
+    
+    if shovelObject and shovelObject.AnimationTracks and shovelObject.AnimationTracks.Attack then
+        shovelObject.AnimationTracks.Attack.Speed = 1.30
+    end
+    
+    return shovelObject
+end
+
+SpitModule.FireGun = function(spitObject, mouseX, mouseY)
+    if not spitObject.Character or not spitObject.Character:FindFirstChild("Head") then return end
+    local headPosition = spitObject.Character.Head.Position
+    
+    local cameraRay = workspace.CurrentCamera:ScreenPointToRay(mouseX, mouseY)
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    raycastParams.FilterDescendantsInstances = { lplr.Character }
+    
+    local raycastResult = workspace:Raycast(cameraRay.Origin, cameraRay.Direction * 1000, raycastParams)
+    local aimPosition = raycastResult and raycastResult.Position or (cameraRay.Origin + cameraRay.Direction * 1000)
+
+    local directionVector = aimPosition - headPosition
+    
+    rStor.Remotes.ZombieRelated.AcidSpit:FireServer(headPosition, aimPosition)
+
+    local projectileMagnitude = directionVector.Magnitude
+    if projectileMagnitude > 41 then
+        directionVector = directionVector.Unit * 40
+        projectileMagnitude = 40
+    end
+
+    local timeToTarget = math.log(1.001 + projectileMagnitude * 0.01)
+    local projectileVelocity = directionVector / timeToTarget + Vector3.new(0, workspace.Gravity * 0.5 * timeToTarget, 0)
+    
+    local visualModule = rStor:FindFirstChild("VisualFunctions") and rStor.VisualFunctions:FindFirstChild("AcidProjectile")
+    if visualModule then
+        require(visualModule)(headPosition, projectileVelocity)
+    end
+end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Unload Entities(P)",
+   Callback = function()
+-- services
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+
+local lplr = Players.LocalPlayer
+local char = lplr.Character or lplr.CharacterAdded:Wait()
+
+-- folder entity (đổi nếu game khác)
+local living = workspace:FindFirstChild("LivingThings")
+if not living then
+    warn("LivingThings not found")
+    return
+end
+
+local unloaded = false
+
+-- luôn giữ character trong workspace
+local function keepCharacterSafe()
+    if char and char.Parent ~= workspace then
+        char.Parent = workspace
+    end
+end
+
+-- theo dõi respawn
+lplr.CharacterAdded:Connect(function(c)
+    char = c
+    task.wait()
+    keepCharacterSafe()
+end)
+
+-- toggle unload
+local function toggleUnload()
+    unloaded = not unloaded
+    keepCharacterSafe()
+
+    if unloaded then
+        living.Parent = nil
+        warn("Unload Entities: ON")
+    else
+        living.Parent = workspace
+        warn("Unload Entities: OFF")
+    end
+end
+
+-- phím bật/tắt
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.P then
+        toggleUnload()
+    end
+end)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Remove Barrires",
+   Callback = function()
+-- xóa barrier trong workspace
+for _, name in ipairs(TeamBarriers) do
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj.Name == name then
+            obj:Destroy()
+        end
+    end
+end
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "acid",
+   Callback = function()
+local u = game.Players.LocalPlayer
+local c = u.Character or u.CharacterAdded:Wait()
+local p = c:WaitForChild("HumanoidRootPart")
+
+local g = Instance.new
+local d = g("ScreenGui", game:GetService("CoreGui"))
+d.Name = string.reverse("iUGtiucri");
+
+local f = g("Frame", d)
+f.Name = "m"
+f.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+f.Size = UDim2.new(0, 260, 0, 140)
+f.Position = UDim2.new(0.5, -130, 0.5, -70)
+f.Active = true
+f.Draggable = true
+
+local l = g("TextButton", f)
+l.Text = "-"
+l.Size = UDim2.new(0, 30, 0, 25)
+l.Position = UDim2.new(1, -60, 0, 0)
+l.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+local x = g("TextButton", f)
+x.Text = "X"
+x.Size = UDim2.new(0, 30, 0, 25)
+x.Position = UDim2.new(1, -30, 0, 0)
+x.BackgroundColor3 = Color3.fromRGB(80, 30, 30)
+
+local i = g("TextBox", f)
+i.PlaceholderText = "Enter floor size"
+i.Size = UDim2.new(0, 120, 0, 30)
+i.Position = UDim2.new(0, 10, 0, 40)
+i.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+i.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local r = g("TextButton", f)
+r.Text = "FIRE"
+r.Size = UDim2.new(0, 100, 0, 30)
+r.Position = UDim2.new(0, 140, 0, 40)
+r.BackgroundColor3 = Color3.fromRGB(60, 100, 60)
+
+local z = f:Clone()
+z.Size = UDim2.new(0, 260, 0, 30)
+z.Position = UDim2.new(0, 0, 0, 25)
+z.Visible = false
+z.Name = "m2"
+z.Parent = f
+
+l.MouseButton1Click:Connect(function()
+    for _,v in pairs(f:GetChildren()) do
+        if v ~= l and v ~= x and v:IsA("TextButton") or v:IsA("TextBox") then
+            v.Visible = not v.Visible
+        end
+    end
+end)
+
+x.MouseButton1Click:Connect(function()
+    d:Destroy()
+end)
+
+local function h(pos)
+    local o = game:GetService("ReplicatedStorage")
+        :WaitForChild(string.reverse("setomeR"))
+        :WaitForChild("ZombieRelated")
+        :WaitForChild(string.rep("AcidSpit", 1))
+
+    local v1 = 10 + 0.1639
+    local v2 = 1
+    local v3 = 46 + 0.50549
+    local args = {
+        [1] = pos,
+        [2] = Vector3.new(v1, v2, v3)
+    }
+    o:FireServer(unpack(args))
+end
+
+r.MouseButton1Click:Connect(function()
+    local n = tonumber(i.Text)
+    if not n then return end
+    local s = 5
+
+    for a = 1, n do
+        for b = 1, n do
+            local ox = (a - (n / 2)) * s
+            local oz = (b - (n / 2)) * s
+            local pos = p.Position + Vector3.new(ox, 0, oz)
+            h(pos)
+        end
+    end
+end)
+   end,
+})
+
+Rayfield:Notify({
+   Title = "Hello",
+   Content = "Thank you for using it",
+   Duration = 6.5,
+   Image = 4483362458,
+})
