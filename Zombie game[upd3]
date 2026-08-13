@@ -2482,6 +2482,20 @@ local Toggle = Tab:CreateToggle({
    end,
 })
 
+local Tab = Window:CreateTab("03y_o", nil)
+
+local Button = Tab:CreateButton({
+   Name = "Get iron Sword",
+   Callback = function()
+local pieces = workspace.Interaction.Ironsword.SwordCollectPieces
+
+fireclickdetector(pieces.IronOre1.ClickDetector)
+fireclickdetector(pieces.IronOre2.ClickDetector)
+fireclickdetector(pieces.StickCollect.ClickDetector)
+fireclickdetector(workspace.Interaction.Ironsword.IronSword.ClickDetector)
+   end,
+})
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
