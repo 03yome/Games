@@ -2298,6 +2298,149 @@ Tab:CreateToggle({
     end,
 })
 
+local Button = Tab:CreateButton({
+   Name = "annoy all (hit edition)",
+   Callback = function()
+-- Xóa GUI cũ nếu đã tồn tại để tránh bị trùng lặp
+local existingGui = game.CoreGui:FindFirstChild("AnnoyHitControlGui")
+if existingGui then
+    existingGui:Destroy()
+end
+
+-- Tạo ScreenGui riêng biệt trong CoreGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AnnoyHitControlGui"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Tạo Main Frame (Khung chính)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderColor3 = Color3.fromRGB(60, 60, 60)
+MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
+MainFrame.Size = UDim2.new(0, 220, 0, 95)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Cho phép kéo thả bảng GUI trên màn hình
+
+-- Tiêu đề GUI
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Title.Size = UDim2.new(1, -30, 0, 30) -- Trừ ra một khoảng cho nút X
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "  Annoy Hit Control"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Nút [X] để xóa GUI
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+CloseButton.Position = UDim2.new(1, -30, 0, 0)
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+
+-- Nút Toggle: Annoy all (Hit edition)
+local HitButton = Instance.new("TextButton")
+HitButton.Parent = MainFrame
+HitButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+HitButton.Position = UDim2.new(0.05, 0, 0.42, 0)
+HitButton.Size = UDim2.new(0.9, 0, 0, 35)
+HitButton.Font = Enum.Font.SourceSansBold
+HitButton.Text = "Hit Edition: OFF"
+HitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+HitButton.TextSize = 14
+
+--------------------------------------------------------------------------------
+-- LOGIC XỬ LÝ
+--------------------------------------------------------------------------------
+
+local plrs = cloneref(game:GetService("Players"))
+local rStor = cloneref(game:GetService("ReplicatedStorage"))
+local lplr = plrs.LocalPlayer
+local living = workspace.LivingThings
+
+-- Hàm tìm kiếm vũ khí (giữ nguyên từ code gốc)[cite: 1]
+local find = {
+    Weapons = "Hitbox" or "Handle" or "Damage",
+}
+for i,v in find do
+    find[i] = function(FindItem)
+        local char = lplr.Character
+        local FindingItem = (FindItem and (lplr:FindFirstChild(v, true) or (char and char:FindFirstChild(v, true))))
+        return ((FindingItem and FindingItem.Parent.Parent) or nil)
+    end
+end
+
+local AnnoyHit_Active = false
+
+-- Sự kiện bấm nút X để tắt tính năng và hủy GUI
+CloseButton.MouseButton1Click:Connect(function()
+    AnnoyHit_Active = false
+    ScreenGui:Destroy()
+end)
+
+-- Sự kiện bật/tắt Hit Edition
+HitButton.MouseButton1Click:Connect(function()
+    AnnoyHit_Active = not AnnoyHit_Active
+    
+    if AnnoyHit_Active then
+        HitButton.Text = "Hit Edition: ON"
+        HitButton.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
+        
+        task.spawn(function()
+            local event = rStor.Remotes.ZombieRelated.PlayerAttack
+            local eventC = 0
+            
+            -- Đảm bảo item Attack được clone an toàn
+            pcall(function()
+                local char = lplr.Character
+                if not lplr:FindFirstChild("Attack", true) and (char and not char:FindFirstChild("Attack", true)) then 
+                    local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
+                    Attack.Parent = lplr:WaitForChild("Backpack") 
+                end
+            end)
+
+            while AnnoyHit_Active do
+                pcall(function()
+                    if find.Weapons(true) then
+                        for _, v in pairs(living:GetChildren()) do
+                            if not AnnoyHit_Active then break end
+                            local char = lplr.Character
+                            if char and char ~= v then
+                                local hum = v:FindFirstChildWhichIsA("Humanoid")
+                                local root = v:FindFirstChild("HumanoidRootPart")
+                                if hum and hum.Health > 0 and root then
+                                    if eventC < 100 then
+                                        coroutine.wrap(function()
+                                            eventC += 1
+                                            pcall(function() event:InvokeServer(root) end)
+                                            eventC -= 1
+                                        end)()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+                task.wait(0.1)
+            end
+        end)
+    else
+        HitButton.Text = "Hit Edition: OFF"
+        HitButton.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+    end
+end)
+   end,
+})
+
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
