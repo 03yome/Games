@@ -2273,6 +2273,64 @@ end)
    end,
 })
 
+Tab:CreateToggle({
+    Name = "Annoy all (Hit edition)",
+    CurrentValue = false,
+    Flag = "AnnoyHitEdition",
+    Callback = function(Value)
+        local event = rStor.Remotes.ZombieRelated.PlayerAttack
+        local eventC = 0
+        local Attack = game:GetService("ReplicatedStorage").Attack:Clone()
+        
+        if not lplr:FindFirstChild("Attack", true) or char:FindFirstChild("Attack", true) then 
+            Attack.Parent = lplr:WaitForChild("Backpack") 
+        end
+
+        if Value then
+            task.spawn(function()
+                while Value do
+                    if not _G.AnnoyHitEnabled then break end -- Dùng để ngắt vòng lặp khi tắt toggle nếu cần
+                    if find.Weapons(true) then
+                        for _, v in living:GetChildren() do
+                            if lplr.Character ~= v then
+                                local hum = v:FindFirstChildWhichIsA("Humanoid")
+                                if hum and hum.Health > 0 and hum.RootPart then
+                                    if eventC < 100 then
+                                        coroutine.wrap(function()
+                                            eventC += 1
+                                            event:InvokeServer(hum.RootPart)
+                                            eventC -= 1
+                                        end)()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Annoy all (Acid edition)",
+    CurrentValue = false,
+    Flag = "AnnoyAcidEdition",
+    Callback = function(Value)
+        if Value then
+            task.spawn(function()
+                while Value do
+                    for i = 1, 50 do
+                        game:GetService("ReplicatedStorage").Remotes.ZombieRelated.TouchedAcid:FireServer("")
+                    end
+                    task.wait(0.3)
+                end
+            end)
+        end
+    end,
+})
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
