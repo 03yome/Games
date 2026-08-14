@@ -2522,6 +2522,20 @@ end
    end,
 })
 
+local Button = Tab:CreateButton({
+   Name = "Get Brains",
+   Callback = function()
+for _, item in ipairs(workspace:GetDescendants()) do
+    if item:IsA("TouchTransmitter") and item.Parent and string.lower(item.Parent.Name):find("Brain") then
+        local part = item.Parent
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        end
+    end
+end
+   end,
+})
+
 Rayfield:Notify({
    Title = "Hello",
    Content = "Thank you for using it",
