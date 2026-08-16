@@ -1,4 +1,74 @@
--- Khởi tạo Rayfield Library
+local player = game:GetService("Players").LocalPlayer
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local userInputService = game:GetService("UserInputService")
+
+local lib = replicatedStorage:FindFirstChild("Lib")
+local poofEffect = lib and lib:FindFirstChild("PoofLocation") or function(pos)
+    
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(1, 1, 1)
+    part.Position = pos
+    part.Anchored = true
+    part.CanCollide = false
+    part.Transparency = 0.5
+    part.BrickColor = BrickColor.new("Bright blue")
+    part.Parent = workspace
+    game:GetService("Debris"):AddItem(part, 0.5)
+end
+
+local function setupDoubleJump(character)
+    local humanoid = character:WaitForChild("Humanoid")
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+    
+    local defaultJumpPower = humanoid.JumpPower
+    humanoid.JumpPower = defaultJumpPower * 1.1
+    
+    local canDoubleJump = false
+    local hasDoubleJumped = false
+    
+    humanoid.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Landed then
+            canDoubleJump = false
+            hasDoubleJumped = false
+            humanoid.JumpPower = defaultJumpPower * 1.1
+        elseif newState == Enum.HumanoidStateType.Freefall then
+            task.wait(0.1)
+            canDoubleJump = true
+        end
+    end)
+    
+    local jumpConnection
+    jumpConnection = userInputService.JumpRequest:Connect(function()
+        if humanoid and humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
+            if canDoubleJump and not hasDoubleJumped then
+                hasDoubleJumped = true
+                humanoid.JumpPower = defaultJumpPower * 1.1 * 1.25
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                
+                if type(poofEffect) == "function" then
+                    pcall(function()
+                        poofEffect(rootPart.Position - Vector3.new(0, 1, 0))
+                    end)
+                end
+            end
+        end
+    end)
+    
+    humanoid.Died:Connect(function()
+        if jumpConnection then
+            jumpConnection:Disconnect()
+        end
+    end)
+end
+
+if player.Character then
+    setupDoubleJump(player.Character)
+end
+
+player.CharacterAdded:Connect(function(newCharacter)
+    setupDoubleJump(newCharacter)
+end)
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
