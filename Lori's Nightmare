@@ -492,3 +492,12 @@ local args = {
 game:GetService("ReplicatedStorage"):WaitForChild("Util"):WaitForChild("Net"):WaitForChild("RE/ChangeSurvivor"):FireServer(unpack(args))
     end,
 })
+
+local Tab = Window:CreateTab("Skill", nil)
+
+local Button = Tab:CreateButton({
+   Name = "Trampoline Feet Passive",
+   Callback = function()
+
+   end,
+})
