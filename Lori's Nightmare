@@ -1,5 +1,19 @@
 local player = game:GetService("Players").LocalPlayer
 
+local function setupHelpingHand(character)
+    character:SetAttribute("ReviveMultiplier", 2)
+end
+
+if player.Character then
+    setupHelpingHand(player.Character)
+end
+
+player.CharacterAdded:Connect(function(newCharacter)
+    setupHelpingHand(newCharacter)
+end)
+
+local player = game:GetService("Players").LocalPlayer
+
 local function setupRunningShoes(character)
     local humanoid = character:WaitForChild("Humanoid")
     humanoid.WalkSpeed = humanoid.WalkSpeed + 0.75
@@ -589,6 +603,13 @@ local Button = Tab:CreateButton({
 
 local Button = Tab:CreateButton({
    Name = "Running Shoes Passive",
+   Callback = function()
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Helping hand Passive",
    Callback = function()
 
    end,
