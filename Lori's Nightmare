@@ -1,7 +1,21 @@
 local player = game:GetService("Players").LocalPlayer
 
+local function setupWorm(character)
+    character:SetAttribute("ReducedCrawlPenalty", 0.725)
+end
+
+if player.Character then
+    setupWorm(player.Character)
+end
+
+player.CharacterAdded:Connect(function(newCharacter)
+    setupWorm(newCharacter)
+end)
+
+local player = game:GetService("Players").LocalPlayer
+
 local function setupHelpingHand(character)
-    character:SetAttribute("ReviveMultiplier", 2)
+    character:SetAttribute("ReviveMultiplier", 2.5)
 end
 
 if player.Character then
@@ -610,6 +624,13 @@ local Button = Tab:CreateButton({
 
 local Button = Tab:CreateButton({
    Name = "Helping hand Passive",
+   Callback = function()
+
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Worm Passive",
    Callback = function()
 
    end,
