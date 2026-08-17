@@ -1,0 +1,21 @@
+--inf stamina
+local localPlayer = game:GetService("Players").LocalPlayer
+
+localPlayer:SetAttribute("DevGodmode", true)
+
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+local gamepassesOwned = localPlayer:FindFirstChild("GamepassesOwned")
+if not gamepassesOwned then
+    gamepassesOwned = Instance.new("Folder")
+    gamepassesOwned.Name = "GamepassesOwned"
+    gamepassesOwned.Parent = localPlayer
+end
+
+if not gamepassesOwned:FindFirstChild("Strength") then
+    local strengthPass = Instance.new("BoolValue")
+    strengthPass.Name = "Strength"
+    strengthPass.Value = true
+    strengthPass.Parent = gamepassesOwner
+end
