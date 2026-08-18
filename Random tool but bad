@@ -109,3 +109,52 @@ game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("le
         end
     end
 })
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        table.insert(playerNames, player.Name)
+    end
+    return playerNames
+end
+
+local Dropdown = Tabs.Main:CreateDropdown("Dropdown", {
+    Title = "Chọn Người Chơi",
+    Values = getPlayerNames(),
+    Multi = false,
+    Default = 1,
+})
+
+Dropdown:OnChanged(function(selectedName)
+    local targetPlayer = Players:FindFirstChild(selectedName)
+    
+    if targetPlayer then
+        local args = {
+            targetPlayer
+        }
+        
+        local character = LocalPlayer.Character
+        if character then
+            local boogieWoogie = character:WaitForChild("Boogie Woogie", 3)
+            if boogieWoogie then
+                local swapEvent = boogieWoogie:WaitForChild("SwapEvent", 3)
+                if swapEvent then
+                    swapEvent:FireServer(unpack(args))
+                end
+            end
+        end
+    end
+end)
+
+Players.PlayerAdded:Connect(function(player)
+    Dropdown:SetValues(getPlayerNames())
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    task.defer(function()
+        Dropdown:SetValues(getPlayerNames())
+    end)
+end)
