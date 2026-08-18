@@ -1,0 +1,111 @@
+local Library = loadstring(game:HttpGet("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau"))()
+
+local Window = Library:CreateWindow{
+	Title = "Random tool but bad| v1",
+	SubTitle = "by @romd3976",
+	TabWidth = 160,
+	Size = UDim2.fromOffset(830, 525),
+	Resize = true,
+	MinSize = Vector2.new(470, 380),
+	Acrylic = true,
+	Theme = "Dark",
+	MinimizeKey = Enum.KeyCode.RightControl
+}
+
+local Tabs = {
+	Main = Window:CreateTab{
+		Title = "Exploits",
+		Icon = "delete"
+	},
+}
+
+Tabs.Main:AddButton({
+    Title = 'Dash',
+    Description = 'Instant Charge Use',
+    Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("DashRemotes"):WaitForChild("DashRequest"):FireServer()
+    end,
+})
+
+Tabs.Main:AddButton({
+    Title = 'Attack sonic',
+    Description = 'Instant Charge Use',
+    Callback = function()
+game:GetService("ReplicatedStorage"):WaitForChild("Attack"):FireServer()
+    end,
+})
+
+local loopAttacksonic = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop Attack sonic",
+    Description = "UFO",
+    Default = false,
+    Callback = function(state)
+        loopAttacksonic = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopAttacksonic do
+game:GetService("ReplicatedStorage"):WaitForChild("Attack"):FireServer()
+                    task.wait(1)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+local loopspamAttacksonic = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop Attack sonic",
+    Description = "UFO",
+    Default = false,
+    Callback = function(state)
+        loopspamAttacksonic = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopspamAttacksonic do
+game:GetService("ReplicatedStorage"):WaitForChild("Attack"):FireServer()
+                    wait(0.1)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
+
+local loopLeafblower = false
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", {
+    Title = "Loop leafblower ",
+    Description = "need leaf blower",
+    Default = false,
+    Callback = function(state)
+        loopLeafblower = state
+
+        if state then
+            print("Toggle On")
+
+            task.spawn(function()
+                while loopLeafblower do
+game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("leaf blower"):WaitForChild("RemoteEvent"):FireServer()
+                    wait(0.5)
+                end
+            end)
+
+        else
+            print("Toggle Off")
+        end
+    end
+})
