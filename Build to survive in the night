@@ -1,5 +1,8 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BlockData = require(ReplicatedStorage.Shared.Lists.BlockData)
 
 local Window = WindUI:CreateWindow({
@@ -9,11 +12,6 @@ local Window = WindUI:CreateWindow({
     Size = UDim2.fromOffset(600, 600),
     Resizable = true,
 })
-
---// SERVICES
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Tab = Window:Tab({ Title = "Place Block" })
 
