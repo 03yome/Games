@@ -199,68 +199,37 @@ Tab:Button({
     end
 })
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BlockData = require(ReplicatedStorage.Shared.Lists.BlockData)
-local inputBlockName = "Wood Block"
+local PlacementState = require(game:GetService("ReplicatedStorage").Client.Modules.BlockClient.States.PlacementState)
+local BlockData = require(game:GetService("ReplicatedStorage").Shared.Lists.BlockData)
+local selectedBlockName = "Red"
 
 Tab:Input({
-    Title = "Tên Block cần đặt",
-    Default = "Wood Block",
-    Placeholder = "Nhập tên block (ví dụ: Stone, Red)",
-    Callback = function(value)
-        inputBlockName = value
+    Title = "Chọn Block mặc định",
+    Placeholder = "Ví dụ: Blue, Stone, Wood",
+    Callback = function(text)
+        selectedBlockName = text
     end
 })
 
 Tab:Button({
-    Title = "Đặt Block Trước Mặt",
-    Desc = "Thực thi đặt block theo tên đã nhập",
+    Title = "Áp dụng Block mặc định",
     Callback = function()
-        local selectedBlockData = BlockData[inputBlockName]
-        
-        if not selectedBlockData then
-            WindUI:Notify({
-                Title = "Lỗi",
-                Content = "Không tìm thấy block: " .. tostring(inputBlockName),
-                Duration = 3
-            })
-            return
-        end
-
-        local success = false
-        for _, closure in pairs(getgc(true)) do
-            if type(closure) == "function" and islclosure(closure) then
-                for _, c in pairs(debug.getconstants(closure)) do
-                    if c == "Place" then
-                        local upvalues = debug.getupvalues(closure)
-                        for _, upval in pairs(upvalues) do
-                            if type(upval) == "table" and rawget(upval, "state") == "Place" then
-                                upval.selectedBlock = selectedBlockData
-                                upval.pause = false
-                                
-                                if rawget(upval, "Place") and type(upval.Place) == "function" then
-                                    upval.Place()
-                                    success = true
-                                end
-                            end
-                        end
-                    end
+        local newBlock = BlockData[selectedBlockName]
+        if newBlock then
+            local i = 1
+            while true do
+                local name, value = debug.getupvalue(PlacementState.Enable, i)
+                if not name and not value then break end
+                
+                -- Tìm và thay thế biến lưu block mặc định
+                if type(value) == "table" and rawget(value, "model") then
+                    debug.setupvalue(PlacementState.Enable, i, newBlock)
                 end
+                i = i + 1
             end
-        end
-
-        if success then
-            WindUI:Notify({
-                Title = "Thành công",
-                Content = "Đã đặt block: " .. inputBlockName,
-                Duration = 2
-            })
+            WindUI:Notify({Title = "Thông báo", Content = "Đã đổi block mặc định thành: " .. selectedBlockName, Duration = 2})
         else
-            WindUI:Notify({
-                Title = "Thất bại",
-                Content = "Hãy chắc chắn bạn đã vào chế độ xây dựng ít nhất 1 lần.",
-                Duration = 3
-            })
+            WindUI:Notify({Title = "Lỗi", Content = "Tên block không tồn tại!", Duration = 2})
         end
     end
 })
