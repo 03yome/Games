@@ -396,7 +396,7 @@ local function UpdateESP()
 
 end
 
-local ReGui = loadstring(game:HttpGet("https://raw.githubusercontent.com/depthso/Dear-ReGui/main/ReGui.lua"))()
+local ReGui = loadstring(game:HttpGet("https://raw.githubusercontent.com/myethg/Dear-ReGui/refs/heads/main/ReGui.lua"))()
 
 local UI = ReGui:TabsWindow({
 
