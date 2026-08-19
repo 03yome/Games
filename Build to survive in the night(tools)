@@ -23,6 +23,7 @@ local AutoEquipRemove = false
 local AutoEquipSpeedCoil = false
 local AutoEquipBomb = false
 local AutoEquipRocketLauncher = false
+local AutoEquipBloxyCola = false
 local AutoUpgradeBow = false
 local AutoUpgradeSword = false
 local AutoPlaceBlocks = false
@@ -301,6 +302,15 @@ TabMain:Toggle({
     end
 })
 
+TabMain:Toggle({
+    Title = "Auto Equip Bloxy Cola",
+    Value = false,
+    Callback = function(v)
+        AutoEquipBloxyCola = v
+        HasEquipped = false
+    end
+})
+
 TabMain:Section({ Title = "Upgrades & Actions" })
 
 TabMain:Toggle({
@@ -480,6 +490,14 @@ RunService.Heartbeat:Connect(function()
         local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
         if hotbarRemote then
             pcall(function() hotbarRemote:FireServer("Rocket Launcher", "PlayerEquip") end)
+            HasEquipped = true
+        end
+    end
+
+    if AutoEquipBloxyCola and not HasEquipped and ReplicatedStorage:FindFirstChild("Networker") then
+        local hotbarRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("HotbarRemote")
+        if hotbarRemote then
+            pcall(function() hotbarRemote:FireServer("Bloxy Cola", "PlayerEquip") end)
             HasEquipped = true
         end
     end
