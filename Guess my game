@@ -1,0 +1,377 @@
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local GameModeModule = require(ReplicatedStorage:WaitForChild("GameModeModule"))
+local GameNames = {}
+local GameData = {}
+
+if GameModeModule and GameModeModule.Characters then
+    for index, item in ipairs(GameModeModule.Characters) do
+        local imageIdMatch = string.match(item.imageId or "", "%d+")
+        if imageIdMatch then
+            GameNames[imageIdMatch] = item.name
+            GameData[imageIdMatch] = item.id or item.Id or item.value or item.characterId or index
+        end
+    end
+end
+
+LocalPlayer.Idled:Connect(function()
+    if _G.AntiAFKEnabled then
+        pcall(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new(0, 0))
+        end)
+    end
+end)
+
+local function getBoardType(targetInstance)
+    local currentParent = targetInstance
+    while currentParent and currentParent ~= workspace do
+        local nameLower = currentParent.Name:lower()
+        if nameLower:find("board1") or nameLower == "b1" or nameLower:find("board1grid") then
+            return 1
+        elseif nameLower:find("board2") or nameLower == "b2" or nameLower:find("board2grid") then
+            return 2
+        end
+        currentParent = currentParent.Parent
+    end
+    return nil
+end
+
+local function getBoardText(container, expectedBoardType)
+    if not container then return "Choosing...", nil end
+    
+    for _, desc in ipairs(container:GetDescendants()) do
+        local boardImageId = desc:GetAttribute("BoardImageId")
+        if boardImageId then
+            local boardType = getBoardType(desc)
+            if boardType == expectedBoardType then
+                local idStr = string.match(tostring(boardImageId), "%d+")
+                if idStr then
+                    if GameNames[idStr] then
+                        return GameNames[idStr], idStr
+                    else
+                        return "ID: " .. idStr, idStr
+                    end
+                end
+            end
+        end
+    end
+    return "Choosing...", nil
+end
+
+local function getNearestDuelTable()
+    local character = LocalPlayer.Character
+    if not character then return nil, nil end
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return nil, nil end
+
+    local duelTables = workspace:FindFirstChild("DuelTables")
+    if not duelTables then return nil, nil end
+
+    local nearestTable = nil
+    local shortestDistance = math.huge
+
+    for _, tableModel in ipairs(duelTables:GetChildren()) do
+        if tableModel.Name:match("^Table_%d+") then
+            local primaryPart = tableModel.PrimaryPart or tableModel:FindFirstChildWhichIsA("BasePart", true)
+            if primaryPart then
+                local dist = (rootPart.Position - primaryPart.Position).Magnitude
+                if dist < shortestDistance and dist < 30 then
+                    shortestDistance = dist
+                    nearestTable = tableModel
+                end
+            end
+        end
+    end
+
+    if nearestTable then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.SeatPart then
+            local seatBoardType = getBoardType(humanoid.SeatPart)
+            if seatBoardType then
+                return nearestTable, seatBoardType
+            end
+            return nearestTable, 1 -- Default fallback
+        end
+        
+        local b1Opt = nearestTable:FindFirstChild("Board1Grid") or nearestTable:FindFirstChild("Board1", true)
+        local b2Opt = nearestTable:FindFirstChild("Board2Grid") or nearestTable:FindFirstChild("Board2", true)
+        
+        local p1 = b1Opt and (b1Opt:IsA("BasePart") and b1Opt or b1Opt:FindFirstChildWhichIsA("BasePart", true))
+        local p2 = b2Opt and (b2Opt:IsA("BasePart") and b2Opt or b2Opt:FindFirstChildWhichIsA("BasePart", true))
+        
+        if p1 and p2 then
+            local dist1 = (rootPart.Position - p1.Position).Magnitude
+            local dist2 = (rootPart.Position - p2.Position).Magnitude
+            return nearestTable, (dist1 < dist2 and 1 or 2)
+        end
+        return nearestTable, 1
+    end
+
+    return nil, nil
+end
+
+local function isGuessMenuOpen()
+    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+    if not playerGui then return false end
+    local gameUi = playerGui:FindFirstChild("GameUI")
+    if not gameUi then return false end
+    local menus = gameUi:FindFirstChild("Menus")
+    if not menus then return false end
+    local guessOrSkip = menus:FindFirstChild("GuessOrSkip")
+    if not guessOrSkip or not guessOrSkip.Visible then return false end
+    
+    local buttonSort = guessOrSkip:FindFirstChild("ButtonSort")
+    if not buttonSort then return false end
+    local guessButton = buttonSort:FindFirstChild("GuessButton")
+    
+    return guessButton and guessButton.Visible
+end
+
+local function applyTileReveal(tableInstance)
+    if not tableInstance then return end
+    for _, item in ipairs(tableInstance:GetDescendants()) do
+        if item:IsA("BasePart") and item.Parent and (item.Parent.Name:match("Grid$") or item.Name:match("Tile")) then
+            item.Transparency = 1
+            for _, child in ipairs(item:GetChildren()) do
+                if child:IsA("Decal") then
+                    child.Transparency = 1
+                end
+            end
+            local surfaceGui = item:FindFirstChildWhichIsA("SurfaceGui")
+            if surfaceGui then
+                for _, guiChild in ipairs(surfaceGui:GetChildren()) do
+                    if guiChild:IsA("ImageLabel") or guiChild:IsA("TextLabel") then
+                        guiChild.Visible = (guiChild.Name == "CharacterImage")
+                    end
+                end
+            end
+        end
+    end
+end
+
+local MainWindow = Rayfield:CreateWindow({
+    Name = "Guess My Game | KaitoFyp (Refactored)",
+    LoadingTitle = "Initializing...",
+    LoadingSubtitle = "Optimized Script",
+    ConfigurationSaving = { Enabled = false },
+    KeySystem = false,
+})
+
+local MainTab = MainWindow:CreateTab("Main Cheats", 4483362458)
+local StatusLabel = MainTab:CreateLabel("📍 Status: Waiting for you to join a table...")
+local RevealTab = MainWindow:CreateTab("Reveal Games", 4483362458)
+local TableParagraphs = {}
+
+for i = 1, 20 do
+    TableParagraphs[i] = RevealTab:CreateParagraph({
+        Title = "🏢 Table " .. i,
+        Content = "🎮 Board 1: Loading...\n🎮 Board 2: Loading...",
+    })
+end
+
+local EspFolder = workspace:FindFirstChild("TableESP_Holder") or Instance.new("Folder", workspace)
+EspFolder.Name = "TableESP_Holder"
+
+local function toggleTableEsp(isEnabled)
+    EspFolder:ClearAllChildren()
+    if not isEnabled then return end
+    
+    local duelTables = workspace:FindFirstChild("DuelTables")
+    if not duelTables then return end
+
+    for _, tableModel in ipairs(duelTables:GetChildren()) do
+        if tableModel.Name:match("^Table_%d+") then
+            local adornee = tableModel.PrimaryPart or tableModel:FindFirstChildWhichIsA("BasePart", true)
+            if adornee then
+                local billboard = Instance.new("BillboardGui")
+                billboard.Name = "TableESP"
+                billboard.Size = UDim2.new(0, 150, 0, 50)
+                billboard.AlwaysOnTop = true
+                billboard.Adornee = adornee
+                billboard.StudsOffset = Vector3.new(0, 3, 0)
+                billboard.Parent = EspFolder
+
+                local textLbl = Instance.new("TextLabel")
+                textLbl.Size = UDim2.new(1, 0, 1, 0)
+                textLbl.BackgroundTransparency = 1
+                textLbl.Text = tableModel.Name:gsub("_", " ")
+                textLbl.TextColor3 = Color3.fromRGB(0, 255, 185)
+                textLbl.Font = Enum.Font.GothamBold
+                textLbl.TextSize = 14
+                textLbl.TextStrokeTransparency = 0
+                textLbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                textLbl.Parent = billboard
+            end
+        end
+    end
+end
+
+_G.AutoRevealTiles = false
+_G.AutoTextDetector = false
+_G.AutoGuessAnswer = false
+_G.TableESPEnabled = false
+_G.GuessDelayValue = 0
+_G.StreamerMode = false
+_G.AntiAFKEnabled = false
+
+local lastGuessedText = ""
+
+task.spawn(function()
+    while true do
+        local currentTable, playerSeatType = getNearestDuelTable()
+        
+        if currentTable and playerSeatType then
+            local board1Name, board1Id = getBoardText(currentTable, 1)
+            local board2Name, board2Id = getBoardText(currentTable, 2)
+            
+            local myGameName, opponentGameName, myTargetId = "", "", nil
+            
+            if playerSeatType == 1 then
+                myGameName = board1Name
+                opponentGameName = board2Name
+                myTargetId = board1Id
+            else
+                myGameName = board2Name
+                opponentGameName = board1Name
+                myTargetId = board2Id
+            end
+
+            if _G.AutoTextDetector then
+                if _G.StreamerMode then
+                    StatusLabel:Set("🏢 Table: [HIDDEN]  |  👤 Me: [PROTECTED]  |  😈 Opponent: " .. opponentGameName)
+                else
+                    StatusLabel:Set("🏢 " .. currentTable.Name:gsub("_", " ") .. "  |  👤 Me: " .. myGameName .. "  |  😈 Opponent: " .. opponentGameName)
+                end
+            end
+
+            if _G.AutoGuessAnswer and myTargetId and GameData[myTargetId] then
+                if isGuessMenuOpen() and lastGuessedText ~= opponentGameName and opponentGameName ~= "Choosing..." then
+                    lastGuessedText = opponentGameName
+                    task.spawn(function()
+                        pcall(function()
+                            local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+                            if remotes then
+                                local startRemote = remotes:FindFirstChild("PlayerGuessStart")
+                                local guessedRemote = remotes:FindFirstChild("PlayerGuessed")
+                                
+                                if startRemote and guessedRemote then
+                                    startRemote:FireServer()
+                                    if _G.GuessDelayValue and _G.GuessDelayValue > 0 then
+                                        task.wait(_G.GuessDelayValue)
+                                    else
+                                        task.wait(0.15)
+                                    end
+                                    guessedRemote:FireServer(GameData[myTargetId])
+                                end
+                            end
+                        end)
+                    end)
+                end
+            end
+        else
+            if _G.AutoTextDetector then
+                StatusLabel:Set("🎯 Live Display: Please sit down at any Table...")
+            end
+            lastGuessedText = ""
+        end
+
+        if _G.AutoRevealTiles and currentTable then
+            pcall(function()
+                applyTileReveal(currentTable)
+            end)
+        end
+
+        -- Update Reveal Games Tab (All Tables Overview)
+        local duelTablesFolder = workspace:FindFirstChild("DuelTables")
+        if duelTablesFolder then
+            for i = 1, 18 do
+                local tableInstance = duelTablesFolder:FindFirstChild("Table_" .. i)
+                if tableInstance and TableParagraphs[i] then
+                    local b1Name = getBoardText(tableInstance, 1)
+                    local b2Name = getBoardText(tableInstance, 2)
+                    TableParagraphs[i]:Set({
+                        Title = "🏢 Table " .. i,
+                        Content = "🎮 Board 1 Reveal Game: " .. b1Name .. "\n🎮 Board 2 Reveal Game: " .. b2Name,
+                    })
+                end
+            end
+        end
+
+        task.wait(0.5)
+    end
+end)
+
+MainTab:CreateToggle({
+    Name = "Table ESP (Show Names)",
+    CurrentValue = false,
+    Flag = "TableESPFlag",
+    Callback = function(state)
+        _G.TableESPEnabled = state
+        toggleTableEsp(state)
+    end,
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Reveal (Games)",
+    CurrentValue = false,
+    Flag = "VisualRevealFlag",
+    Callback = function(state)
+        _G.AutoRevealTiles = state
+    end,
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Reveal Games (Live Display)",
+    CurrentValue = false,
+    Flag = "TextDetectorFlag",
+    Callback = function(state)
+        _G.AutoTextDetector = state
+        if not state then
+            StatusLabel:Set("📍 Status: Disabled")
+        end
+    end,
+})
+
+MainTab:CreateToggle({
+    Name = "Auto-Guess (Insta-Win)",
+    CurrentValue = false,
+    Flag = "AutoGuessFlag",
+    Callback = function(state)
+        _G.AutoGuessAnswer = state
+        if not state then
+            lastGuessedText = ""
+        end
+    end,
+})
+
+MainTab:CreateInput({
+    Name = "Auto-Guess Delay (Seconds)",
+    PlaceholderText = "Enter seconds (e.g. 2 or 4.5)",
+    RemoveTextAfterFocus = true,
+    Callback = function(text)
+        _G.GuessDelayValue = tonumber(text) or 0
+    end,
+})
+
+MainTab:CreateToggle({
+    Name = "Streamer Mode (Hide Info)",
+    CurrentValue = true,
+    Flag = "StreamerModeFlag",
+    Callback = function(state)
+        _G.StreamerMode = state
+    end,
+})
+
+MainTab:CreateToggle({
+    Name = "Anti-AFK (Stay Online)",
+    CurrentValue = true,
+    Flag = "AntiAFKFlag",
+    Callback = function(state)
+        _G.AntiAFKEnabled = state
+    end,
+})
