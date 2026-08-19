@@ -199,38 +199,105 @@ Tab:Button({
     end
 })
 
-local PlacementState = require(game:GetService("ReplicatedStorage").Client.Modules.BlockClient.States.PlacementState)
-local BlockData = require(game:GetService("ReplicatedStorage").Shared.Lists.BlockData)
-local selectedBlockName = "Red"
-
-Tab:Input({
-    Title = "Chọn Block mặc định",
-    Placeholder = "Ví dụ: Blue, Stone, Wood",
-    Callback = function(text)
-        selectedBlockName = text
-    end
-})
-
 Tab:Button({
     Title = "Áp dụng Block mặc định",
     Callback = function()
-        local newBlock = BlockData[selectedBlockName]
-        if newBlock then
-            local i = 1
-            while true do
-                local name, value = debug.getupvalue(PlacementState.Enable, i)
-                if not name and not value then break end
-                
-                -- Tìm và thay thế biến lưu block mặc định
-                if type(value) == "table" and rawget(value, "model") then
-                    debug.setupvalue(PlacementState.Enable, i, newBlock)
-                end
-                i = i + 1
-            end
-            WindUI:Notify({Title = "Thông báo", Content = "Đã đổi block mặc định thành: " .. selectedBlockName, Duration = 2})
-        else
-            WindUI:Notify({Title = "Lỗi", Content = "Tên block không tồn tại!", Duration = 2})
+        local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+if CoreGui:FindFirstChild("DefaultBlockChangerGui") then
+    CoreGui.DefaultBlockChangerGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DefaultBlockChangerGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 260, 0, 180)
+MainFrame.Position = UDim2.new(0.1, 0, 0.3, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true -- Cho phép kéo thả khung
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 1
+Title.Text = "Đổi Block Mặc Định"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local BlockInput = Instance.new("TextBox")
+BlockInput.Size = UDim2.new(0.9, 0, 0, 35)
+BlockInput.Position = UDim2.new(0.05, 0, 0, 45)
+BlockInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+BlockInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+BlockInput.PlaceholderText = "Nhập tên block (VD: Stone, Wood)"
+BlockInput.Text = "Stone"
+BlockInput.TextSize = 14
+BlockInput.Font = Enum.Font.Gotham
+BlockInput.Parent = MainFrame
+
+local Corner1 = Instance.new("UICorner")
+Corner1.CornerRadius = UDim.new(0, 6)
+Corner1.Parent = BlockInput
+
+local ApplyButton = Instance.new("TextButton")
+ApplyButton.Size = UDim2.new(0.9, 0, 0, 40)
+ApplyButton.Position = UDim2.new(0.05, 0, 0, 95)
+ApplyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyButton.Text = "ÁP DỤNG HOOK"
+ApplyButton.TextSize = 15
+ApplyButton.Font = Enum.Font.GothamBold
+ApplyButton.Parent = MainFrame
+
+local Corner2 = Instance.new("UICorner")
+Corner2.CornerRadius = UDim.new(0, 6)
+Corner2.Parent = ApplyButton
+
+ApplyButton.MouseButton1Click:Connect(function()
+    local blockName = BlockInput.Text
+    
+    local success, BlockData = pcall(function()
+        return require(ReplicatedStorage.Shared.Lists.BlockData)
+    end)
+    
+    local success2, PlacementState = pcall(function()
+        return require(ReplicatedStorage.Client.Modules.BlockClient.States.PlacementState)
+    end)
+
+    if not success or not success2 then
+        warn("❌ Không tìm thấy đường dẫn Module của game!")
+        return
+    end
+
+    local targetBlock = BlockData[blockName]
+    if not targetBlock then
+        warn("❌ Tên block không tồn tại trong BlockData:", blockName)
+        return
+    end
+
+    local oldEnable = PlacementState.Enable
+    PlacementState.Enable = function(p13, ...)
+        oldEnable(p13, ...)
+        
+        if p13 and p13.SelectBlock then
+            p13.SelectBlock(targetBlock)
         end
+    end
+
+    print("✅ Đã áp dụng Hook thành công cho block:", blockName)
+end)
     end
 })
 
