@@ -683,6 +683,13 @@ Tab:Button({
         end
      })
 
+Tab:Button({
+    Title = "Build",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/03yome/Games/refs/heads/main/Build%20to%20survive%20in%20the%20night%20(Build)"))()
+        end
+     })
+
 --// GET VALID TARGETS
 function GetValidTargets()
     local targets = {}
