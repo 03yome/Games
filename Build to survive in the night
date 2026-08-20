@@ -1,3 +1,13 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MarketplaceClient = require(ReplicatedStorage.Client.Modules.MarketplaceClient)
+
+MarketplaceClient.StartSpin = function()
+
+end
+
+MarketplaceClient.EndSpin = function()
+end
+
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
