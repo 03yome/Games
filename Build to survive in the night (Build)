@@ -1,0 +1,105 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local HRP = Character:WaitForChild("HumanoidRootPart")
+
+local AutoPlaceFarm = false
+
+-- ==================== CẤU HÌNH GÓC XOAY ====================
+local CHAIR_ROTATIONS = { top = 90, bottom = 270, left = 180, right = 0 }
+local STAIRS_ROTATIONS = { top = 90, bottom = 270, left = 180, right = 0 }
+-- =========================================================
+
+local function PlaceFarm()
+    local basePos = HRP.Position + Vector3.new(0, -3, 10)
+    local blockRemote = ReplicatedStorage.Networker.Remotes:FindFirstChild("BlockReliable")
+    if not blockRemote then return end
+
+    local gridSize, spacing, inset = 8, 4, 1
+    local baseStartX = basePos.X - ((gridSize * spacing) / 2) + (spacing / 2)
+    local baseStartZ = basePos.Z - ((gridSize * spacing) / 2) + (spacing / 2)
+    local baseEndX = baseStartX + ((gridSize - 1) * spacing)
+    local baseEndZ = baseStartZ + ((gridSize - 1) * spacing)
+    local floorStartX, floorStartZ = baseStartX + (inset * spacing), baseStartZ + (inset * spacing)
+    local adjustedSize = gridSize - (inset * 2)
+    local topY = basePos.Y + (3 * spacing) -- Độ cao của khung nối đỉnh
+
+    -- 1. Xây Sàn
+    for x = 0, adjustedSize - 1 do
+        for z = 0, adjustedSize - 1 do
+            local pos = Vector3.new(floorStartX + (x * spacing), basePos.Y, floorStartZ + (z * spacing))
+            pcall(function() blockRemote:FireServer({rotation = 270, selectedBlock = {order = 13, model = ReplicatedStorage.Components.Blocks.Black, category = "furniture"}, gridPosition = pos}, "Place") end)
+        end
+    end
+
+    -- 2. Xây Cột 4 góc (Cao 4 tầng)
+    for _, corner in ipairs({{x = baseStartX, z = baseStartZ}, {x = baseEndX, z = baseStartZ}, {x = baseStartX, z = baseEndZ}, {x = baseEndX, z = baseEndZ}}) do
+        for h = 0, 3 do
+            local pos = Vector3.new(corner.x, basePos.Y + (h * spacing), corner.z)
+            pcall(function() blockRemote:FireServer({rotation = 270, selectedBlock = {order = 13, model = ReplicatedStorage.Components.Blocks.Black, category = "furniture"}, gridPosition = pos}, "Place") end)
+        end
+    end
+
+    -- 3. NỐI ĐỈNH CỘT (Khung thanh ngang trên cùng)
+    for i = 0, (gridSize - 1) do
+        local points = {
+            Vector3.new(baseStartX + (i * spacing), topY, baseStartZ),
+            Vector3.new(baseStartX + (i * spacing), topY, baseEndZ),
+            Vector3.new(baseStartX, topY, baseStartZ + (i * spacing)),
+            Vector3.new(baseEndX, topY, baseStartZ + (i * spacing))
+        }
+        for _, pos in ipairs(points) do
+            pcall(function() blockRemote:FireServer({rotation = 270, selectedBlock = {order = 13, model = ReplicatedStorage.Components.Blocks.Black, category = "furniture"}, gridPosition = pos}, "Place") end)
+        end
+    end
+
+    -- 4. ĐẶT CẦU THANG (Nằm trên các cột nối đỉnh, dịch lên trên 1 khoảng `spacing` để không bị đè)
+    local stairTopY = topY + spacing -- Đặt cao hơn thanh nối đỉnh 1 tầng
+    for i = 0, (gridSize - 1) do
+        local stairsList = {
+            {pos = Vector3.new(baseStartX + (i * spacing), stairTopY, baseStartZ), rot = STAIRS_ROTATIONS.top},
+            {pos = Vector3.new(baseStartX + (i * spacing), stairTopY, baseEndZ), rot = STAIRS_ROTATIONS.bottom},
+            {pos = Vector3.new(baseStartX, stairTopY, baseStartZ + (i * spacing)), rot = STAIRS_ROTATIONS.left},
+            {pos = Vector3.new(baseEndX, stairTopY, baseStartZ + (i * spacing)), rot = STAIRS_ROTATIONS.right}
+        }
+        for _, item in ipairs(stairsList) do
+            pcall(function()
+                blockRemote:FireServer({
+                    rotation = item.rot,
+                    selectedBlock = {
+                        order = 3,
+                        model = ReplicatedStorage.Components.Blocks["Black Stairs"],
+                        category = "furniture"
+                    },
+                    gridPosition = item.pos
+                }, "Place")
+            end)
+        end
+    end
+
+    -- 5. Đặt Ghế (Tầng trệt)
+    local chairRows = {
+        { rot = CHAIR_ROTATIONS.top,    isX = true,  coord = floorStartZ - spacing },
+        { rot = CHAIR_ROTATIONS.bottom, isX = true,  coord = floorStartZ + (adjustedSize * spacing) },
+        { rot = CHAIR_ROTATIONS.left,   isX = false, coord = floorStartX - spacing },
+        { rot = CHairs_right or CHAIR_ROTATIONS.right, isX = false, coord = floorStartX + (adjustedSize * spacing) }
+    }
+    -- Sửa lại biến gọi cho an toàn
+    chairRows[4].rot = CHAIR_ROTATIONS.right
+
+    for _, row in ipairs(chairRows) do
+        for i = 0, adjustedSize - 1 do
+            local pos = row.isX and Vector3.new(floorStartX + (i * spacing), basePos.Y, row.coord) or Vector3.new(row.coord, basePos.Y, floorStartZ + (i * spacing))
+            pcall(function() blockRemote:FireServer({rotation = row.rot, selectedBlock = {order = 2, model = ReplicatedStorage.Components.Blocks["Black Chair"], category = "furniture"}, gridPosition = pos}, "Place") end)
+        end
+    end
+end
+
+-- UI
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local Window = WindUI:CreateWindow({Title = "Game Tools by 03y_o", Icon = "rbxassetid://7072718336", Size = UDim2.fromOffset(400, 200), Theme = "Dark"})
+Window:Tab({Title = "Main"}):Toggle({Title = "Auto Build Final v2", Value = false, Callback = function(v)
+    AutoPlaceFarm = v
+    if v then task.spawn(function() while AutoPlaceFarm do PlaceFarm(); task.wait(3) end end) end
+end})
