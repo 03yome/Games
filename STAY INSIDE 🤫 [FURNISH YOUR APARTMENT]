@@ -161,17 +161,13 @@ local Dropdown = Tab:CreateDropdown({
    Callback = function(Options)
        local selected = Options[1]
        
-       if selected == "Tầng 10" then
-           local args = { "10" }
-           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
-       
-       elseif selected == "Tầng 8" then
-           local args = { "8" }
-           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
+       if selected == "Home" then
+           local args = { "6" }
+           game:GetService("ReplicatedStorage"):WaitForChild("Core"):WaitForChild("Elevator"):WaitForChild("ElevatorTeleport"):FireServer(unpack(args))
        
        elseif selected == "Tầng G" then
            local args = { "G" }
-           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ElevatorButton2"):InvokeServer(unpack(args))
+           game:GetService("ReplicatedStorage"):WaitForChild("Core"):WaitForChild("Elevator"):WaitForChild("ElevatorTeleport"):FireServer(unpack(args))
        end
    end,
 })
