@@ -154,7 +154,7 @@ local Input = Tab:CreateInput({
 
 local Dropdown = Tab:CreateDropdown({
    Name = "Select Elevator Floor",
-   Options = {"Tầng 10", "Tầng 8", "Tầng G"},
+   Options = {"Home", "Tầng G"},
    CurrentOption = {"Tầng G"}, 
    MultipleOptions = false,
    Flag = "DropdownElevator", 
