@@ -1,0 +1,109 @@
+-- Các dịch vụ của Roblox
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+
+-- CẤU HÌNH TRẠNG THÁI MẶC ĐỊNH
+local AutoPromptEnabled = false -- Mới vào game sẽ TẮT, bấm nút mới BẬT
+local MAX_DISTANCE = 25         -- Khoảng cách tối đa (Studs)
+
+----------------------------------------------------------------
+-- 1. TẠO GIAO DIỆN (GUI) BẬT / TẮT
+----------------------------------------------------------------
+-- Xóa GUI cũ để không bị lỗi trùng lặp khi chạy lại script
+if CoreGui:FindFirstChild("AutoPromptGui") then
+    CoreGui.AutoPromptGui:Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AutoPromptGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = CoreGui
+
+-- Tạo nút bấm chính
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Size = UDim2.new(0, 160, 0, 45)
+-- Đặt vị trí nút ở cạnh phải màn hình (giữa màn hình dọc) để không vướng nút Mortar cũ
+toggleButton.Position = UDim2.new(0.85, 0, 0.4, 0) 
+toggleButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- Màu đỏ (Đang Tắt)
+toggleButton.Text = "Auto E: TẮT"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 16
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.Parent = screenGui
+
+-- Bo góc nút bấm
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = toggleButton
+
+-- Thêm hiệu ứng viền cho đẹp
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Thickness = 2
+uiStroke.Color = Color3.fromRGB(255, 255, 255)
+uiStroke.Parent = toggleButton
+
+----------------------------------------------------------------
+-- 2. XỬ LÝ LOGIC KHI BẤM NÚT GUI
+----------------------------------------------------------------
+toggleButton.MouseButton1Click:Connect(function()
+    AutoPromptEnabled = not AutoPromptEnabled -- Đảo trạng thái Bật <-> Tắt
+    
+    if AutoPromptEnabled then
+        toggleButton.Text = "Auto E: ĐANG CHẠY"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(40, 180, 40) -- Đổi sang màu Xanh Lá
+    else
+        toggleButton.Text = "Auto E: ĐÃ DỪNG"
+        toggleButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- Đổi về màu Đỏ
+    end
+end)
+
+----------------------------------------------------------------
+-- 3. HÀM TÍNH KHOẢNG CÁCH VÀ TỰ ĐỘNG NHẤN (E)
+----------------------------------------------------------------
+local function getDistance(prompt)
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then 
+        return math.huge 
+    end
+    
+    local parent = prompt.Parent
+    if parent:IsA("BasePart") then
+        return (player.Character.HumanoidRootPart.Position - parent.Position).Magnitude
+    elseif parent:IsA("Model") and parent.PrimaryPart then
+        return (player.Character.HumanoidRootPart.Position - parent.PrimaryPart.Position).Magnitude
+    end
+    
+    return math.huge
+end
+
+-- Vòng lặp chạy ngầm quét ProximityPrompt
+task.spawn(function()
+    while task.wait(0.1) do
+        -- Nếu trạng thái đang TẮT thì bỏ qua không làm gì cả
+        if not AutoPromptEnabled then continue end
+        
+        for _, prompt in ipairs(Workspace:GetDescendants()) do
+            -- Chỉ bấm khi Script đang BẬT, Prompt được kích hoạt và nằm trong tầm quét
+            if AutoPromptEnabled and prompt:IsA("ProximityPrompt") and prompt.Enabled then
+                local distance = getDistance(prompt)
+                
+                if distance <= MAX_DISTANCE then
+                    -- Thực hiện giả lập nhấn phím E
+                    if prompt.HoldDuration > 0 then
+                        prompt:InputHoldBegin()
+                        task.wait(prompt.HoldDuration)
+                        prompt:InputHoldEnd()
+                    else
+                        prompt:InputHoldBegin()
+                        prompt:InputHoldEnd()
+                    end
+                end
+            end
+        end
+    end
+end)
+
+print("Script Auto ProximityPrompt kèm GUI dừng đã sẵn sàng!")
