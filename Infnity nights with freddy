@@ -1,0 +1,185 @@
+-- Made By R010101010101011010 and Jimallop300
+-- Fixed auto escape and use Rayfield
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local Debris = game:GetService("Debris")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "R0 HUB",
+    LoadingTitle = "LOADING R0 HUB!",
+    LoadingSubtitle = "MADE BY 2 USERS",
+    ConfigurationSaves = true,
+    ConfigurationSaving = {Enabled = true, FolderName = "R0HUB", FileName = "Config"}
+})
+
+local ESPTab = Window:CreateTab("ESP")
+local PlayerTab = Window:CreateTab("PLAYER")
+local DoorTab = Window:CreateTab("DOOR")
+local AntiCheatTab = Window:CreateTab("ANTICHEAT")
+local AutoTab = Window:CreateTab("AUTO")
+
+local anticheatRemoved = false
+local function Notify(t,c) Rayfield:Notify({Title=t,Content=c,Duration=3}) end
+local function needAC() if not anticheatRemoved then Notify("READ","DISABLE ANTICHEAT FIRST!"); return false end; return true end
+
+-- ESP Animatronics
+local espOn,hlObjs=false,{}
+local espCache,espLastCache,CACHE_INT={},0,5
+local function addHL(m) if not m or not m.Parent then return nil end; if m:FindFirstChild("HL") then return m.HL end; local ok,hl=pcall(function() local h=Instance.new("Highlight"); h.Name="HL"; h.FillColor=Color3.fromRGB(255,255,0); h.OutlineColor=Color3.fromRGB(255,170,0); h.FillTransparency=0.5; h.Adornee=m; h.Parent=m; return h end); return ok and hl or nil end
+local function clearHL() for _,h in hlObjs do if h and h.Parent then h:Destroy() end end; hlObjs={} end
+local function getAnims() if tick()-espLastCache<CACHE_INT and #espCache>0 then return espCache end; local a={}; local f=Workspace:FindFirstChild("Animatronics"); if f then for _,c in f:GetChildren() do if c:IsA("Model") then table.insert(a,c) end end end; espCache=a; espLastCache=tick(); return a end
+local function updateESP() local a=getAnims(); local hm={}; for _,h in hlObjs do if h and h.Adornee then hm[h.Adornee]=true end end; for _,m in a do if not hm[m] then local h=addHL(m); if h then table.insert(hlObjs,h) end end end; local tr={}; for i,h in hlObjs do if not h or not h.Parent or not h.Adornee or not h.Adornee.Parent then table.insert(tr,i); if h then h:Destroy() end end end; for i=#tr,1,-1 do table.remove(hlObjs,tr[i]) end end
+
+-- Fullbright
+local fbOn,origLight=false,{}
+local function fbEnable() local l=Lighting; origLight={Ambient=l.Ambient,Brightness=l.Brightness,ColorShift_Top=l.ColorShift_Top,ColorShift_Bottom=l.ColorShift_Bottom,GlobalShadows=l.GlobalShadows,OutdoorAmbient=l.OutdoorAmbient}; l.Ambient=Color3.fromRGB(255,255,255); l.Brightness=2; l.ColorShift_Bottom=Color3.fromRGB(0,0,0); l.ColorShift_Top=Color3.fromRGB(0,0,0); l.GlobalShadows=false; l.OutdoorAmbient=Color3.fromRGB(255,255,255) end
+local function fbDisable() local l=Lighting; if origLight.Ambient then l.Ambient=origLight.Ambient; l.Brightness=origLight.Brightness; l.ColorShift_Top=origLight.ColorShift_Top; l.ColorShift_Bottom=origLight.ColorShift_Bottom; l.GlobalShadows=origLight.GlobalShadows; l.OutdoorAmbient=origLight.OutdoorAmbient end end
+
+-- Speed & Jump
+local speedOn,speedValue=false,16
+local jumpOn,jumpValue=false,50
+local speedConn,jumpConn=nil,nil
+local function updateSpeed() local c=player.Character; if c then local h=c:FindFirstChildOfClass("Humanoid"); if h then h.WalkSpeed=speedOn and speedValue or 16 end end end
+local function updateJump() local c=player.Character; if c then local h=c:FindFirstChildOfClass("Humanoid"); if h then h.UseJumpPower=true; h.JumpPower=jumpOn and jumpValue or 50 end end end
+
+-- AntiCheat
+local function removeAC() if anticheatRemoved then Notify("INFO","ANTICHEAT ALREADY REMOVED!"); return true end; local c=player.Character or player.CharacterAdded:Wait(); local os=c:FindFirstChild("ClientScript"); if not os then anticheatRemoved=true; Notify("SUCCESS","No AntiCheat found!"); return true end; local cc={}; for _,ch in os:GetChildren() do table.insert(cc,ch:Clone()) end; os:Destroy(); local ns=Instance.new("LocalScript"); ns.Name="ClientScript"; ns.Source=""; ns.Parent=c; for _,ch in cc do ch.Parent=ns end; anticheatRemoved=true; Notify("SUCCESS","AntiCheat removed!"); return true end
+
+-- NoClip
+local function noclip(c) if c then for _,p in c:GetDescendants() do if p:IsA("BasePart") then p.CanCollide=false end end end end
+local function unclip(c) if c then for _,p in c:GetDescendants() do if p:IsA("BasePart") then p.CanCollide=true end end end end
+
+-- Generator
+local genOn,genOldPos,genPlat=false,nil,nil
+local function genPlatform(c) if genPlat then genPlat:Destroy() end; local hrp=c and c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; genPlat=Instance.new("Part"); genPlat.Name="GenPlat"; genPlat.Size=Vector3.new(4,1,4); genPlat.Anchored=true; genPlat.CanCollide=true; genPlat.Transparency=0.5; genPlat.Color=Color3.fromRGB(255,0,0); genPlat.Material=Enum.Material.Neon; genPlat.CFrame=CFrame.new(hrp.Position.X,hrp.Position.Y-3,hrp.Position.Z); genPlat.Parent=Workspace end
+local function clearGenPlat() if genPlat then genPlat:Destroy(); genPlat=nil end end
+local function doGen() if not needAC() then genOn=false; return end; local c=player.Character; if not c then return end; local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; local prompt=Workspace.Map.ImportantSpots.PowerBox.Prompt.ProximityPrompt; if not prompt then return end; if not prompt.Enabled then if genOldPos then hrp.CFrame=genOldPos; genOldPos=nil end; clearGenPlat(); unclip(c); return end; if not genOldPos then genOldPos=hrp.CFrame; noclip(c) end; hrp.CFrame=CFrame.new(Workspace.Map.ImportantSpots.PowerBox.Prompt.Position+Vector3.new(-5.5,0,0)); genPlatform(c); local amountToFix=Workspace:GetAttribute("Variable_AmountToFixGenerator") or 5; for i=1,amountToFix do fireproximityprompt(prompt) end end
+
+-- Auto Escape (retry until EscapeHighlight disabled)
+local escOn,escPlat,escFired=false,nil,false
+local function escPlatform(c) if escPlat then escPlat:Destroy() end; local hrp=c and c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; escPlat=Instance.new("Part"); escPlat.Name="EscPlat"; escPlat.Size=Vector3.new(4,1,4); escPlat.Anchored=true; escPlat.CanCollide=true; escPlat.Transparency=0.5; escPlat.Color=Color3.fromRGB(0,255,0); escPlat.Material=Enum.Material.Neon; escPlat.CFrame=CFrame.new(hrp.Position.X,hrp.Position.Y-3,hrp.Position.Z); escPlat.Parent=Workspace end
+local function clearEscPlat() if escPlat then escPlat:Destroy(); escPlat=nil end end
+local function doEscape()
+    if not needAC() then escOn=false; return end
+    local c=player.Character; if not c then return end
+    local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end
+    local escapeHighlight=Workspace.Map.ImportantSpots.EndPos:FindFirstChild("EscapeHighlight")
+    if not escapeHighlight or not escapeHighlight.Enabled then escFired=false; return end
+    if not escFired then
+        escFired=true
+        local ep=Workspace.Map.ImportantSpots.EndPos
+        local epr=ep:FindFirstChild("ProximityPrompt"); if not epr then return end
+        hrp.CFrame=ep.CFrame*CFrame.new(0,0,-3); escPlatform(c)
+        repeat
+            fireproximityprompt(epr)
+            task.wait(0.1)
+            escapeHighlight=Workspace.Map.ImportantSpots.EndPos:FindFirstChild("EscapeHighlight")
+        until not escapeHighlight or not escapeHighlight.Enabled or not escOn
+        clearEscPlat()
+    end
+end
+
+-- Auto Trash
+local trashOn,trashOldPos,curTarget=false,nil,nil
+local function doTrash() if not needAC() then trashOn=false; return end; local c=player.Character; if not c then return end; local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; local ctf=Workspace.Map.Trash:FindFirstChild("CurrentTrash"); if not ctf or not ctf:IsA("Folder") or #ctf:GetChildren()==0 then if trashOldPos then hrp.CFrame=trashOldPos; trashOldPos=nil end; curTarget=nil; return end; if curTarget and curTarget.Parent then local cp=nil; for _,d in ctf:GetDescendants() do if d.Name=="CleanPrompt" and d:IsA("ProximityPrompt") then cp=d; break end end; if cp then for i=1,5 do fireproximityprompt(cp) end end; return end; curTarget=nil; local tp=nil; for _,ch in ctf:GetChildren() do if ch:IsA("BasePart") or ch:IsA("MeshPart") then tp=ch; break elseif ch:IsA("Folder") then for _,sc in ch:GetChildren() do if sc:IsA("BasePart") or sc:IsA("MeshPart") then tp=sc; break end end; if tp then break end end end; if tp then curTarget=tp; if not trashOldPos then trashOldPos=hrp.CFrame end; hrp.CFrame=tp.CFrame; local cp=nil; for _,d in ctf:GetDescendants() do if d.Name=="CleanPrompt" and d:IsA("ProximityPrompt") then cp=d; break end end; if cp then for i=1,5 do fireproximityprompt(cp) end end else if trashOldPos then hrp.CFrame=trashOldPos; trashOldPos=nil end end end
+
+-- Auto Skip
+local skipOn=false
+local function doSkip() pcall(function() ReplicatedStorage.Events.SkipIntermission:FireServer() end) end
+
+-- Auto Music Box
+local musicOn,musicOldPos,musicPlat,musicThreshold=false,nil,nil,50
+local function musicPlatform(c) if musicPlat then musicPlat:Destroy() end; local hrp=c and c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; musicPlat=Instance.new("Part"); musicPlat.Name="MusicPlat"; musicPlat.Size=Vector3.new(4,1,4); musicPlat.Anchored=true; musicPlat.CanCollide=true; musicPlat.Transparency=0.5; musicPlat.Color=Color3.fromRGB(0,0,255); musicPlat.Material=Enum.Material.Neon; musicPlat.CFrame=CFrame.new(hrp.Position.X,hrp.Position.Y-3,hrp.Position.Z); musicPlat.Parent=Workspace end
+local function clearMusicPlat() if musicPlat then musicPlat:Destroy(); musicPlat=nil end end
+local function doMusic() if not needAC() then musicOn=false; return end; local c=player.Character; if not c then return end; local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; local mbv=Workspace:GetAttribute("MusicBox"); if not mbv then return end; if mbv>=100 then if musicOldPos then hrp.CFrame=musicOldPos; musicOldPos=nil end; clearMusicPlat() elseif mbv<musicThreshold then if not musicOldPos then musicOldPos=hrp.CFrame end; hrp.CFrame=CFrame.new(Workspace.Map.ImportantSpots.MusicBox.Prompt.Position+Vector3.new(0,5,0)); musicPlatform(c); local p=Workspace.Map.ImportantSpots.MusicBox.Prompt.Prompt; if p then for i=1,10 do fireproximityprompt(p) end end else if musicOldPos then hrp.CFrame=musicOldPos; musicOldPos=nil end; clearMusicPlat() end end
+
+-- Smart Door
+local doorOn,showRay,doorsData,lastCheck=false,true,nil,0
+local doorCloseDist=12
+local beams={L={},R={}}
+local COOLDOWN,CHECK_INT=0.3,0.15
+local function clearBeams(side) for _,v in beams[side] do if v and v.Parent then v:Destroy() end end; beams[side]={} end
+local function makeBeam(sp,ep,hit,side) if (sp-ep).Magnitude<0.3 then return end; local col=hit and Color3.fromRGB(255,30,30) or Color3.fromRGB(30,255,30); local beam=Instance.new("Beam"); beam.Width0=0.1; beam.Width1=0.1; beam.Color=ColorSequence.new(col); beam.Transparency=NumberSequence.new(0.1); beam.LightEmission=1; beam.Texture="rbxassetid://251083625"; beam.TextureLength=1; beam.FaceCamera=false; local a0=Instance.new("Attachment"); a0.WorldCFrame=CFrame.new(sp); a0.Parent=Workspace.Terrain; local a1=Instance.new("Attachment"); a1.WorldCFrame=CFrame.new(ep); a1.Parent=Workspace.Terrain; beam.Attachment0=a0; beam.Attachment1=a1; beam.Parent=Workspace.Terrain; table.insert(beams[side],beam); table.insert(beams[side],a0); table.insert(beams[side],a1); local ball=Instance.new("Part"); ball.Size=Vector3.new(0.4,0.4,0.4); ball.CFrame=CFrame.new(ep); ball.Anchored=true; ball.CanCollide=false; ball.Material=Enum.Material.Neon; ball.Shape=Enum.PartType.Ball; ball.BrickColor=hit and BrickColor.new("Bright red") or BrickColor.new("Bright green"); ball.Transparency=0.2; ball.Parent=Workspace; table.insert(beams[side],ball); Debris:AddItem(beam,0.2); Debris:AddItem(a0,0.2); Debris:AddItem(a1,0.2); Debris:AddItem(ball,0.2) end
+local function checkDoor(side,doorPos,doorX) local anims=Workspace:FindFirstChild("Animatronics"); if not anims then return false end; if showRay then clearBeams(side) end; local offX=(side=="L") and -1 or 1; local rs=doorPos+Vector3.new(offX,0,0); for _,a in anims:GetChildren() do if a:IsA("Model") then local pp=a.PrimaryPart; if pp then local ax=pp.Position.X; if (side=="L" and ax<doorX) or (side=="R" and ax>doorX) then local dist=(pp.Position-doorPos).Magnitude; local hit=dist<=doorCloseDist; if showRay then local dir=(pp.Position-rs).Unit; makeBeam(rs,rs+dir*math.min(dist,50),hit,side) end; if hit then return true end end end end end; return false end
+local function setupDoors() local dc=Workspace:WaitForChild("Map"):WaitForChild("Doors"); local d=dc:GetChildren(); local ld,rd=nil,nil; for _,door in d do if door.Name=="Door" then if not ld then ld=door else rd=door; break end end end; if not ld or not rd then return nil end; return {L={door=ld,root=ld:WaitForChild("RootPart"),prompt=ld:WaitForChild("Button"):WaitForChild("ProximityPrompt"),lastAct=0,closed=false},R={door=rd,root=rd:WaitForChild("RootPart"),prompt=rd:WaitForChild("Button"):WaitForChild("ProximityPrompt"),lastAct=0,closed=false}} end
+local function fireDoor(dd) local n=tick(); if n-dd.lastAct<COOLDOWN then return false end; fireproximityprompt(dd.prompt); dd.lastAct=n; return true end
+local function doDoor() local n=tick(); if n-lastCheck<CHECK_INT then return end; lastCheck=n; if not doorsData then doorsData=setupDoors(); if not doorsData then return end end; doorsData.L.closed=doorsData.L.door:GetAttribute("Closed") or false; doorsData.R.closed=doorsData.R.door:GetAttribute("Closed") or false; local ln=checkDoor("L",doorsData.L.root.Position,doorsData.L.root.Position.X); if ln and not doorsData.L.closed then fireDoor(doorsData.L) elseif not ln and doorsData.L.closed then fireDoor(doorsData.L) end; local rn=checkDoor("R",doorsData.R.root.Position,doorsData.R.root.Position.X); if rn and not doorsData.R.closed then fireDoor(doorsData.R) elseif not rn and doorsData.R.closed then fireDoor(doorsData.R) end end
+
+-- Wall Hack
+local wallOn=false
+local wallConn=nil
+local function wallEnable(c) if c then for _,p in c:GetDescendants() do if p:IsA("BasePart") then p.CanCollide=false end end end end
+local function wallDisable(c) if c then for _,p in c:GetDescendants() do if p:IsA("BasePart") then p.CanCollide=true end end end end
+
+-- Inmortal
+local function doGod() local af=Workspace:FindFirstChild("Animatronics"); if not af then return 0 end; local count=0; for _,a in af:GetChildren() do if a:IsA("Model") then for _,d in a:GetDescendants() do if d.Name=="AttackEvent" and d:IsA("RemoteEvent") then d:Destroy(); count=count+1 end end; local hitbox=a:FindFirstChild("CollideHitbox"); if hitbox then local ti=hitbox:FindFirstChild("TouchInterest"); if ti then ti:Destroy(); count=count+1 end end end end; return count end
+
+-- Auto Fuseboxes
+local fuseOn,fuseOldPos,curFuse,fuseNotified=false,nil,nil,false
+local function doFuse() local c=player.Character; if not c then return end; local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; local power=Workspace:GetAttribute("Power"); if power==false then if not fuseNotified then Notify("INFO","WAITING GENERATOR ON"); fuseNotified=true end; return end; fuseNotified=false; local fbf=Workspace.Map.ImportantSpots:FindFirstChild("FuseBoxes"); if not fbf then return end; local allFixed=true; for _,fb in fbf:GetChildren() do local pp=fb:FindFirstChild("PrompPart") or fb:FindFirstChild("PromptPart"); if pp then local px=pp:FindFirstChild("ProximityPrompt"); if px and px.ActionText=="Turn On" then allFixed=false; break end end end; if allFixed then if fuseOldPos then hrp.CFrame=fuseOldPos; fuseOldPos=nil end; curFuse=nil; return end; if curFuse then local pp=curFuse:FindFirstChild("PrompPart") or curFuse:FindFirstChild("PromptPart"); if pp then local px=pp:FindFirstChild("ProximityPrompt"); if px and px.Enabled and px.ActionText=="Turn On" then if not fuseOldPos then fuseOldPos=hrp.CFrame end; hrp.CFrame=pp.CFrame*CFrame.new(0,0,-3); fireproximityprompt(px); return end end; curFuse=nil end; for _,fb in fbf:GetChildren() do local pp=fb:FindFirstChild("PrompPart") or fb:FindFirstChild("PromptPart"); if pp then local px=pp:FindFirstChild("ProximityPrompt"); if px and px.Enabled and px.ActionText=="Turn On" then curFuse=fb; if not fuseOldPos then fuseOldPos=hrp.CFrame end; hrp.CFrame=pp.CFrame*CFrame.new(0,0,-3); fireproximityprompt(px); return end end end end
+
+-- Inf Cash
+local cashOn=false
+local function doCash() local c=player.Character; if not c then return end; local hrp=c:FindFirstChild("HumanoidRootPart"); if not hrp then return end; local fo=Workspace.Shop.Stands.GamblingButtons["FUN ONE"]; if fo then hrp.CFrame=fo.CFrame+Vector3.new(0,0,3); local px=fo:FindFirstChild("ProximityPrompt"); if px then for i=1,50 do fireproximityprompt(px) end end end; local balls=Workspace.Shop.FunMachine:FindFirstChild("Balls"); local good=Workspace.Shop.FunMachine.Zones:FindFirstChild("GOOD"); if balls and good then for _,ball in balls:GetChildren() do if ball:IsA("BasePart") then ball.CFrame=good.CFrame; pcall(function() ReplicatedStorage.Events.Grab:FireServer(ball); ReplicatedStorage.Events.Grab:FireServer(ball,true) end) end end end; task.wait() end
+
+-- ==================== ESP TAB ====================
+ESPTab:CreateToggle({Name="ESP ANIMATRONICS",CurrentValue=false,Callback=function(v) espOn=v; if espOn then updateESP(); spawn(function() while espOn do updateESP(); task.wait(2) end end) else clearHL(); espCache={}; espLastCache=0 end end})
+ESPTab:CreateToggle({Name="ESP PLAYERS",CurrentValue=false,Callback=function(v) if v then local running=true; spawn(function() while running do for _,p in Players:GetPlayers() do if p~=player and p.Character and not p.Character:FindFirstChild("HL_Player") then local h=Instance.new("Highlight"); h.Name="HL_Player"; h.FillColor=Color3.fromRGB(0,255,255); h.OutlineColor=Color3.fromRGB(0,200,200); h.FillTransparency=0.5; h.Adornee=p.Character; h.Parent=p.Character end end; task.wait(2) end; for _,p in Players:GetPlayers() do if p.Character then local h=p.Character:FindFirstChild("HL_Player"); if h then h:Destroy() end end end end) else for _,p in Players:GetPlayers() do if p.Character then local h=p.Character:FindFirstChild("HL_Player"); if h then h:Destroy() end end end end end})
+ESPTab:CreateToggle({Name="ESP GENERATOR",CurrentValue=false,Callback=function(v) if v then local gen=Workspace.Map.ImportantSpots.PowerBox; if gen and not gen:FindFirstChild("HL_Gen") then local h=Instance.new("Highlight"); h.Name="HL_Gen"; h.FillColor=Color3.fromRGB(255,0,0); h.OutlineColor=Color3.fromRGB(200,0,0); h.FillTransparency=0.5; h.Adornee=gen; h.Parent=gen end else local gen=Workspace.Map.ImportantSpots.PowerBox; if gen then local h=gen:FindFirstChild("HL_Gen"); if h then h:Destroy() end end end end})
+ESPTab:CreateToggle({Name="ESP MUSIC BOX",CurrentValue=false,Callback=function(v) if v then local mb=Workspace.Map.ImportantSpots.MusicBox; if mb and not mb:FindFirstChild("HL_Music") then local h=Instance.new("Highlight"); h.Name="HL_Music"; h.FillColor=Color3.fromRGB(0,0,255); h.OutlineColor=Color3.fromRGB(0,0,200); h.FillTransparency=0.5; h.Adornee=mb; h.Parent=mb end else local mb=Workspace.Map.ImportantSpots.MusicBox; if mb then local h=mb:FindFirstChild("HL_Music"); if h then h:Destroy() end end end end})
+
+-- ==================== PLAYER TAB ====================
+PlayerTab:CreateToggle({Name="FULLBRIGHT",CurrentValue=false,Callback=function(v) fbOn=v; if fbOn then fbEnable() else fbDisable() end end})
+PlayerTab:CreateSlider({Name="WALK SPEED",Range={16,200},Increment=1,Suffix="",CurrentValue=16,Callback=function(v) speedValue=v; updateSpeed() end})
+PlayerTab:CreateToggle({Name="ENABLE SPEED",CurrentValue=false,Callback=function(v) speedOn=v; if v then updateSpeed(); speedConn=RunService.Heartbeat:Connect(updateSpeed) else if speedConn then speedConn:Disconnect(); speedConn=nil end; speedValue=16; updateSpeed() end end})
+PlayerTab:CreateSlider({Name="JUMP POWER",Range={50,350},Increment=1,Suffix="",CurrentValue=50,Callback=function(v) jumpValue=v; updateJump() end})
+PlayerTab:CreateToggle({Name="ENABLE JUMP",CurrentValue=false,Callback=function(v) jumpOn=v; if v then updateJump(); jumpConn=RunService.Heartbeat:Connect(updateJump) else if jumpConn then jumpConn:Disconnect(); jumpConn=nil end; jumpValue=50; updateJump() end end})
+PlayerTab:CreateToggle({Name="WALL HACK",CurrentValue=false,Callback=function(v) wallOn=v; if wallOn then if not needAC() then wallOn=false; return end; wallEnable(player.Character); wallConn=RunService.Heartbeat:Connect(function() local c=player.Character; if c then wallEnable(c) end end) else if wallConn then wallConn:Disconnect(); wallConn=nil end; wallDisable(player.Character) end end})
+PlayerTab:CreateButton({Name="INMORTAL (FOREVER)",Callback=function() local count=doGod(); Notify("INMORTAL","Destroyed "..count.." objects!") end})
+
+-- ==================== DOOR TAB ====================
+DoorTab:CreateToggle({Name="SMART DOOR",CurrentValue=false,Callback=function(v) doorOn=v; if doorOn then doorsData=nil; lastCheck=0; doDoor(); spawn(function() while doorOn do doDoor(); task.wait(CHECK_INT) end end) else doorsData=nil; clearBeams("L"); clearBeams("R") end end})
+DoorTab:CreateSlider({Name="CLOSE DISTANCE",Range={5,30},Increment=1,Suffix=" studs",CurrentValue=12,Callback=function(v) doorCloseDist=v end})
+DoorTab:CreateToggle({Name="RAYCAST (SMART DOOR)",CurrentValue=true,Callback=function(v) showRay=v; if not showRay then clearBeams("L"); clearBeams("R") end end})
+
+-- ==================== ANTICHEAT TAB ====================
+local stopCatchOn = false
+
+AntiCheatTab:CreateButton({Name="REMOVE ANTICHEAT",Callback=function() removeAC() end})
+
+AntiCheatTab:CreateToggle({Name="STOP CATCH",CurrentValue=false,Callback=function(v)
+    stopCatchOn = v
+    if v then
+        Notify("INFO","CAN TOUCH BASEPLATE")
+        spawn(function()
+            while stopCatchOn do
+                local catch = Workspace:FindFirstChild("Catch")
+                if catch then catch.CanTouch = false end
+                task.wait(0.5)
+            end
+        end)
+    else
+        Notify("INFO","CAN'T TOUCH BASEPLATE")
+        local catch = Workspace:FindFirstChild("Catch")
+        if catch then catch.CanTouch = true end
+    end
+end})
+
+-- ==================== AUTO TAB ====================
+AutoTab:CreateToggle({Name="AUTO GENERATOR",CurrentValue=false,Callback=function(v) genOn=v; if genOn then if not needAC() then genOn=false; return end; genOldPos=nil; doGen(); spawn(function() while genOn do doGen(); task.wait() end end) else clearGenPlat(); genOldPos=nil; local c=player.Character; if c then unclip(c) end end end})
+AutoTab:CreateToggle({Name="AUTO ESCAPE",CurrentValue=false,Callback=function(v) escOn=v; if escOn then if not needAC() then escOn=false; return end; escFired=false; doEscape(); spawn(function() while escOn do doEscape(); task.wait(0.5) end end) else clearEscPlat(); escFired=false end end})
+AutoTab:CreateToggle({Name="AUTO TRASH",CurrentValue=false,Callback=function(v) trashOn=v; if trashOn then if not needAC() then trashOn=false; return end; trashOldPos=nil; curTarget=nil; doTrash(); spawn(function() while trashOn do doTrash(); task.wait(0.3) end end) else trashOldPos=nil; curTarget=nil end end})
+AutoTab:CreateToggle({Name="AUTO SKIP INTERMISSION",CurrentValue=false,Callback=function(v) skipOn=v; if skipOn then doSkip(); spawn(function() while skipOn do doSkip(); task.wait(1) end end) end end})
+AutoTab:CreateSlider({Name="MUSIC BOX THRESHOLD",Range={0,100},Increment=1,Suffix="%",CurrentValue=50,Callback=function(v) musicThreshold=v end})
+AutoTab:CreateToggle({Name="AUTO MUSIC BOX",CurrentValue=false,Callback=function(v) musicOn=v; if musicOn then if not needAC() then musicOn=false; return end; musicOldPos=nil; doMusic(); spawn(function() while musicOn do doMusic(); task.wait() end end) else musicOldPos=nil; clearMusicPlat() end end})
+AutoTab:CreateToggle({Name="AUTO FUSEBOXES",CurrentValue=false,Callback=function(v) fuseOn=v; if fuseOn then if not needAC() then fuseOn=false; return end; fuseOldPos=nil; curFuse=nil; fuseNotified=false; doFuse(); spawn(function() while fuseOn do doFuse(); task.wait(0.3) end end) else fuseOldPos=nil; curFuse=nil; fuseNotified=false end end})
+AutoTab:CreateToggle({Name="INFINITE CASH",CurrentValue=false,Callback=function(v) cashOn=v; if cashOn then if not needAC() then cashOn=false; return end; spawn(function() while cashOn do pcall(doCash) end end) end end})
