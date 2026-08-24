@@ -43,12 +43,16 @@ local function getHRP()
 end
 
 RunService.RenderStepped:Connect(function()
+	-- KIỂM TRA NGAY LẬP TỨC: Nếu tắt thì dừng hẳn hàm, không chạy code phía dưới
 	if not enabled then return end
 	
 	local hrp = getHRP()
 	if not hrp then return end
 	
 	for _,block in ipairs(blocksFolder:GetChildren()) do
+		-- Kiểm tra thêm 1 lần nữa bên trong vòng lặp để ngắt ngay lập tức nếu trạng thái thay đổi giữa chừng
+		if not enabled then break end
+		
 		local part
 		
 		if block:IsA("BasePart") then
@@ -66,8 +70,6 @@ RunService.RenderStepped:Connect(function()
 			local checkZ = math.abs(pos.Z - myPos.Z) <= range
 			
 			-- GIỚI HẠN TRỤC Y THEO CỠ BLOCK 3x3x3:
-			-- Chỉ đào lớp block bạn đang đứng đè lên (chân player) trở lên trên.
-			-- Loại bỏ hoàn toàn các lớp block nằm sâu hẳn ở phía dưới.
 			local checkY = pos.Y >= (myPos.Y - 4.5)
 			
 			if checkX and checkZ and checkY then
