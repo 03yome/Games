@@ -84,86 +84,37 @@ end)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Khử trùng lặp GUI cũ nếu có
-pcall(function()
-    game:GetService("CoreGui"):FindFirstChild("TouchEnterGui"):Destroy()
-end)
-
--- Khởi tạo GUI trong CoreGui
 local gui = Instance.new("ScreenGui")
-gui.Name = "TouchEnterGui"
+gui.Name = "TouchInterestGUI"
 gui.ResetOnSpawn = false
-gui.Parent = game:GetService("CoreGui")
+gui.Parent = game.CoreGui
 
 local button = Instance.new("TextButton")
-button.Size = UDim2.new(0, 150, 0, 50)
-button.Position = UDim2.new(0.5, -75, 0, 10)
-button.Text = "Touch Enter: OFF"
-button.Font = Enum.Font.GothamBold
-button.TextSize = 14
-button.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+button.Size = UDim2.new(0, 180, 0, 50)
+button.Position = UDim2.new(0.5, -90, 0.8, 0)
+button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.TextSize = 18
+button.Text = "Touch Enter"
 button.Parent = gui
 
--- Bo góc cho nút bấm gọn đẹp
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 8)
 corner.Parent = button
 
--- Biến trạng thái Toggle
-local toggled = false
-local loopConnection = nil
-
--- Hàm xử lý chạm vật lý gõ thẳng vào Class hệ thống
-local function fireTouch(part)
-    local char = player.Character
-    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-
-    -- Kích hoạt lệnh chạm (0 = Chạm vào, 1 = Thả ra)
-    firetouchinterest(hrp, part, 0)
-    task.wait()
-    firetouchinterest(hrp, part, 1)
-end
-
--- Hàm tìm kiếm đường dẫn an toàn từng bước
-local function getEnterPart()
-    local plots = workspace:FindFirstChild("Plots")
-    if not plots then return nil end
-    
-    local plot = plots:FindFirstChild("x5_oz6")
-    if not plot then return nil end
-    
-    local interact = plot:FindFirstChild("Interact")
-    if not interact then return nil end
-    
-    return interact:FindFirstChild("Enter")
-end
-
--- Sự kiện Click nút bấm từ tay bạn (Chuyển thành Toggle)
 button.MouseButton1Click:Connect(function()
-    toggled = not toggled
+    local character = player.Character or player.CharacterAdded:Wait()
+    local root = character:FindFirstChild("HumanoidRootPart")
 
-    if toggled then
-        button.Text = "Touch Enter: ON"
-        button.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-        
-        -- Vòng lặp tự động gọi liên tục khi bật
-        loopConnection = task.spawn(function()
-            while toggled do
-                local enter = getEnterPart()
-                if enter and enter:IsA("BasePart") then
-                    fireTouch(enter)
-                else
-                    warn("Không tìm thấy đường dẫn đến khối Enter!")
-                end
-                task.wait(0.5) -- Thời gian chờ giữa các lần lặp (có thể chỉnh lại tùy ý)
-            end
-        end)
-    else
-        button.Text = "Touch Enter: OFF"
-        button.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+    local target = workspace
+        :WaitForChild("Plots")
+        :WaitForChild("x5_oz6")
+        :WaitForChild("Interact")
+        :WaitForChild("Enter")
+
+    if root and target:IsA("BasePart") then
+        firetouchinterest(root, target, 0)
+        task.wait(0.1)
+        firetouchinterest(root, target, 1)
     end
 end)
-
-print("=== SCRIPT TOGGLE ĐÃ SẴN SÀNG ===")
