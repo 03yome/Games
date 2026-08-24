@@ -91,7 +91,7 @@ gui.Parent = game.CoreGui
 
 local button = Instance.new("TextButton")
 button.Size = UDim2.new(0, 180, 0, 50)
-button.Position = UDim2.new(0.527, 0, 0.002, 0)
+button.Position = UDim2.new(0.5, -90, 0, 10)
 button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 button.TextColor3 = Color3.fromRGB(255, 255, 255)
 button.TextSize = 18
@@ -106,15 +106,17 @@ button.MouseButton1Click:Connect(function()
     local character = player.Character or player.CharacterAdded:Wait()
     local root = character:FindFirstChild("HumanoidRootPart")
 
-    local target = workspace
+    local enter = workspace
         :WaitForChild("Plots")
         :WaitForChild("x5_oz7")
         :WaitForChild("Interact")
         :WaitForChild("Enter")
 
-    if root and target:IsA("BasePart") then
-        firetouchinterest(root, target, 0)
+    local touchInterest = enter:FindFirstChild("TouchInterest")
+
+    if root and enter:IsA("BasePart") and touchInterest then
+        firetouchinterest(root, enter, 0)
         task.wait(0.1)
-        firetouchinterest(root, target, 1)
+        firetouchinterest(root, enter, 1)
     end
 end)
