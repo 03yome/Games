@@ -108,7 +108,7 @@ button.MouseButton1Click:Connect(function()
 
     local target = workspace
         :WaitForChild("Plots")
-        :WaitForChild("x5_oz6")
+        :WaitForChild("x5_oz7")
         :WaitForChild("Interact")
         :WaitForChild("Enter")
 
