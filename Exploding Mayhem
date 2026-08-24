@@ -1,9 +1,7 @@
--- Services
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local localPlayer = Players.LocalPlayer
 
--- Đường dẫn đến thư mục chứa vật phẩm
 local debrisFolder = Workspace:WaitForChild("DebrisFolder", 5)
 
 if not debrisFolder then
@@ -11,7 +9,6 @@ if not debrisFolder then
     return
 end
 
--- Bảng lưu trữ những item đã tương tác để tránh spam liên tục
 local collectedItems = {}
 
 local function collectItems()
@@ -22,36 +19,31 @@ local function collectItems()
     if not rootPart then return end
 
     for _, item in ipairs(debrisFolder:GetChildren()) do
-        -- Kiểm tra item hợp lệ, là BasePart và chưa bị xử lý trước đó
         if item:IsA("BasePart") and not collectedItems[item] then
-            local itemName = item.Name
             
-            if itemName:match("Coin") or itemName:match("Emerald") then
-                -- Đánh dấu item này đang xử lý
+            local touchInterest = item:FindFirstChildWhichIsA("TouchTransmitter") or item:FindFirstChild("TouchInterest")
+            
+            if touchInterest then
                 collectedItems[item] = true
                 
-                -- Thực hiện firetouchinterest an toàn
                 local success, err = pcall(function()
                     firetouchinterest(rootPart, item, 0)
+                    task.wait()
                     firetouchinterest(rootPart, item, 1)
                 end)
                 
                 if not success then
                     warn("Lỗi firetouchinterest: " .. tostring(err))
                 end
-                
-                -- Tạm dừng siêu nhỏ giữa mỗi item để không nghẽn game
-                task.wait(0.05)
             end
         end
     end
 end
 
--- Dọn dẹp bộ nhớ: Xóa các item đã bị xóa khỏi game ra khỏi danh sách `collectedItems`
 task.spawn(function()
     while true do
         for item, _ in pairs(collectedItems) do
-            if not item.Parent then
+            if not item or not item.Parent or not item:IsDescendantOf(debrisFolder) then
                 collectedItems[item] = nil
             end
         end
@@ -59,12 +51,9 @@ task.spawn(function()
     end
 end)
 
--- Vòng lặp chính chạy giãn cách để chống đơ
 task.spawn(function()
     while true do
         pcall(collectItems)
-        task.wait(0.5) -- Kiểm tra lại danh sách mỗi 0.5 giây (có thể tăng lên 1 nếu vẫn giật)
+        task.wait(0.2)
     end
 end)
-
-print("Đã bật Auto Farm tối ưu (Không đơ game)!")
