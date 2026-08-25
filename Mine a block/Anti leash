@@ -1,0 +1,65 @@
+-- Combined Anti-Leash & Optimized Anti-Stun Script for Executor
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+-- 1. Hàm quét và xóa các vật thể kéo (Leash constraints)
+local function removeLeashConstraints()
+    local char = player.Character
+    if not char then return end
+    
+    for _, desc in ipairs(char:GetDescendants()) do
+        if desc:IsA("Constraint") or desc:IsA("BodyMover") or desc:IsA("LinearVelocity") or desc:IsA("AlignPosition") then
+            desc:Destroy()
+        end
+    end
+end
+
+-- Vòng lặp siêu nhẹ chỉ chuyên để chống Leash (quét mượt mà không gây lag)
+RunService.RenderStepped:Connect(function()
+    removeLeashConstraints()
+end)
+
+-- 2. Hệ thống Anti-Stun phiên bản nhẹ (Không dùng RenderStepped nặng nề)
+local function cleanStun(char)
+    if not char then return end
+    
+    local function checkAttributes()
+        if char:GetAttribute("Stunned") then
+            char:SetAttribute("Stunned", false)
+        end
+    end
+    
+    char.AttributeChanged:Connect(function(attributeName)
+        if attributeName == "Stunned" then
+            checkAttributes()
+        end
+    end)
+    
+    task.spawn(function()
+        while char and char.Parent do
+            checkAttributes()
+            
+            local humanoid = char:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if humanoid:GetAttribute("Stunned") then
+                    humanoid:SetAttribute("Stunned", false)
+                end
+                if humanoid:GetAttribute("StunDuration") and humanoid:GetAttribute("StunDuration") > 0 then
+                    humanoid:SetAttribute("StunDuration", 0)
+                end
+            end
+            
+            task.wait(0.2) -- Kiểm tra thưa để không gây tụt FPS
+        end
+    end)
+end
+
+if player.Character then
+    cleanStun(player.Character)
+end
+
+player.CharacterAdded:Connect(cleanStun)
+
+print("Anti-Leash & Optimized Anti-Stun Loaded Successfully!")
