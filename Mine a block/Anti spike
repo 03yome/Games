@@ -1,0 +1,70 @@
+-- Anti-Spike / Anti-Trap Script for Executor
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local plotsFolder = Workspace:WaitForChild("Plots", 5)
+
+if not plotsFolder then
+    warn("Không tìm thấy thư mục Plots trong Workspace!")
+    return
+end
+
+local activeConnections = {}
+
+-- Hàm kiểm tra và xóa các bẫy gai (Spikes) của player khác
+local function removeOtherPlotsSpikes()
+    local myPlotName = player.Name -- Thông thường tên plot sẽ trùng với tên player hoặc được lưu trữ ở đâu đó, nếu game đặt tên khác bạn có thể điều chỉnh
+    
+    for _, plot in ipairs(plotsFolder:GetChildren()) do
+        -- Bỏ qua plot của chính mình (kiểm tra tên plot hoặc giả sử plot của bạn mang tên bạn)
+        if plot.Name ~= player.Name and plot.Name ~= tostring(player.UserId) then
+            
+            -- Tìm thư mục Blocks bên trong Plot của người khác
+            local blocks = plot:FindFirstChild("Blocks")
+            if blocks then
+                for _, block in ipairs(blocks:GetDescendants()) do
+                    -- Kiểm tra nếu tên chứa "Spike" hoặc "Stone Spikes" hoặc có chứa sự kiện Touch gây sát thương
+                    if block.Name:lower():find("spike") or block.Name:lower():find("trap") then
+                        -- Xóa part hoặc vô hiệu hóa bộ phận Touch bằng cách xóa hoặc đổi tên
+                        block:Destroy()
+                    end
+                end
+            end
+            
+            -- Quét tổng quát bất kỳ phần tử nào có tên "Stone Spikes" hoặc chứa sự kiện Touch độc hại
+            for _, descendant in ipairs(plot:GetDescendants()) do
+                if descendant.Name == "Stone Spikes" or (descendant:IsA("BasePart") and descendant.Name:lower():find("spike")) then
+                    descendant:Destroy()
+                end
+            end
+        end
+    end
+end
+
+-- Lắng nghe sự kiện khi nhân vật hồi sinh hoặc chết
+local function setupCharacter(char)
+    local humanoid = char:WaitForChild("Humanoid", 5)
+    if humanoid then
+        -- Khi chết, hủy bỏ hoặc dừng các tính năng nếu cần (hoặc giữ nguyên vòng lặp quét)
+        humanoid.Died:Connect(function()
+            -- Bạn có thể thêm logic reset tại đây nếu muốn
+        end)
+    end
+end
+
+if player.Character then
+    setupCharacter(player.Character)
+end
+
+player.CharacterAdded:Connect(setupCharacter)
+
+-- Chạy vòng lặp liên tục để dọn dẹp các bẫy gai mới được đặt ra liên tục bởi người khác
+task.spawn(function()
+    while true do
+        pcall(removeOtherPlotsSpikes)
+        task.wait(0.5) -- Quét lại mỗi 0.5 giây để đảm bảo bẫy mới spawn bị xóa ngay lập tức
+    end
+end)
+
+print("Anti-Spike Loaded Successfully!")
