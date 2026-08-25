@@ -1,0 +1,44 @@
+-- Script Path: game:GetService("ReplicatedStorage").Modules.Client.Tools.Attack["Light Punch"]
+-- Bypass Cooldown & No Restrictions
+
+local v_u_1 = game.Players.LocalPlayer
+v_u_1:GetMouse()
+local v2 = game.ReplicatedStorage.Modules.Shared
+require(v2.ToolData)
+local v_u_3 = {}
+
+game.ReplicatedStorage.Events.ItemHeldOut.OnClientEvent:Connect(function(p4, p5, p6, p7, p_u_8, p9)
+    if p4 == "Tool" then
+        if p5 ~= "Attack" then
+            return
+        end
+        if p6 == "Begin" and p7 == "Light Punch" then
+            v_u_3.unequip = p9.Unequipped:Connect(function()
+                for _, v10 in v_u_3 do
+                    v10:Disconnect()
+                end
+                v_u_3 = {}
+            end)
+            v_u_3.destroy = p9.AncestryChanged:Connect(function(_, p11)
+                if p11 == nil then
+                    for _, v12 in v_u_3 do
+                        v12:Disconnect()
+                    end
+                    v_u_3 = {}
+                end
+            end)
+            v_u_3.attack = p9.Activated:Connect(function()
+                -- Đã loại bỏ InvokeCooldown, Stunned và Attacking để đấm liên tục không giới hạn
+                if v_u_1.Character and v_u_1.Character:FindFirstChild("Humanoid") and v_u_1.Character.Humanoid.Health > 0 then
+                    local v13 = {
+                        ["Input"] = "Light Punch",
+                        ["ID"] = p_u_8
+                    }
+                    game.ReplicatedStorage.Events.Attack:FireServer(v13)
+                end
+            end)
+        end
+    end
+end)
+
+return {}
