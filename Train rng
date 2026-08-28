@@ -54,9 +54,9 @@ Tab1:Toggle("Auto Add Tix", false, function(bool)
     end
 end)
 
-local 03yo = Window:AddSection("03y_o")
+local Tab2 = Window:AddSection("03y_o")
 
-03yo:Button("no (Fix Wait)", function()
+Tab2:Button("no (Fix Wait)", function()
     local g
     g = hookfunction(wait, function(seconds)
         return g(0)
@@ -64,7 +64,7 @@ local 03yo = Window:AddSection("03y_o")
     print("HI")
 end)
 
-03yo:Button("Spawn Platform", function()
+Tab2:Button("Spawn Platform", function()
     local part = Instance.new("Part")
     part.Size = Vector3.new(100000, 1, 100000)
     part.Position = Vector3.new(0, 190, 0)
