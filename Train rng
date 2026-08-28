@@ -74,3 +74,8 @@ Tab2:Button("Spawn Platform", function()
     part.Parent = game.Workspace
     print("HI")
 end)
+
+Tab2:Button("Free door", function()
+workspace.RNGPlace["Floor 1"].Floor2.GroupDoor:Destroy()
+workspace.RNGPlace["Floor 1"].Floor1.VIPDoor:Destroy()
+end)
