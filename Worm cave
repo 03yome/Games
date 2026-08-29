@@ -1,0 +1,27 @@
+local function startStaminaLock(stamina)
+    task.spawn(function()
+        while stamina and stamina.Parent do
+            if stamina.Value ~= 100 then
+                stamina.Value = 100
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "x5_oz7" then
+        local stamina = child:WaitForChild("StaminaValue", 5)
+        if stamina then
+            startStaminaLock(stamina)
+        end
+    end
+end)
+
+local existingChar = workspace:FindFirstChild("x5_oz7")
+if existingChar then
+    local stamina = existingChar:WaitForChild("StaminaValue", 5)
+    if stamina then
+        startStaminaLock(stamina)
+    end
+end
