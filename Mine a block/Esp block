@@ -13,6 +13,13 @@ local COLOR_LUCKY = Color3.fromRGB(255, 192, 44)      -- Lucky Block (Không c�
 local COLOR_DIAMOND_BLOCK = Color3.fromRGB(111, 205, 255) -- Kim Cương Block (Không cần nền xám - Cần chữ M)
 local COLOR_EMERALD_BLOCK = Color3.fromRGB(103, 193, 103) -- Ngọc Lục Bảo Block (Không cần nền xám - Cần chữ M)
 
+-- Màu sắc riêng của Diamond Lucky Block theo cấu trúc Model của bạn
+local COLOR_DL_CUBE2 = Color3.fromRGB(231, 231, 236)
+local COLOR_DL_CUBE3 = Color3.fromRGB(248, 248, 248)
+local COLOR_DL_PART  = Color3.fromRGB(101, 170, 255)
+-- Màu hiển thị ESP cho Diamond Lucky Block (Sử dụng màu của Part hoặc tùy chỉnh theo ý bạn)
+local COLOR_DIAMOND_LUCKY = Color3.fromRGB(101, 170, 255)
+
 -- Quản lý các khung ESP trong CoreGui
 local ESPContainer = CoreGui:FindFirstChild("BlockESPContainer") or Instance.new("Folder")
 if not ESPContainer.Parent then
@@ -38,7 +45,7 @@ local function createTextLabelM(target, espColor)
 	billboard.Name = "LabelM"
 	billboard.Adornee = target
 	billboard.Size = UDim2.new(0, 50, 0, 50)
-	billboard.AlwaysOnTop = true -- Giúp chữ nhìn xuyên qua mọi lớp đá đất
+	billboard.AlwaysOnTop = true
 	
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -47,7 +54,7 @@ local function createTextLabelM(target, espColor)
 	textLabel.Font = Enum.Font.GothamBold
 	textLabel.TextSize = 24
 	textLabel.TextColor3 = espColor
-	textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0) -- Viền chữ màu đen cho dễ nhìn
+	textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 	textLabel.TextStrokeTransparency = 0
 	textLabel.Parent = billboard
 	
@@ -67,9 +74,24 @@ local function validateAndGetOreColor(model)
 	local hasDiamondBlock = false
 	local hasEmeraldBlock = false
 
+	-- Biến kiểm tra cấu trúc Diamond Lucky Block
+	local foundCube2 = false
+	local foundCube3 = false
+	local foundPart = false
+
 	for _, child in ipairs(model:GetDescendants()) do
 		if child:IsA("BasePart") then
 			local c = child.Color
+			
+			-- Check Diamond Lucky Block dựa theo tên hoặc màu sắc các thành phần bên trong
+			if child.Name == "Cube.002" and isColorMatch(c, COLOR_DL_CUBE2) then
+				foundCube2 = true
+			elseif child.Name == "Cube.003" and isColorMatch(c, COLOR_DL_CUBE3) then
+				foundCube3 = true
+			elseif child.Name == "Part" and isColorMatch(c, COLOR_DL_PART) then
+				foundPart = true
+			end
+
 			if isColorMatch(c, COLOR_BASE) then
 				hasBaseGrey = true
 			elseif isColorMatch(c, COLOR_DIAMOND) then
@@ -92,6 +114,11 @@ local function validateAndGetOreColor(model)
 		end
 	end
 
+	-- Nếu model chứa đủ cấu trúc của Diamond Lucky Block
+	if foundCube2 and foundCube3 and foundPart then
+		return COLOR_DIAMOND_LUCKY, false
+	end
+
 	-- Trả về: Màu sắc, và biến Boolean xác định xem có phải là "Block nguyên chất" cần chữ M không
 	if hasSapphire then
 		return COLOR_SAPPHIRE, false
@@ -100,9 +127,9 @@ local function validateAndGetOreColor(model)
 	elseif hasLucky then
 		return COLOR_LUCKY, false
 	elseif hasDiamondBlock then
-		return COLOR_DIAMOND_BLOCK, true -- Cần chữ M
+		return COLOR_DIAMOND_BLOCK, true
 	elseif hasEmeraldBlock then
-		return COLOR_EMERALD_BLOCK, true -- Cần chữ M
+		return COLOR_EMERALD_BLOCK, true
 	end
 
 	if hasBaseGrey then
@@ -132,12 +159,9 @@ local function applyESP(model, espColor, needTextM)
 	highlight.OutlineTransparency = 0
 	highlight.Parent = ESPContainer
 	
-	-- Nếu thuộc nhóm Kim Cương Block hoặc Ngọc Lục Bảo Block, tạo thêm chữ M lơ lửng
 	if needTextM then
-		-- Tìm một BasePart bất kỳ trong Model để gắn chữ lên tâm của nó
 		local mainPart = model:IsA("BasePart") and model or model:FindFirstChildWhichIsA("BasePart")
 		if mainPart then
-			-- Xóa chữ M cũ phòng hờ trùng lặp
 			if mainPart:FindFirstChild("LabelM") then mainPart.LabelM:Destroy() end
 			createTextLabelM(mainPart, espColor)
 		end
@@ -160,9 +184,9 @@ local function processBlock(item)
 		elseif isColorMatch(c, COLOR_LUCKY) then
 			applyESP(item, COLOR_LUCKY, false)
 		elseif isColorMatch(c, COLOR_DIAMOND_BLOCK) then
-			applyESP(item, COLOR_DIAMOND_BLOCK, true) -- Cần chữ M
+			applyESP(item, COLOR_DIAMOND_BLOCK, true)
 		elseif isColorMatch(c, COLOR_EMERALD_BLOCK) then
-			applyESP(item, COLOR_EMERALD_BLOCK, true) -- Cần chữ M
+			applyESP(item, COLOR_EMERALD_BLOCK, true)
 		end
 	end
 end
@@ -193,5 +217,3 @@ blocksFolder.ChildRemoved:Connect(function(child)
 		associatedESP:Destroy()
 	end
 end)
-
-print("=== ESP CẬP NHẬT: ĐÃ THÊM CHỮ M CHO KIM CƯƠNG & NGỌC LỤC BẢO BLOCK ===")
