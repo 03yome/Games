@@ -16,6 +16,38 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
+_G.ModifySpeed = false
+_G.CustomSpeed = 32
+_G.ModifyJump = false
+_G.CustomJump = 100
+
+--------------------------------------------------
+-- METATABLE HOOKING (CLEAN VERSION)
+--------------------------------------------------
+local rawMetatable = getrawmetatable(game)
+local oldNewIndex = rawMetatable.__newindex
+local oldNameCall = rawMetatable.__namecall
+setreadonly(rawMetatable, false)
+
+rawMetatable.__newindex = newcclosure(function(object, property, value)
+    local isTargetHumanoid = object:IsA("Humanoid")
+    
+    if isTargetHumanoid then
+        isTargetHumanoid = object.Parent == Player.Character
+    end
+    
+    if isTargetHumanoid then
+        if property == "WalkSpeed" and _G.ModifySpeed then
+            return oldNewIndex(object, property, _G.CustomSpeed)
+        end
+
+        if property == "JumpHeight" and _G.ModifyJump then
+            return oldNewIndex(object, property, _G.CustomJump)
+        end
+    end
+    
+    return oldNewIndex(object, property, value)
+end)
 --------------------------------------------------
 -- INTERCEPT RE-EXECUTION (RELOAD NOTIFICATION SYSTEM)
 --------------------------------------------------
@@ -185,7 +217,7 @@ Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
 -- TAB NAVIGATION BAR (LEFT SIDEBAR)
 --------------------------------------------------
 local Sidebar = Instance.new("ScrollingFrame")
-Sidebar.CanvasSize = UDim2.new(0, 0, 0, 250)
+Sidebar.CanvasSize = UDim2.new(0, 0, 0, 270)
 Sidebar.ScrollBarThickness = 2
 Sidebar.ScrollBarImageColor3 = Color3.fromRGB(50, 50, 60)
 Sidebar.Size = UDim2.new(0, 110, 1, -45)
@@ -483,6 +515,28 @@ local function createButton(text, parent)
 	return Btn, BtnStroke
 end
 
+--------------------------------------------------
+-- TEXTBUTTON CREATOR UTILITY
+--------------------------------------------------
+
+local function createTextBox(placeholderText, parent)
+	local Box = Instance.new("TextBox", parent)
+	Box.Size = UDim2.new(1, -6, 0, 34)
+	Box.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+	Box.TextColor3 = Color3.fromRGB(200, 200, 210)
+	Box.PlaceholderText = placeholderText
+	Box.PlaceholderColor3 = Color3.fromRGB(100, 100, 110)
+	Box.Font = Enum.Font.GothamBold
+	Box.TextSize = 11
+	Box.Text = ""
+	Box.ClearTextOnFocus = false
+	Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 5)
+	local Stroke = Instance.new("UIStroke", Box)
+	Stroke.Color = Color3.fromRGB(38, 38, 45)
+	Stroke.Thickness = 1
+	return Box, Stroke
+end
+
 local FullBrightBtn, FBtnStroke = createButton("Visual Full Bright", PageMainVisuals)
 local FullBrightShaderBtn, FBStnStroke = createButton("Shader Full Bright", PageMainVisuals)
 local EmoteBtn, EmBtnStroke      = createButton("Trigger Emote Button", PageMainVisuals)
@@ -503,6 +557,10 @@ local ItemsESPBtn, ItemsStroke   = createButton("Items ESP", PageESP)
 
 local EscobaBtn, EaStroke   = createButton("Escoba", PageItems)
 
+local SpeedBtn, SpeedStroke     = createButton("Speed Boost", PageMovement)
+local JumpBtn, JumpStroke       = createButton("High Jump", PageMovement)
+local SpeedBox, SpeedBoxStroke  = createTextBox("Custom Speed", PageMovement)
+local JumpBox, JumpBoxStroke    = createTextBox("Custom Jump", PageMovement)
 --------------------------------------------------
 -- TOGGLE SYSTEM ANIMATIONS
 --------------------------------------------------
@@ -1268,6 +1326,53 @@ Close.MouseButton1Click:Connect(function()
 	cleanPlayerESP() cleanMonsterESP() cleanItemsESP()
 	TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = UDim2.new(0, 390, 0, 35)}):Play()
 	task.wait(0.3) ScreenGui:Destroy()
+end)
+
+SpeedBtn.MouseButton1Click:Connect(function()
+	_G.ModifySpeed = not _G.ModifySpeed
+	animateToggle(SpeedBtn, SpeedStroke, _G.ModifySpeed, "Speed Boost", Color3.fromRGB(35, 100, 140), Color3.fromRGB(60, 160, 220))
+end)
+
+JumpBtn.MouseButton1Click:Connect(function()
+	_G.ModifyJump = not _G.ModifyJump
+	animateToggle(JumpBtn, JumpStroke, _G.ModifyJump, "High Jump", Color3.fromRGB(140, 100, 35), Color3.fromRGB(220, 160, 60))
+end)
+
+SpeedBox.FocusLost:Connect(function()
+	local num = tonumber(SpeedBox.Text)
+	if num then
+		_G.CustomSpeed = num
+		SpeedBox.Text = "Set: " .. tostring(num)
+		task.wait(1)
+		SpeedBox.Text = tostring(num)
+	else
+		SpeedBox.Text = ""
+	end
+end)
+
+JumpBox.FocusLost:Connect(function()
+	local num = tonumber(JumpBox.Text)
+	if num then
+		_G.CustomJump = num
+		JumpBox.Text = "Set: " .. tostring(num)
+		task.wait(1)
+		JumpBox.Text = tostring(num)
+	else
+		JumpBox.Text = ""
+	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	local char = Player.Character
+	local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+	if hum then
+		if _G.ModifySpeed and hum.WalkSpeed ~= _G.CustomSpeed then
+			hum.WalkSpeed = _G.CustomSpeed
+		end
+		if _G.ModifyJump and hum.JumpHeight ~= _G.CustomJump then
+			hum.JumpHeight = _G.CustomJump
+		end
+	end
 end)
 
 print("crack by 03y_o")
