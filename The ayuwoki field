@@ -262,6 +262,7 @@ local PageMisc        = createTab("Misc", false)
 local PageSP 		  = createTab("03y_o", false)
 local PageCredits     = createTab("Credits", false)
 local PageItems       = createTab("Items", false)
+local PageMovement    = createTab("Movement", false)
 
 --------------------------------------------------
 -- INFO TAB DESIGN PRESETS
