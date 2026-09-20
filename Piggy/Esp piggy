@@ -1,0 +1,13 @@
+local targetBot = workspace:WaitForChild("PiggyNPC"):WaitForChild("PiggyBot")
+
+local highlight = targetBot:FindFirstChild("PiggyHighlight")
+if not highlight then
+	highlight = Instance.new("Highlight")
+	highlight.Name = "PiggyHighlight"
+	highlight.Adornee = targetBot
+	highlight.FillColor = Color3.fromRGB(255, 0, 0)
+	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+	highlight.FillTransparency = 0.5
+	highlight.OutlineTransparency = 0
+	highlight.Parent = targetBot
+end
