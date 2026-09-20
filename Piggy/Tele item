@@ -1,0 +1,176 @@
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+
+-- Chờ cho đến khi Workspace.ItemFolder xuất hiện (tránh lỗi nil)
+local itemFolder = workspace:WaitForChild("ItemFolder", 10)
+if not itemFolder then
+	warn("Không tìm thấy Workspace.ItemFolder trong game!")
+	return
+end
+
+-- ==================== PHẦN 1: BACKUP VÀ BẢO VỆ TÊN GỐC ====================
+local function setupItem(item)
+	-- Kiểm tra và tạo StringValue lưu tên gốc
+	local originalNameVal = item:FindFirstChild("OriginalName")
+	if not originalNameVal then
+		originalNameVal = Instance.new("StringValue")
+		originalNameVal.Name = "OriginalName"
+		originalNameVal.Value = item.Name
+		originalNameVal.Parent = item
+	end
+
+	-- Lắng nghe nếu tên bị thay đổi thì trả lại tên gốc
+	item:GetPropertyChangedSignal("Name"):Connect(function()
+		if item.Name ~= originalNameVal.Value then
+			item.Name = originalNameVal.Value
+		end
+	end)
+end
+
+-- Hàm đệ quy quét toàn bộ item trong ItemFolder và thư mục con
+local function scanAndSetupFolder(folder)
+	for _, item in ipairs(folder:GetChildren()) do
+		if item:IsA("BasePart") or item:IsA("Model") then
+			setupItem(item)
+		elseif item:IsA("Folder") then
+			scanAndSetupFolder(item)
+		end
+	end
+end
+
+-- Thiết lập ban đầu cho các item hiện có
+scanAndSetupFolder(itemFolder)
+
+-- Lắng nghe khi có item mới hoặc thư mục con mới được thêm vào
+itemFolder.DescendantAdded:Connect(function(descendant)
+	if descendant:IsA("BasePart") or descendant:IsA("Model") then
+		setupItem(descendant)
+	end
+end)
+
+
+-- ==================== PHẦN 2: GIAO DIỆN TELEPORT GUI ====================
+
+-- Xóa GUI cũ nếu đã chạy trước đó
+if playerGui:FindFirstChild("ItemTeleportGui") then
+	playerGui.ItemTeleportGui:Destroy()
+end
+
+-- Tạo ScreenGui mới
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ItemTeleportGui"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
+
+-- Khung chính của bảng
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 240, 0, 320)
+mainFrame.Position = UDim2.new(0, 50, 0, 50)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+-- Tiêu đề bảng
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 35)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "  Danh Sách Item"
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextSize = 14
+title.Font = Enum.Font.SourceSansBold
+title.Parent = mainFrame
+
+-- Nút Làm mới (Refresh) danh sách
+local refreshBtn = Instance.new("TextButton")
+refreshBtn.Size = UDim2.new(0, 65, 0, 22)
+refreshBtn.Position = UDim2.new(1, -70, 0, 6)
+refreshBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+refreshBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+refreshBtn.Text = "Làm mới"
+refreshBtn.TextSize = 12
+refreshBtn.Parent = title
+
+-- Khung cuộn danh sách (ScrollingFrame)
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(1, -10, 1, -45)
+scrollingFrame.Position = UDim2.new(0, 5, 0, 40)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scrollingFrame.Parent = mainFrame
+
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+uiListLayout.Padding = UDim.new(0, 5)
+uiListLayout.Parent = scrollingFrame
+
+-- Hàm lấy tọa độ CFrame của item
+local function getTargetCFrame(item)
+	if item:IsA("BasePart") then
+		return item.CFrame
+	elseif item:IsA("Model") then
+		if item.PrimaryPart then
+			return item.PrimaryPart.CFrame
+		else
+			local part = item:FindFirstChildWhichIsA("BasePart", true)
+			if part then return part.CFrame end
+		end
+	end
+	return nil
+end
+
+-- Hàm cập nhật lại danh sách các item lên giao diện
+local function updateList()
+	-- Xóa các nút cũ trước khi quét mới
+	for _, child in ipairs(scrollingFrame:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+
+	-- Quét đệ quy tạo nút bấm cho từng item
+	local function scanFolderForGui(parentFolder)
+		for _, item in ipairs(parentFolder:GetChildren()) do
+			if item:IsA("BasePart") or item:IsA("Model") then
+				local btn = Instance.new("TextButton")
+				btn.Size = UDim2.new(1, 0, 0, 32)
+				btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+				btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				-- Ưu tiên hiển thị tên gốc nếu có StringValue
+				local origName = item:FindFirstChild("OriginalName")
+				btn.Text = origName and origName.Value or item.Name
+				btn.TextSize = 13
+				btn.Font = Enum.Font.SourceSans
+				
+				-- Sự kiện bấm vào tên item để dịch chuyển đến đó
+				btn.MouseButton1Click:Connect(function()
+					local cframe = getTargetCFrame(item)
+					if cframe then
+						local char = localPlayer.Character
+						if char and char:FindFirstChild("HumanoidRootPart") then
+							char.HumanoidRootPart.CFrame = cframe + Vector3.new(0, 3, 0)
+						end
+					end
+				end)
+				
+				btn.Parent = scrollingFrame
+			elseif item:IsA("Folder") then
+				scanFolderForGui(item)
+			end
+		end
+	end
+
+	scanFolderForGui(itemFolder)
+end
+
+-- Gắn sự kiện cho nút Làm mới
+refreshBtn.MouseButton1Click:Connect(updateList)
+
+-- Chạy lần đầu tiên khi bật script
+updateList()
+print("Đã tải xong Script Bảo Vệ Tên & Teleport GUI!")
